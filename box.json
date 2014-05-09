@@ -1,0 +1,19 @@
+{
+    "main": "server.php",
+    "output": "server.phar",
+    "chmod": "0755",
+    "shebang": "#!/usr/bin/env php",
+    "stub": true,
+    "directories": ["src"],
+    "finder": [
+        {
+            "name": "*.php",
+            "in": "vendor"
+        }
+    ],
+    "files": [
+      "README.md"
+    ],
+    "algorithm": "SHA1",
+    "compression": "GZ"
+}

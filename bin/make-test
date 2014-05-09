@@ -1,0 +1,16 @@
+#! /bin/bash
+
+set -e
+
+./bin/composer.phar update  --dev
+php -S localhost:8080 -t . server.php &
+pid=$!
+
+./vendor/bin/phpunit \
+  --coverage-text \
+  --strict \
+  --colors \
+  --bootstrap=vendor/autoload.php \
+  scenarios/
+
+kill -9 ${pid}

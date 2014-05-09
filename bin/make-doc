@@ -1,0 +1,17 @@
+#! /bin/bash
+
+set -e
+
+rm -rf \
+  ./doc/src \
+  ./doc/scenarios
+
+docco --layout linear \
+      --output doc/src \
+      src/README.md $(find src/ -name "*.php")
+docco --layout linear \
+      --output doc/scenarios \
+      scenarios/README.md $(find scenarios/ -name "*.php" | grep -v "vendor")
+docco --layout linear \
+      --output doc/sheets \
+      $(find doc/sheets/ -name "*.md")

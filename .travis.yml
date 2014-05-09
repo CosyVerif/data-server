@@ -1,0 +1,23 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+
+install:
+  - sudo apt-get install npm
+  - sudo npm update npm -g
+  - sudo npm config set registry http://registry.npmjs.org/
+  - sudo npm install -g docco
+  - sudo apt-get install
+
+script: ./bin/make-all
+
+notifications:
+  recipients:
+    - alban.linard@lsv.ens-cachan.fr
+    - rokysaroi@yahoo.fr
+  email:
+    on_success: change
+    on_failure: always
