@@ -1,21 +1,38 @@
 #! /bin/bash
 
-set -e
+#set -e
+#set -x
 
 rm -rf \
   ./doc/src \
   ./doc/scenarios \
   ./doc/sheets
 
-docco --layout linear \
-      --output doc/src \
-      server.php \
-      $(find src/ -name "*.php") \
-      $(find src/ -name "*.md")
-docco --layout linear \
-      --output doc/scenarios \
-      $(find scenarios/ -name "*.php" | grep -v "vendor") \
-      $(find scenarios/ -name "*.md" | grep -v "vendor")
-docco --layout linear \
-      --output doc/sheets \
-      $(find sheets/ -name "*.md")
+files="server.php $(find src/ -name '*.php')"
+if [ ! -z "${files}" ]
+then
+  docco --layout linear \
+        --output doc/src \
+        ${files}
+fi
+
+files=$(find scenarios/ -name '*.php' | grep -v 'vendor')
+if [ ! -z "${files}" ]
+then
+  docco --layout linear \
+        --output doc/scenarios \
+        $(files)
+fi
+
+files=$(find sheets/ -name '*.md')
+if [ ! -z "${files}" ]
+then
+  mkdir -p doc/sheets
+  for file in ${files}
+  do
+    cp ${file} doc/${file/.md/.litcoffee}
+  done
+  docco --layout linear \
+        --output doc/sheets \
+        $(find doc/sheets/ -name "*.litcoffee")
+fi
