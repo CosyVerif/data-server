@@ -6,12 +6,32 @@ rm -rf \
   ./doc/src \
   ./doc/scenarios
 
+
+# Rename files *.php and *.md to *.php.lua and *.md.lua
+
+for file in src/README.md $(find src/ -name "*.php") \
+            scenarios/README.md $(find scenarios/ -name "*.php" | grep -v "vendor") \
+            $(find doc/sheets/ -name "*.md")
+do
+  mv $file $file.lua
+done
+
 docco --layout linear \
       --output doc/src \
-      src/README.md $(find src/ -name "*.php")
+      $(find src/ -name "*.lua")
 docco --layout linear \
       --output doc/scenarios \
-      scenarios/README.md $(find scenarios/ -name "*.php" | grep -v "vendor")
+      $(find scenarios/ -name "*.lua" | grep -v "vendor")
 docco --layout linear \
       --output doc/sheets \
-      $(find doc/sheets/ -name "*.md")
+      $(find doc/sheets/ -name "*.lua")
+
+
+# Rename files *.php.lua and *.md.lua to *.php and *.md
+
+for file in $(find src/ -name "*.lua") \
+            $(find scenarios/ -name "*.lua" | grep -v "vendor") \
+            $(find doc/sheets/ -name "*.lua")
+do
+  mv $file "${file/.lua/}"
+done
