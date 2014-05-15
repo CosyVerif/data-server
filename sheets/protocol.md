@@ -96,6 +96,8 @@ resource to the required format.
 
 ### Example: representation of a collection of resources and a resource
 
+One user in `XML`:
+
 ````xml
 <user xmlns='http://example.org/mon-exemple-ns/'>
   <first-name>First name</first-name>
@@ -104,16 +106,22 @@ resource to the required format.
   <phone>Phone number</phone>
 </user>
 ````
+
+The same in `JSON`:
+
 ````json
-  {
-    "user": {
-      "first-name" : "First name",
-      "last-name" : "Last name",
-      "login" : "User name",
-      "phone" : "Phone number"
-    }
+{
+  "user": {
+    "first-name" : "First name",
+    "last-name" : "Last name",
+    "login" : "User name",
+    "phone" : "Phone number"
   }
+}
 ````
+
+A collection of users in `XML`:
+
 ````xml
 <users xmlns='http://example.org/mon-exemple-ns/'>
   <user-ref href="first user URI">complete name first user</user-ref>
@@ -122,6 +130,9 @@ resource to the required format.
   <user-ref href="last user URI"/>complete name last user</user-ref>
 </users>
 ````
+
+The same in `JSON`:
+
 ````json
 {
   "users": {
@@ -135,7 +146,7 @@ resource to the required format.
 }
 ````
 
- _The presentation of all representation formats resources here ......_.
+_The presentation of all representation formats resources here ......_.
 
 
 
