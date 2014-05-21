@@ -1,0 +1,18 @@
+-- # Test of delete a user
+--
+-- The test will cover deletion a user. many cases (case 
+-- sucess or cases errors) can have present itself to us : 
+--
+-- * delete a user exist,
+-- * delete a user not exist,
+-- * unauthorized delete a user,
+-- * internal server error
+-- ...
+--
+--
+--
+-- ##### Delete a existing user
+--
+-- this test is a deletion of a user. The client asks into 
+-- server a delete user by URL. The server delete user and
+-- return into client `status code 200' (Sucess).
