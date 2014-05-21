@@ -23,7 +23,7 @@ class Core
       //$this->put($app->request->getResourceUri(), $data);
       //$app->response->setStatus(201);
       //$app->response->setBody($data);
-      $app->response->headers->set('Content-Type' : 'application/json');
+      //$app->response->headers->set('Content-Type' : 'application/json');
     });
 
   }
