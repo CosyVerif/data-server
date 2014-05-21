@@ -15,17 +15,13 @@ class Core
       $data = $this->get($app->request->getResourceUri());
       if(!is_null($data)){$app->response->setBody($data);}
     });
-
     $app->put('/(users|projects)/:id', function($id) use($app){
-
-      $data = $app->request->put("body");
-      //echo $data;
-      //$this->put($app->request->getResourceUri(), $data);
-      //$app->response->setStatus(201);
-      //$app->response->setBody($data);
-      //$app->response->headers->set('Content-Type' : 'application/json');
+      $data = json_decode($app->request->getBody(), TRUE);
+      if(!is_array($data)){
+        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+      }
+      $this->put($app->request->getResourceUri(), $data);
     });
-
   }
 
   /**
@@ -51,9 +47,18 @@ class Core
      */
   public function put($url, $data)
   {
-
     $is_ok = StreamJson::write($url, $data);
+    return $is_ok;
+  }
 
+  /**
+     * DELETE method.
+     * 
+     * @param  url
+     * @return boolean
+     */
+  public function delete($url){
+    $is_ok = StreamJson::delete($url);
     return $is_ok;
   }
 }

@@ -38,21 +38,34 @@ class StreamJson
 
   public static function write($url, $data)
   {
+    global $app;
     //Write ressource
-    $data = json_decode($data);
-    if(!is_array($resource)){
-      $app->response->setStatus(STATUS_UNPROCESSABLE_ENTITY);
-      return false;
-    }
+    $is_ok = false;
     $resource = "";
-    if(file_exists("resources".$url.".txt")){
+    if(file_exists("resources".$url.".json")){
       // Resource not found
-      $resource = unserialize(file_get_contents("resources".$url.".json"));
-      //TODO update resource
+      $resource = json_decode(file_get_contents("resources".$url.".json"), TRUE);
+      //Update resource
+      foreach ($data as $field => $value) {
+        $resource[$field] = $value;
+      }
+      $app->response->setStatus(STATUS_OK);
     } else{
       $resource = $data;
+      $app->response->setStatus(STATUS_CREATED);
     }
-    file_put_contents("resources".$url.".txt", serialize($resource));
+    file_put_contents("resources".$url.".json",
+                      json_encode($resource));
+    return $is_ok = true;
+  }
+
+  public static function delete($url){
+    global $app;    
+    $app->response->setStatus(STATUS_NOT_CONTENT);
+    if(file_exists("resources".$url.".json")){
+      StreamJson::write($url, '{"is_deleted" :1}');
+      return true;
+    }
     return true;
   }
 
