@@ -3,8 +3,8 @@
 -- The test will cover adding a user. many cases (case 
 -- sucess or cases errors) can have present itself to us : 
 --
--- * add a existing user,
--- * add a not existing user,
+-- * add a user exist,
+-- * add a user not exist,
 -- * unauthorized add user,
 -- * internal server error
 -- ...
@@ -13,4 +13,14 @@
 --
 -- ##### Add a existing user
 --
--- this test is update of 
+-- this test is updating of a user. The client send 
+-- the user (Idrissa's exist) information to server. 
+-- Server update user information and return `status code
+-- 200` (Success).
+--
+--
+-- 
+-- ##### Add a user not exist
+--
+-- This test create a new user (new file) in to server.
+-- The server return `status code 201` (created). 

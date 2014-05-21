@@ -10,16 +10,39 @@ class TestAddUser extends PHPUnit_Framework_TestCase
   {
     
     $client = new GuzzleHttp\Client();
-    $res = $client->put('http://localhost:8080/server.php/users/rokysaroi', 
+    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json'],
-                         'body' => '{"first_name" : "tata","last_name" : "sow", "login" :"tsow"}',
-                         'debug' => true
+                         'body' => '{"first_name" : "Tata","last_name" : "Sow", "login" :"tsow"}'//,
+                         //'debug' => true
                         ]);
+    $this->assertEquals(201, $res->getStatusCode()); 
 
-    //echo $res->getBody();
-    //echo $res->getHeader('content-type');
+    $res = $client->get('http://localhost:8080/server.php/users/tsow', ['headers' => ['Accept' => 'application/json']]);
+
+    $data = json_decode($res->getBody(),TRUE);
+
+    $this->assertEquals(200, $res->getStatusCode()); 
+    $this->assertEquals("Tata", $data["first_name"]); 
     
+  }
 
+  public function testUserUpdating()
+  {
+    
+    $client = new GuzzleHttp\Client();
+    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
+                        ['headers' => ['Content-Type' => 'application/json'],
+                         'body' => '{"first_name" : "Titi","last_name" : "Sow", "login" :"tsow"}'
+                        ]);
+    $this->assertEquals(200, $res->getStatusCode()); 
+
+    $res = $client->get('http://localhost:8080/server.php/users/tsow', ['headers' => ['Accept' => 'application/json']]);
+
+    $data = json_decode($res->getBody(),TRUE);
+
+    $this->assertEquals(200, $res->getStatusCode()); 
+    $this->assertEquals("Titi", $data["first_name"]); 
+    
   }
 
 }
