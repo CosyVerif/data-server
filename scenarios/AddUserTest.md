@@ -1,0 +1,16 @@
+-- # Test of adding a user
+--
+-- The test will cover adding a user. many cases (case 
+-- sucess or cases errors) can have present itself to us : 
+--
+-- * add a existing user,
+-- * add a not existing user,
+-- * unauthorized add user,
+-- * internal server error
+-- ...
+--
+--
+--
+-- ##### Add a existing user
+--
+-- this test is update of 
