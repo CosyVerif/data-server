@@ -14,5 +14,14 @@
 -- ##### Delete a existing user
 --
 -- this test is a deletion of a user. The client asks into 
--- server a delete user by URL. The server delete user and
--- return into client `status code 200' (Sucess).
+-- server a delete user by URL. The server change status
+-- user to `status delete user` and return into client 
+-- `status code 200' (Sucess).
+--
+--
+--
+-- ##### Delete a user not exist
+--
+-- this test is a deletion of user not exist. The server 
+-- not hound the user then it return `status code 404` 
+-- (not found user) into client.
