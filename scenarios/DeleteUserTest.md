@@ -4,7 +4,7 @@
 -- sucess or cases errors) can have present itself to us : 
 --
 -- * delete a user exist,
--- * delete a user not exist,
+-- * delete a user not exist or deleted,
 -- * unauthorized delete a user,
 -- * internal server error
 -- ...
@@ -20,8 +20,8 @@
 --
 --
 --
--- ##### Delete a user not exist
+-- ##### Delete a user not exist or deleted
 --
--- this test is a deletion of user not exist. The server 
+-- this test is a deletion of user not exist or deleted. The server 
 -- not hound the user then it return `status code 404` 
 -- (not found user) into client.

@@ -24,24 +24,14 @@ class DeleteUserTest extends PHPUnit_Framework_TestCase
                         ]);
     $this->assertEquals(410, $res->getStatusCode());  
   }
-/*
-  public function testUserUpdating()
-  {
-    
+
+  public function testDeleteUserNotExist()
+  {   
     $client = new GuzzleHttp\Client();
-    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
-                        ['headers' => ['Content-Type' => 'application/json'],
-                         'body' => '{"first_name" : "Titi","last_name" : "Sow", "login" :"tsow"}'
-                        ]);
-    $this->assertEquals(200, $res->getStatusCode()); 
-
-    $res = $client->get('http://localhost:8080/server.php/users/tsow', ['headers' => ['Accept' => 'application/json']]);
-
-    $data = json_decode($res->getBody(),TRUE);
-
-    $this->assertEquals(200, $res->getStatusCode()); 
-    $this->assertEquals("Titi", $data["first_name"]); 
-    
+    $client->delete('http://localhost:8080/server.php/users/udelete',
+                    ['exceptions' => false]);
+    $res = $client->delete('http://localhost:8080/server.php/users/udelete',
+                           ['exceptions' => false]);
+    $this->assertEquals(404, $res->getStatusCode()); 
   }
-*/
 }
