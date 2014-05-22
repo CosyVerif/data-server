@@ -12,14 +12,18 @@ require_once 'Constants.php';
  */
 class StreamJson
 {
-
   public static function read($url)
   {
     global $app;
     //Verify existing resource
-    if(!file_exists("resources".$url.".json")){
+    if(!file_exists("resources".$url.".json") && 
+       !file_exists("resources".$url.".conf")){
       // Resource not found
       $app->response->setStatus(STATUS_NOT_FOUND);
+      return null;
+    }else if(!file_exists("resources".$url.".json") && 
+             file_exists("resources".$url.".conf")){
+      $app->response->setStatus(STATUS_GONE);
       return null;
     }
     $resource = json_decode(file_get_contents("resources".$url.".json"), TRUE);
@@ -27,11 +31,7 @@ class StreamJson
       $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
       return null;
     }    
-    if($resource["is_deleted"] == RESOURCE_DELETED){
-      $app->response->setStatus(STATUS_GONE);
-    } else {
-      $app->response->setStatus(STATUS_OK);
-    } 
+    $app->response->setStatus(STATUS_OK);
     $app->response->headers->set('Content-Type','application/json');
     return $resource;
   }
@@ -52,6 +52,7 @@ class StreamJson
       $app->response->setStatus(STATUS_OK);
     } else{
       $resource = $data;
+      file_put_contents("resources".$url.".conf","");
       $app->response->setStatus(STATUS_CREATED);
     }
     file_put_contents("resources".$url.".json",
@@ -61,15 +62,15 @@ class StreamJson
 
   public static function delete($url){
     global $app;    
-    $app->response->setStatus(STATUS_NOT_CONTENT);
     if(file_exists("resources".$url.".json")){
-      StreamJson::write($url, '{"is_deleted" :1}');
+      unlink("resources".$url.".json");
+      $app->response->setStatus(STATUS_NOT_CONTENT);
       return true;
     }
-    return true;
+    $app->response->setStatus(STATUS_NOT_FOUND);
+    return false;
   }
 
-  public function getStatus(){ return $this->status; }
-
+  public function getStatus(){return $this->status;}
 }
 ?>

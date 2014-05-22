@@ -15,6 +15,7 @@ class Core
       $data = $this->get($app->request->getResourceUri());
       if(!is_null($data)){$app->response->setBody($data);}
     });
+
     $app->put('/(users|projects)/:id', function($id) use($app){
       $data = json_decode($app->request->getBody(), TRUE);
       if(!is_array($data)){
@@ -22,6 +23,11 @@ class Core
       }
       $this->put($app->request->getResourceUri(), $data);
     });
+
+    $app->delete('/(users|projects)/:id', function($id) use($app){
+      $this->delete($app->request->getResourceUri());
+    });
+
   }
 
   /**
