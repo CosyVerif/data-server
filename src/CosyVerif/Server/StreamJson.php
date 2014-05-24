@@ -3,31 +3,22 @@
 namespace CosyVerif\Server;
 require_once 'Constants.php';
 
-
-/**
- * JSON response class.
- * 
- * @package core-api
- * 
- */
 class StreamJson
 {
   public static function read($url)
   {
     global $app;
     //Verify existing resource
-    if(!file_exists("resources".$url.".json") && 
-       !file_exists("resources".$url.".conf")){
+    if (!file_exists("resources".$url)){
       // Resource not found
       $app->response->setStatus(STATUS_NOT_FOUND);
       return null;
-    }else if(!file_exists("resources".$url.".json") && 
-             file_exists("resources".$url.".conf")){
+    } else if(!file_exists("resources".$url."/info.json")){
       $app->response->setStatus(STATUS_GONE);
       return null;
     }
-    $resource = json_decode(file_get_contents("resources".$url.".json"), TRUE);
-    if(!is_array($resource)){
+    $resource = json_decode(file_get_contents("resources".$url."/info.json"), TRUE);
+    if (!is_array($resource)){
       $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
       return null;
     }    
@@ -42,35 +33,43 @@ class StreamJson
     //Write ressource
     $is_ok = false;
     $resource = "";
-    if(file_exists("resources".$url.".json")){
+    if (file_exists("resources".$url."/info.json")){
       // Resource not found
-      $resource = json_decode(file_get_contents("resources".$url.".json"), TRUE);
+      $resource = json_decode(file_get_contents("resources".$url."/info.json"), TRUE);
       //Update resource
       foreach ($data as $field => $value) {
         $resource[$field] = $value;
       }
       $app->response->setStatus(STATUS_OK);
     } else{
+      if(!file_exists("resources".$url))
+        mkdir("resources".$url);
       $resource = $data;
-      file_put_contents("resources".$url.".conf","");
+      $password = $resource["login"].$resource["password"];
+      $auth = array('login' => $resource["login"], 
+                    'password' => password_hash($password, PASSWORD_DEFAULT));
+      file_put_contents("resources".$url."/auth.json", json_encode($auth));
       $app->response->setStatus(STATUS_CREATED);
     }
-    file_put_contents("resources".$url.".json",
+    unset($resource["login"]);
+    unset($resource["password"]);
+    file_put_contents("resources".$url."/info.json",
                       json_encode($resource));
     return $is_ok = true;
   }
 
-  public static function delete($url){
-    global $app;    
-    if(file_exists("resources".$url.".json")){
-      unlink("resources".$url.".json");
-      $app->response->setStatus(STATUS_NOT_CONTENT);
-      return true;
+  public static function delete($url)
+  {
+    global $app;  
+    $is_ok = false;  
+    if (file_exists("resources".$url."/info.json")){
+      unlink("resources".$url."/info.json");
+      $app->response->setStatus(STATUS_NO_CONTENT);
+      $is_ok = true;
+    } else {
+      $app->response->setStatus(STATUS_NOT_FOUND);
     }
-    $app->response->setStatus(STATUS_NOT_FOUND);
-    return false;
+    return is_ok;
   }
-
-  public function getStatus(){return $this->status;}
 }
 ?>
