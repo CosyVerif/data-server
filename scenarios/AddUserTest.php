@@ -5,21 +5,11 @@ use GuzzleHttp\Stream;
 class AddUserTest extends PHPUnit_Framework_TestCase
 {
 
-  public function testUp(){
-    $this->rrmdir("resources/users");
-    $info = array('first_name' =>'Idrissa',
-                  'last_name' => 'Sokhona');
-    $auth = array('login' => 'isokhona',
-                  'password' => password_hash('isokhonatoto', PASSWORD_DEFAULT));
-    mkdir("resources/users/isokhona");
-    file_put_contents("resources/users/isokhona/info.json", json_encode($info));
-    file_put_contents("resources/users/isokhona/auth.json", json_encode($auth));
-  }
-
   public function testUserCreated()
   {
+    Util::addUserRoot(RESOURCE_PUBLIC);
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("isokhona:toto");
+    $encoded = base64_encode("root:toto");
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -38,7 +28,7 @@ class AddUserTest extends PHPUnit_Framework_TestCase
   public function testUserUpdating()
   {  
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("isokhona:toto");
+    $encoded = base64_encode("root:toto");
     $client->put('http://localhost:8080/server.php/users/tsow', 
                  ['headers' => ['Content-Type' => 'application/json', 
                                 'Authorization' => 'Basic '.$encoded.'=='],
@@ -58,14 +48,4 @@ class AddUserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals("Titi", $data["first_name"]);  
   }
 
-  private function rrmdir($dir){
-    foreach(glob($dir . '/*') as $file) {
-        if(is_dir($file))
-            $this->rrmdir($file);
-        else
-            unlink($file);
-    }
-    if($dir != "resources/users")
-      rmdir($dir);
-  }
 }
