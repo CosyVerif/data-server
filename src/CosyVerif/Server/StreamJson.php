@@ -32,31 +32,31 @@ class StreamJson
     global $app;
     //Write ressource
     $is_ok = false;
-    $resource = "";
+    $info = "";
+    $auth = "";
     if (file_exists("resources".$url."/info.json")){
       // Resource not found
-      $resource = json_decode(file_get_contents("resources".$url."/info.json"), TRUE);
+      $info = json_decode(file_get_contents("resources".$url."/info.json"), TRUE);
       //Update resource
-      foreach ($data as $field => $value) {
-        $resource[$field] = $value;
+      foreach ($data["info"] as $field => $value){
+        $info[$field] = $value;
+      }
+      $auth = json_decode(file_get_contents("resources".$url."/auth.json"), TRUE);
+      //Update resource
+      foreach ($data["auth"] as $field => $value){
+        $info[$field] = $value;
       }
       $app->response->setStatus(STATUS_OK);
-    } else{
+    } else {
       if(!file_exists("resources".$url))
         mkdir("resources".$url);
-      $resource = $data;
-      $password = $resource["login"].$resource["password"];
-      $auth = array('login' => $resource["login"], 
-                    'password' => password_hash($password, PASSWORD_DEFAULT),
-                    'user_type' => USER_LIMIT,
-                    'is_public' => RESOURCE_PUBLIC);
-      file_put_contents("resources".$url."/auth.json", json_encode($auth));
+      $info = $data["info"];
+      $auth = $data["auth"];
+      $auth["password"] = password_hash($auth["login"].$auth["password"], PASSWORD_DEFAULT);
       $app->response->setStatus(STATUS_CREATED);
     }
-    unset($resource["login"]);
-    unset($resource["password"]);
-    file_put_contents("resources".$url."/info.json",
-                      json_encode($resource));
+    file_put_contents("resources".$url."/info.json",json_encode($info));
+    file_put_contents("resources".$url."/auth.json", json_encode($auth));
     return $is_ok = true;
   }
 

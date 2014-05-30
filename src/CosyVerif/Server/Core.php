@@ -29,7 +29,7 @@ class Core  extends \Slim\Middleware
     $this->next->call();
   }
 
-  public function get($url)
+  private function get($url)
   { 
     $resource = StreamJson::read($url);  
     if (is_array($resource)){
@@ -38,13 +38,13 @@ class Core  extends \Slim\Middleware
     return $resource;
   }
 
-  public function put($url, $data)
+  private function put($url, $data)
   {
     $is_ok = StreamJson::write($url, $data);
     return $is_ok;
   }
 
-  public function delete($url)
+  private function delete($url)
   {
     $is_ok = StreamJson::delete($url);
     return $is_ok;
