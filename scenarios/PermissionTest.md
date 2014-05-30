@@ -14,7 +14,8 @@
 -- ##### Administrator
 --
 -- This test treats a user has all permissions (we can have multiple
--- administrators). If a user is administrator, it will be served.
+-- administrators). If a user is administrator, it will be served if
+-- the action don't delete itself.
 --
 --
 -- 
