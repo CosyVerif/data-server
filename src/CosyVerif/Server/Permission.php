@@ -11,13 +11,15 @@ class Permission extends \Slim\Middleware
     global $app;
     if (!($this->resourceExists($app->request->getResourceUri())))
       $this->next->call();
-    if (($this->permissionGranted()))
+    else if (($this->permissionGranted()))
       $this->next->call();
     else
       $app->response->setStatus(STATUS_FORBIDDEN);
   }
 
-  private function permissionGranted(){
+  private function permissionGranted()
+  {
+    global $app;
     $action = strtoupper($app->request->getMethod());
     $url = $app->request->getResourceUri();
     $is_ok = false;
@@ -26,7 +28,7 @@ class Permission extends \Slim\Middleware
         $is_ok = (($action == 'DELETE') && ($this->isOneself($url))) ? false : true;
         break;
       case USER_DEFAULT: // No users authentified
-        $is_ok = (($action == 'GET') && ($this->isPublicResource($url)) ? true : false;
+        $is_ok = (($action == 'GET') && ($this->isPublicResource($url))) ? true : false;
         break;
       case USER_LIMIT: // Users authentified
         $is_ok = ($this->isGranted($url, $action)) ? true : false;
@@ -38,7 +40,8 @@ class Permission extends \Slim\Middleware
     return $is_ok;
   }
 
-  private function isGranted($url, $action){
+  private function isGranted($url, $action)
+  {
     $is_ok = false;
     switch ($action) {
       case 'GET':
@@ -67,8 +70,9 @@ class Permission extends \Slim\Middleware
     return $is_ok;
   }
 
-  private function havePermission($url, $action){
-    $permission = $this->getProjectPermissions()
+  private function havePermission($url, $action)
+  {
+    $permission = $this->getProjectPermissions($url);
     if (is_null($permission))
       return false;
     //Protect the privates resources of users
@@ -105,13 +109,15 @@ class Permission extends \Slim\Middleware
     }
   */
 
-  private function getProjectPermissions($url){
+  private function getProjectPermissions($url)
+  {
+    global $app;
     if (!($this->isProjectResource($url)))
       return null;
     $parts = explode('/', $url);
     if (trim($parts[1]) == "projects"){
       $url = '/'.implode('/', array_slice($parts, 1, 2));
-    }else{
+    } else {
       $url = '/'.implode('/', array_slice($parts, 3, 2));
     }
     $auth = json_decode(file_get_contents("resources".$url."/auth.json"), TRUE);
@@ -121,7 +127,9 @@ class Permission extends \Slim\Middleware
       return null;
   }
 
-  private function isOneself($url){
+  private function isOneself($url)
+  {
+    global $app;
     $realURL = $this->getRealURL($url);
     if ($this->isProjectResource($realURL))
       $realURL = $this->getRealURL($realURL);
@@ -134,7 +142,9 @@ class Permission extends \Slim\Middleware
       return false;
   }
 
-  private function isItsResource($url){
+  private function isItsResource($url)
+  {
+    global $app;
     if ($this->isProjectResource($url))
       return false;
     $parts = explode('/', $url);
@@ -146,7 +156,8 @@ class Permission extends \Slim\Middleware
       return false;
   }
 
-  private function isPublicResource($url){
+  private function isPublicResource($url)
+  {
     $is_ok = false;
     if ($this->isProjectResource($url)){
       $is_ok = false;
@@ -157,13 +168,15 @@ class Permission extends \Slim\Middleware
     return $is_ok;
   }
 
-  private function isProjectResource($url){
+  private function isProjectResource($url)
+  {
     $parts = explode('/', $url);
     return (((trim($parts[1]) == "projects") && (count($parts) > 2)) || 
             ((trim($parts[3]) == "projects") && (count($parts) > 4)));
   }
 
-  private function isProjectUser($url){
+  private function isProjectUser($url)
+  {
     $realURL = $this->getRealURL($url);
     if ($this->isProjectResource($realURL)){
       $realURL = $this->getRealURL($realURL);
@@ -175,7 +188,8 @@ class Permission extends \Slim\Middleware
       return false;
   }
 
-  private function getRealURL($url){
+  private function getRealURL($url)
+  {
     $parts = explode('/', $url);
     if (((trim($parts[3]) == "users") || (trim($parts[3]) == "projects")) 
         && (count($parts) > 4)){
@@ -184,7 +198,8 @@ class Permission extends \Slim\Middleware
     return $url;
   }
 
-  private function resourceExists($url){ 
+  private function resourceExists($url)
+  { 
     $is_ok = false;
     $realURL = $this->getRealURL($url);
     if ($url == $realURL){

@@ -47,7 +47,9 @@ class StreamJson
       $resource = $data;
       $password = $resource["login"].$resource["password"];
       $auth = array('login' => $resource["login"], 
-                    'password' => password_hash($password, PASSWORD_DEFAULT));
+                    'password' => password_hash($password, PASSWORD_DEFAULT),
+                    'user_type' => USER_LIMIT,
+                    'is_public' => RESOURCE_PUBLIC);
       file_put_contents("resources".$url."/auth.json", json_encode($auth));
       $app->response->setStatus(STATUS_CREATED);
     }

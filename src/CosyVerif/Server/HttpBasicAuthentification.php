@@ -14,12 +14,12 @@ class HttpBasicAuthentification extends \Slim\Middleware
     $res = $this->app->response();
     $authUser = $req->headers('PHP_AUTH_USER');
     $authPass = $req->headers('PHP_AUTH_PW');
-    if(!isset($authUser) && !isset($authPass)){
-      $app->user = array('permissions' => array('default' => 'default'));
+    if (!isset($authUser) && !isset($authPass)){
+      $app->user = array('user_type' => USER_DEFAULT, 'login' => 'default');
       $this->next->call();
     } else if (isset($authUser) && isset($authPass) && $this->authentificate($authUser, $authPass)){
       $this->next->call();
-    } else{
+    } else {
       $res->status(STATUS_UNAUTHORIZED);
       $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realm));
     }
