@@ -10,12 +10,12 @@ class DeleteUserTest extends PHPUnit_Framework_TestCase
     Util::addUserRoot(RESOURCE_PUBLIC);
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("root:toto");
+    $body = array('info' => array('first_name' => 'User', 'last_name' => 'Delete'),
+                  'auth' => array('login' => 'udelete', 'password' => 'toto'));
     $res = $client->put('http://localhost:8080/server.php/users/udelete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
-                         'body' => '{"first_name" : "User","last_name" : "Delete", 
-                                     "login" :"udelete","password" : "toto"}'
-                        ]);
+                         'body' => json_encode($body)]);
     $this->assertEquals(STATUS_CREATED, $res->getStatusCode()); 
     $res = $client->get('http://localhost:8080/server.php/users/udelete', 
                         ['headers' => ['Accept' => 'application/json',

@@ -35,11 +35,12 @@ class GetUserTest extends PHPUnit_Framework_TestCase
   {
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("root:toto");
+    $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Oto'),
+                  'auth' => array('login' => 'toto', 'password' => 'toto'));
     $client->put('http://localhost:8080/server.php/users/toto', 
                  ['headers' => ['Content-Type' => 'application/json',
                                 'Authorization' => 'Basic '.$encoded.'=='],
-                  'body' => '{"first_name" : "Tata","last_name" : "Oto", 
-                              "login" :"toto","password" : "toto"}']);
+                  'body' => json_encode($body)]);
     $res = $client->delete('http://localhost:8080/server.php/users/toto',
                            ['headers' =>['Authorization' => 'Basic '.$encoded.'==']]);
     $res = $client->get('http://localhost:8080/server.php/users/toto',
