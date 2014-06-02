@@ -1,6 +1,7 @@
 {
   "require": {
-    "slim/slim": "*"
+    "slim/slim": "*",
+    "ircmaxell/password-compat": "*"
    },
   "require-dev": {
     "guzzlehttp/guzzle": "*",
