@@ -4,13 +4,9 @@ php:
   - 5.4
   - 5.5
 
-install:
-  - sudo apt-get install npm
-  - sudo npm config set registry http://registry.npmjs.org/
-  - sudo npm update npm -g
-  - if [ -z "$(npm list -g | grep 'docco')" ]; then sudo npm install docco -g; fi
-
-script: ./bin/make-all
+script:
+  - ./bin/make-phar
+  - ./bin/make-test
 
 notifications:
   recipients:
