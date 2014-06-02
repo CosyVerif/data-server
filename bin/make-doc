@@ -21,7 +21,7 @@ if [ ! -z "${files}" ]
 then
   docco --layout linear \
         --output doc/scenarios \
-        $(files)
+        ${files}
 fi
 
 files=$(find sheets/ -name '*.md')
