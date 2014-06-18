@@ -4,14 +4,10 @@ php:
   - 5.4
   - 5.5
 
-install:
-  - sudo apt-get install npm
-  - sudo npm update npm -g
-  - sudo npm config set registry http://registry.npmjs.org/
-  - sudo npm install -g docco
-  - sudo apt-get install
-
-script: ./bin/make-all
+script:
+  - ./bin/install-tools
+  - ./bin/make-phar
+  - ./bin/make-test
 
 notifications:
   recipients:

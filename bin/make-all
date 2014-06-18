@@ -1,22 +1,6 @@
 #! /bin/bash
 
-cd bin
-while [ ! -f composer.phar ]
-do
-  curl -S https://getcomposer.org/installer | php -d detect_unicode=0
-done
-cd ..
-./bin/composer.phar self-update
-./bin/composer.phar install --dev
-
-cd bin
-while [ ! -f box.phar ]
-do
-  curl -S http://box-project.org/installer.php | php -d detect_unicode=0
-done
-cd ..
-./bin/box.phar update
-
+./bin/install-tools
 ./bin/make-phar
 ./bin/make-doc
 ./bin/make-test
