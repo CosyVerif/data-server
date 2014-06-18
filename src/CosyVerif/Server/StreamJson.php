@@ -141,7 +141,7 @@ class StreamJson
     {
       $app->response->setStatus(STATUS_NOT_FOUND);
     }
-    return is_ok;
+    return $is_ok;
   }
 
   public static function rrmdir($path, $newPath){
