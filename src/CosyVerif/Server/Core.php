@@ -13,7 +13,7 @@ class Core  extends \Slim\Middleware
     {
         $app->group('users(/)', function () use ($app) 
         {
-            $app->group('/:userID(/)', function () use ($app, $user) 
+            $app->group('/:userID(/)', function () use ($app) 
             {
                 $app->group('/projects(/)', function () use ($app) 
                 {
