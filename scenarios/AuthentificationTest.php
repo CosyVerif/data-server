@@ -7,10 +7,11 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
 
   public function testAcceptAuthentification()
   {
-    Util::addUserRoot(RESOURCE_PUBLIC);
+    Util::addUserRoot();
+    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, true, true);
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("root:toto");
-    $res = $client->get('http://localhost:8080/server.php/users/root', 
+    $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json',
                                        'Authorization' => 'Basic '.$encoded.'==']]);
     $this->assertEquals(STATUS_OK, $res->getStatusCode());
@@ -20,7 +21,7 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
   {
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("sisi:totoi");
-    $res = $client->get('http://localhost:8080/server.php/users/root', 
+    $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json',
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'exceptions' => false]);
@@ -30,7 +31,7 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
   public function testNotProvidedInformationAuth()
   {
     $client = new GuzzleHttp\Client();
-    $res = $client->get('http://localhost:8080/server.php/users/root', 
+    $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json'],
                          'exceptions' => false]);
     $this->assertEquals(STATUS_OK, $res->getStatusCode());

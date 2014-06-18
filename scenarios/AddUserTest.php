@@ -7,11 +7,16 @@ class AddUserTest extends PHPUnit_Framework_TestCase
 
   public function testUserCreated()
   {
-    Util::addUserRoot(RESOURCE_PUBLIC);
+    Util::addUserRoot();
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("root:toto");
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Sow'),
-                  'auth' => array('login' => 'tsow', 'password' => 'toto'));
+                  'auth' => array('login' => 'tsow', 
+                                  'password' => 'toto',
+                                  'permissions' => array("user-create" => false, 
+                                                         "user-modify" => false, 
+                                                         "user-delete" => false),
+                  'can-public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -30,14 +35,24 @@ class AddUserTest extends PHPUnit_Framework_TestCase
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("root:toto");
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Sow'),
-                  'auth' => array('login' => 'tsow', 'password' => 'toto'));
+                  'auth' => array('login' => 'tsow', 
+                                  'password' => 'toto',
+                                  'permissions' => array("user-create" => false, 
+                                                         "user-modify" => false, 
+                                                         "user-delete" => false),
+                  'can_public' => true));
     $client->put('http://localhost:8080/server.php/users/tsow', 
                  ['headers' => ['Content-Type' => 'application/json', 
                                 'Authorization' => 'Basic '.$encoded.'=='],
                   'body' => json_encode($body),
                   'exceptions' => false]);
     $body = array('info' => array('first_name' => 'Titi', 'last_name' => 'Sow'),
-                  'auth' => array('login' => 'tsow', 'password' => 'toto'));
+                  'auth' => array('login' => 'tsow', 
+                                  'password' => 'toto',
+                                  'permissions' => array("user-create" => false, 
+                                                         "user-modify" => false, 
+                                                         "user-delete" => false),
+                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],

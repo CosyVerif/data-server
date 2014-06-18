@@ -21,22 +21,22 @@ define('STATUS_NOT_IMPLEMENTED', 501);
 /**
 *   Users type
 */
-define('USER_ADMIN', 1); // Server administrator (root permissions)
-define('USER_LIMIT', 2); // authentified users
-define('USER_DEFAULT', 3); // not authentified users
 
 
 /**
-*   Resource visibility
+*   Users permissions
 */
-define('RESOURCE_PUBLIC', 4); // All users can use the resource
-define('RESOURCE_PRIVATE', 5); // Only user owner and Server administrator can use the resource
+define('USER_CREATE', 'u_create'); // All users can use the resource
+define('USER_MODIFY', 'u_modify'); // Only user owner and Server administrator can use the resource
+define('USER_DELETE', 'u_delete'); // Only user owner and Server administrator can use the resource
 
 /**
 *   user permissions of a project
 */
-define('PROJECT_ADMIN', 6); // Project administrator
-define('PROJECT_READ', 7); // Permission read (execute if that a service) the project resources
-define('PROJECT_WRITE', 8); // Permission write the project resources
+define('PROJECT_CREATE', 'p_create'); // Project administrator
+define('PROJECT_MODIFY', 'p_modify'); // Permission read (execute if that a service) the project resources
+define('PROJECT_DELETE', 'p_delete'); // Permission write the project resources
+
+define('IS_PUBLIC', true);
 
 ?>
