@@ -20,10 +20,10 @@ class Core  extends \Slim\Middleware
                     $app->get('', function() use($app){
                       echo " :projects: ";
                     })->setName("get-user-resourceList");
-                    $app->get('/:projectID+', function() use($app, $projectID){})->setName("user-project");
-                    $app->put('/:projectID+', function() use($app, $projectID){})->setName("user-project");
-                    $app->patch('/:projectID+', function() use($app, $projectID){})->setName("user-project");
-                    $app->delete('/:projectID+', function() use($app, $projectID){})->setName("user-project");
+                    $app->get('/:projectID+', function() use($app){})->setName("user-project");
+                    $app->put('/:projectID+', function() use($app){})->setName("user-project");
+                    $app->patch('/:projectID+', function() use($app){})->setName("user-project");
+                    $app->delete('/:projectID+', function() use($app){})->setName("user-project");
                 });
                 $app->group('/:others(/)', function () use ($app) 
                 {
