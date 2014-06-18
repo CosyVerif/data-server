@@ -49,8 +49,8 @@ class Permission extends \Slim\Middleware
         $users = $auth["users"];
         $can_participate = (!is_null($userID)) ? array_key_exists($userID, $users) : false;
         $permissions = ($can_participate) ? $users[$userID] : array();
-        return ($can_participate && (($method == "PUT" && $permissions["change-project"]) ||
-                ($method == "DELETE" && ($permissions["change-project"] || $params["projectUserID"] == $userID))));
+        return ($can_participate && (($method == "PUT" && $permissions["change_project"]) ||
+                ($method == "DELETE" && ($permissions["change_project"] || $params["projectUserID"] == $userID))));
       }
       else 
       {
@@ -73,10 +73,10 @@ class Permission extends \Slim\Middleware
       {
         $auth = json_decode(file_get_contents("resources/users/".$userID."/auth.json"), TRUE);
         $permissions = $auth["permissions"];
-        return (($method == "DELETE" && $permissions["user-delete"]) ||
+        return (($method == "DELETE" && $permissions["user_delete"]) ||
                 ($method == "PUT" && ((!file_exists("/users/".$params["userID"]) && 
-                      $permissions["user-create"]) || (file_exists("/users/".$params["userID"]) && 
-                      $permissions["user-modify"]))) ||
+                      $permissions["user_create"]) || (file_exists("/users/".$params["userID"]) && 
+                      $permissions["user_modify"]))) ||
                 ($method == "PATCH" && $permissions["user-modify"]));
       }
       else
@@ -94,8 +94,8 @@ class Permission extends \Slim\Middleware
       else if ($routeName == "project" || $routeName == "project-resource")
       {
         $permissions = ($can_participate) ? $users[$userID] : array();
-        return ($can_participate && (($routeName == "project" && $permissions["change-project"]) || 
-                ($routeName == "project-resource" && $permissions["change-resource"]))) ? true : false;
+        return ($can_participate && (($routeName == "project" && $permissions["change_project"]) || 
+                ($routeName == "project-resource" && $permissions["change_resource"]))) ? true : false;
       } 
       else
         return false;
