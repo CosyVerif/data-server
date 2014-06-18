@@ -15,9 +15,9 @@ class HttpBasicAuthentification extends \Slim\Middleware
     $authUser = $req->headers('PHP_AUTH_USER');
     $authPass = $req->headers('PHP_AUTH_PW');
     if (!isset($authUser) && !isset($authPass)){
-      $app->user = array('user_type' => USER_DEFAULT, 'login' => 'default');
+      $app->user = null;
       $this->next->call();
-    } else if (isset($authUser) && isset($authPass) && $this->authentificate($authUser, $authPass)){
+    } else if (isset($authUser) && isset($authPass) && $this->authenticate($authUser, $authPass)){
       $this->next->call();
     } else {
       $res->status(STATUS_UNAUTHORIZED);
@@ -25,7 +25,7 @@ class HttpBasicAuthentification extends \Slim\Middleware
     }
   }
 
-  public function authentificate($user, $password)
+  public function authenticate($user, $password)
   {
     global $app;
     if (!file_exists("resources/users/".$user)){
