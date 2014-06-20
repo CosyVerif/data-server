@@ -14,12 +14,17 @@ class HttpBasicAuthentification extends \Slim\Middleware
     $res = $this->app->response();
     $authUser = $req->headers('PHP_AUTH_USER');
     $authPass = $req->headers('PHP_AUTH_PW');
-    if (!isset($authUser) && !isset($authPass)){
+    if (!isset($authUser) && !isset($authPass))
+    {
       $app->user = null;
       $this->next->call();
-    } else if (isset($authUser) && isset($authPass) && $this->authenticate($authUser, $authPass)){
+    } 
+    else if (isset($authUser) && isset($authPass) && $this->authenticate($authUser, $authPass))
+    {
       $this->next->call();
-    } else {
+    } 
+    else 
+    {
       $res->status(STATUS_UNAUTHORIZED);
       $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realm));
     }
@@ -28,15 +33,18 @@ class HttpBasicAuthentification extends \Slim\Middleware
   public function authenticate($user, $password)
   {
     global $app;
-    if (!file_exists("resources/users/".$user)){
+    if (!file_exists($app->config["base_dir"]."/users/".$user))
+    {
       return false;
-    }
-    $auth = json_decode(file_get_contents("resources/users/".$user."/auth.json"), TRUE);
+    } 
+    $auth = json_decode(file_get_contents($app->config["base_dir"]."/users/".$user."/auth.json"), TRUE);
     $password = $user.$password;
-    if ($auth["login"] == $user && password_verify($password, $auth["password"])){
+    if ($auth["login"] == $user && password_verify($password, $auth["password"]))
+    {
       $app->user = $auth;
       return true;
-    } else
+    } 
+    else
       return false;
   } 
 }

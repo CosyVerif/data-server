@@ -20,22 +20,11 @@ define('STATUS_NOT_IMPLEMENTED', 501);
 
 
 /**
-*   Users type
+*   Permissions
 */
-
-
-/**
-*   Users permissions
-*/
-define('USER_CREATE', 'user_create'); // All users can use the resource
-define('USER_MODIFY', 'user_modify'); // Only user owner and Server administrator can use the resource
-define('USER_DELETE', 'user_delete'); // Only user owner and Server administrator can use the resource
-
-/**
-*   user permissions of a project
-*/
-define('CHANGE_PROJECT', 'change_project'); // Project administrator
-define('CHANGE_RESOURCE', 'change_resource'); // Permission read (execute if that a service) the project resources
+define('ADMIN_USER', 'admin_user'); 
+define('ADMIN_PROJECT', 'admin_project'); 
+define('EDIT_PROJECT', 'edit_project');
 
 define('IS_PUBLIC', true);
 
