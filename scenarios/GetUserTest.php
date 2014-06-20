@@ -8,10 +8,11 @@ class GetUserTest extends PHPUnit_Framework_TestCase
 
   public function testUserFound()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
-    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, true, true);
+    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true);
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'==']]);
@@ -22,8 +23,9 @@ class GetUserTest extends PHPUnit_Framework_TestCase
 
   public function testUserNotFound()
   {
+    $config = Util::getConfig();
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $res = $client->get('http://localhost:8080/server.php/users/other',
                         ['headers' => ['Accept' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -34,15 +36,14 @@ class GetUserTest extends PHPUnit_Framework_TestCase
 
   public function testUserDeleted()
   {
+    $config = Util::getConfig();
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Oto'),
                   'auth' => array('login' => 'toto', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => false, 
-                                                         "user-modify" => false, 
-                                                         "user-delete" => false),
-                  'can_public' => true));
+                                  'admin_user' => false,
+                                  'can_public' => true));
     $client->put('http://localhost:8080/server.php/users/toto', 
                  ['headers' => ['Content-Type' => 'application/json',
                                 'Authorization' => 'Basic '.$encoded.'=='],

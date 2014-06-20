@@ -7,16 +7,15 @@ class DeleteUserTest extends PHPUnit_Framework_TestCase
 {
   public function testDeleteExistUser()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $body = array('info' => array('first_name' => 'User', 'last_name' => 'Delete'),
                   'auth' => array('login' => 'udelete', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => false, 
-                                                         "user-modify" => false, 
-                                                         "user-delete" => false),
-                  'can_public' => true));
+                                  'admin_user' => false,
+                                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/udelete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -39,8 +38,9 @@ class DeleteUserTest extends PHPUnit_Framework_TestCase
 
   public function testDeleteUserNotExist()
   {   
+    $config = Util::getConfig();
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $res = $client->delete('http://localhost:8080/server.php/users/udelete',
                            ['headers' => ['Authorization' => 'Basic '.$encoded.'=='],
                             'exceptions' => false]);

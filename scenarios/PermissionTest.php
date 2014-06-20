@@ -8,13 +8,14 @@ class PermissionTest extends PHPUnit_Framework_TestCase
 
   public function testGetUser()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
-    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, true, true);
-    Util::addUser("Toto", "Sow", "tsow", "toto", true,true,false, false);
-    Util::addUser("Nana", "Nana", "nnana", "toto", true,true,false, true);
+    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true);
+    Util::addUser("Toto", "Sow", "tsow", "toto", true, false);
+    Util::addUser("Nana", "Nana", "nnana", "toto", true, true);
     $client = new GuzzleHttp\Client();
     //Administrator use get users
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -36,7 +37,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
                                        'Authorization' => 'Basic '.$encoded.'==']]);
     $this->assertEquals(STATUS_OK, $res->getStatusCode()); 
     //not authentified user
-    $res = $client->get('http://localhost:8080/server.php/users/root', 
+    $res = $client->get('http://localhost:8080/server.php/users/'.$config["user_root"], 
                         ['headers' => ['Accept' => 'application/json'],
                          'exceptions' => false]);
     $this->assertEquals(STATUS_FORBIDDEN, $res->getStatusCode()); 
@@ -52,20 +53,19 @@ class PermissionTest extends PHPUnit_Framework_TestCase
 
   public function testPutUser()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
-    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, true, true);
-    Util::addUser("Toto", "Sow", "tsow", "toto", true,true,false, false);
-    Util::addUser("Nana", "Nana", "nnana", "toto", false,false,false, true);
+    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true);
+    Util::addUser("Toto", "Sow", "tsow", "toto", true, false);
+    Util::addUser("Nana", "Nana", "nnana", "toto", false, true);
     $client = new GuzzleHttp\Client();
     //Administrator use get users
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Sow'),
                   'auth' => array('login' => 'tsow', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => true, 
-                                                         "user-modify" => true, 
-                                                         "user-delete" => true),
-                  'can_public' => true));
+                                  'admin_user' => true,
+                                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -82,10 +82,8 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     $body = array('info' => array('first_name' => 'Nanas', 'last_name' => 'Nanas'),
                   'auth' => array('login' => 'nnana', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => true, 
-                                                         "user-modify" => true, 
-                                                         "user-delete" => true),
-                  'can_public' => true));
+                                  'admin_user' => true,
+                                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/nnana', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
@@ -96,10 +94,8 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Sow'),
                   'auth' => array('login' => 'tsow', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => true, 
-                                                         "user-modify" => true, 
-                                                         "user-delete" => true),
-                  'can_public' => true));
+                                  'admin_user' => true,
+                                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json'],
                          'body' => json_encode($body),
@@ -109,19 +105,18 @@ class PermissionTest extends PHPUnit_Framework_TestCase
 
   public function testDeleteUser()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
-    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, false, false);
-    Util::addUser("Toto", "Sow", "tsow", "toto", true,true,false, true);
+    Util::addUser("Gael", "Thomas", "gthomas", "toto", false, false);
+    Util::addUser("Toto", "Sow", "tsow", "toto", true, true);
     $client = new GuzzleHttp\Client();
-    //Administrator use get users
-    $encoded = base64_encode("root:toto");
+    //Administrator use delete users
+    $encoded = base64_encode($config["user_root"].":toto");
     $body = array('info' => array('first_name' => 'Tata', 'last_name' => 'Sow'),
                   'auth' => array('login' => 'tsow', 
                                   'password' => 'toto',
-                                  'permissions' => array("user-create" => true, 
-                                                         "user-modify" => true, 
-                                                         "user-delete" => true),
-                  'can_public' => true));
+                                  'admin_user' => true,
+                                  'can_public' => true));
     $res = $client->put('http://localhost:8080/server.php/users/tsow', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],

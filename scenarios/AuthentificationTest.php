@@ -7,10 +7,11 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
 
   public function testAcceptAuthentification()
   {
+    $config = Util::getConfig();
     Util::addUserRoot();
-    Util::addUser("Gael", "Thomas", "gthomas", "toto", true, true, true, true);
+    Util::addUser("test", "pass", "gthomas", "toto", true, true);
     $client = new GuzzleHttp\Client();
-    $encoded = base64_encode("root:toto");
+    $encoded = base64_encode($config["user_root"].":toto");
     $res = $client->get('http://localhost:8080/server.php/users/gthomas', 
                         ['headers' => ['Accept' => 'application/json',
                                        'Authorization' => 'Basic '.$encoded.'==']]);

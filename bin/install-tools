@@ -16,3 +16,4 @@ do
 done
 cd ..
 ./bin/box.phar update
+
