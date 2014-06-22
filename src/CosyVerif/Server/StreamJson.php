@@ -116,12 +116,14 @@ class StreamJson
         if ($routeName == "user")
         {
           mkdir($app->config["base_dir"].$url."/projects");
+          $tmp = array();
           $tmp["name"] = "Project list";
           file_put_contents($app->config["base_dir"].$url."/projects/info.json", json_encode($tmp));
         } 
         else if ($routeName == "project") 
         {
           mkdir($app->config["base_dir"].$url."/users");
+          $tmp = array();
           $tmp["name"] = "user list";
           file_put_contents($app->config["base_dir"].$url."/users/info.json", json_encode($tmp));
         }
