@@ -2,51 +2,51 @@
 require_once 'Constants.php';
 use GuzzleHttp\Stream;
 
-/**
-# Test of adding a user
-  =====================
 
-This test covers adding, getting, deleting users. 
-many cases (cases success or cases failure or 
-cases errors) can have present itself to us : 
+// # Test of adding a user
+// 
+// 
+// This test covers adding, getting, deleting users. 
+// many cases (Success cases or failure cases or 
+// errors cases) can have present itself to us : 
+// 
+// Success cases
+// -------------
+// 1. add a new user,
+// 2. update a user,
+// 3. get a user,
+// 4. get users,
+// 5. delete a user.
+// 
+// Failure cases
+// -------------
+// 1. get a not found user,
+// 2. get a deleted user,
+// 3. patch a not found user
+// 4. delete a not found/deleted user.
+// 
+// Errors cases
+// ------------
+// 1. Query contains syntax errors,
+// 2. Internal server error.
 
-  Cases success :
-  -------------
-    1. add a new user,
-    2. update a user,
-    3. get a user,
-    4. get users,
-    5. delete a user.
-
-  Cases failure :
-  -------------
-    1. get a not found user,
-    2. get a deleted user,
-    3. delete a not found/deleted user.
-
-  Cases errors :
-  ------------
-    1. Query contains syntax errors,
-    2. Internal server error.
-*/
 
 class UserTest extends PHPUnit_Framework_TestCase
 {
-  /* Cases success : 
-     ==============
-  */
+// Success cases 
+// --------------
 
-  /**
-  ##### Add a new user
-  This test create a new user in to server. The query 
-  is prepared and sends user data into server. The server
-  creates user and returns to the client a 
-  confirmation user creation by the `status code 201` 
-  (created). The client verify if the status code is
-  `status code 201`. And this test get user and
-  verify corresponds to the first name and first name 
-  that was sent.
-  */
+
+// ##### Add a new user
+// This test create a new user in to server. The query 
+// is prepared and sends user data into server. The server
+// creates user and returns to the client a 
+// confirmation user creation by the `status code 201` 
+// (created). The client verify if the status code is
+// `status code 201`. And this test get user and
+// verify corresponds to the first name and first name 
+// that was sent.
+
   public function testAddNewUser()
   {
     /* Prepares the request    */
@@ -76,15 +76,15 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals("new_user", $data["first_name"]); 
   }
 
-  /**
-  ##### Update a user
-  This test update a user in server. This test start
-  in create a new user. After, it update user changing
-  user data (first name is changed new_user => update_user) and 
-  get user for verify if the data has been updated. 
-  The server returns `status code 200` (Success) if 
-  the user data has been updated.
-  */
+
+// ##### Update a user
+// This test update a user in server. This test start
+// in create a new user. After, it update user changing
+// user data (first name is changed new_user => update_user) and 
+// get user for verify if the data has been updated. 
+// The server returns `status code 200` (Success) if 
+// the user data has been updated.
+
   public function testUpdateUser()
   { 
     /* Prepares the request    */
@@ -123,13 +123,13 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals("update_user", $data["first_name"]);  
   }
 
-  /**
-  ##### Get a user
-  This test get a user in server. This test start
-  in create a new user manually. After, it get user 
-  and verify status code if that is `status code 200` 
-  (success) and verify user data. 
-  */
+
+// ##### Get a user
+// This test get a user in server. This test start
+// in create a new user manually. After, it get user 
+// and verify status code if that is `status code 200` 
+// (success) and verify user data. 
+
   public function testGetUser()
   {
     /* Prepares the request    */
@@ -150,13 +150,13 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals("get_user", $data["first_name"]);   
   }
 
-  /**
-  ##### Get users
-  This test get all users in server. This test start
-  in create a new tree users manually. After, it get 
-  users collection and verify status code if that is 
-  `status code 200` (success). 
-  */
+
+// ##### Get users
+// This test get all users in server. This test start
+// in create a new tree users manually. After, it get 
+// users collection and verify status code if that is 
+// `status code 200` (success). 
+
   public function testGetUsers()
   {
     /* Prepares the request    */
@@ -176,16 +176,16 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_OK, $res->getStatusCode());   
   }
 
-  /**
-  ##### Delete a user
-  This test delete a user in server. This test start
-  in create a new user and verify if that has been
-  created. After, it delete user and 
-  get user for verify if the user has been deleted. 
-  The server returns `status code 204` (no content) 
-  if the user has been deleted. Get user deleted
-  return the `status code 410` (Gone).
-  */
+
+// ##### Delete a user
+// This test delete a user in server. This test start
+// in create a new user and verify if that has been
+// created. After, it delete user and 
+// get user for verify if the user has been deleted. 
+// The server returns `status code 204` (no content) 
+// if the user has been deleted. Get user deleted
+// return the `status code 410` (Gone).
+
   public function testDeleteUser()
   {
     /* Prepares the request    */
@@ -224,16 +224,15 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_GONE, $res->getStatusCode());  
   }
 
-  /* Cases failure : 
-    ==============
-  */
+// Failure cases
+// -------------
 
-  /**
-  ##### Get a not found user
-  This test get a not found user in server. Get any user 
-  not found in serveur and verify status code if that is 
-  `status code 404` (Not found). 
-  */
+
+// ##### Get a not found user
+// This test get a not found user in server. Get any user 
+// not found in serveur and verify status code if that is 
+// `status code 404` (Not found). 
+
   public function testGetUserNotFound()
   {
     /* Prepares the request    */
@@ -250,14 +249,14 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_NOT_FOUND, $res->getStatusCode());   
   }
 
-  /**
-  ##### Get a deleted user
-  This test get a deleted user in server. This test start
-  in create a new user and delete its. After, get user and
-  verify status code if that is `status code 410` (Gone).
-  If get a deleted user, the server return status code
-  410 (Gone). 
-  */
+
+// ##### Get a deleted user
+// This test get a deleted user in server. This test start
+// in create a new user and delete its. After, get user and
+// verify status code if that is `status code 410` (Gone).
+// If get a deleted user, the server return status code
+// 410 (Gone). 
+
   public function testGetDeletedUser()
   {
     /* Prepares the request    */
@@ -287,11 +286,11 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_GONE, $res->getStatusCode());   
   }
 
-  /**
-  ##### Delete a not found/deleted user
-  This test delete a not found user in server. The server
-  returns `status code 404` (Not found). 
-  */
+ 
+// ##### Delete a not found/deleted user
+// This test delete a not found user in server. The server
+// returns `status code 404` (Not found). 
+
   public function testDeleteNotFoundUser()
   {  
     /* Prepares the request    */ 
@@ -306,18 +305,13 @@ class UserTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_NOT_FOUND, $res->getStatusCode());
   }
 
-  /* Cases errors : 
-     ==============
-  */
+// Errors cases
+// -------------
 
-  /**
-  ##### Query contains syntax errors
-  
-  */
 
-  /**
-  ##### Internal server error
-  
-  */
+// ##### Query contains syntax errors
+
+
+// ##### Internal server error
   
 }

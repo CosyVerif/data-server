@@ -3,43 +3,42 @@ require_once 'Constants.php';
 require_once 'Util.php';
 use GuzzleHttp\Stream;
 
-/**
-# User Permissions Test
-  =====================
 
-This test covers user permissions test. many cases (cases 
-success or cases failure or cases errors) can have present 
-itself to us : 
+// # User Permissions Test
+// 
+// 
+// This test covers user permissions test. many cases (cases 
+// success or cases failure or cases errors) can have present 
+// itself to us : 
+// 
+// Success cases :
+// -------------
+// 1. Root user uses user resource (:user),
+// 2. User uses itselves resources,
+// 3. User requests a resource and it have permission.
+// 
+// Failure cases :
+// -------------
+// 1. User requests a resource and it not have permission,
+// 2. Requested resource is not found or the method is not implemented. 
+// 
+// Errors cases :
+// ------------
+// 1. Query contains syntax errors,
+// 2. Internal server error.
 
-  Cases success :
-  -------------
-    1. Root user uses user resource (:user),
-    2. User uses itselves resources,
-    3. User requests a resource and it have permission.
-
-  Cases failure :
-  -------------
-    1. User requests a resource and it not have permission,
-    2. Requested resource is not found or the method is not implemented. 
-
-  Cases errors :
-  ------------
-    1. Query contains syntax errors,
-    2. Internal server error.
-*/
 
 class PermissionTest extends PHPUnit_Framework_TestCase
 {
-  /* Cases success : 
-     ==============
-  */
+// Success cases
+// -------------
 
-  /**
-  ##### Root user uses user resource (:user)
-  This test treats the authentificate root user (root have 
-  all permission on user resource).
-  */
-  /* Root user get user : returns user data */
+
+// ##### Root user uses user resource (:user)
+// This test treats the authentificate root user (root have 
+// all permission on user resource).
+
+  // __Root user get user : returns user data__
   public function testRootGetUser()
   {
     $config = Util::getConfig();
@@ -56,7 +55,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     /* Verify status code 200 (success) */
     $this->assertEquals(STATUS_OK, $res->getStatusCode()); 
   }
-  /* Root user put user : user created */
+  // __Root user put user : user created__
   public function testRootPutUser()
   {
     $config = Util::getConfig();
@@ -76,7 +75,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     /* Verify status code  201 (created) */
     $this->assertEquals(STATUS_CREATED, $res->getStatusCode()); 
   }
-  /* Root user delete user  : user deleted */
+  // __Root user delete user  : user deleted__
   public function testRootDeleteUser()
   {
     $config = Util::getConfig();
@@ -141,9 +140,14 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     Util::addUser("Toto", "Sow", "tsow", "toto", true, false);
     Util::addUser("Nana", "Nana", "nnana", "toto", false, true);
     $client = new GuzzleHttp\Client();
+    $body = array('info' => array('first_name' => 'user_put', 'last_name' => 'user_put'),
+                  'auth' => array('login' => 'user_put', 
+                                  'password' => 'toto',
+                                  'admin_user' => true,
+                                  'can_public' => true));
     //authentified user
     $encoded = base64_encode("nnana:toto");
-    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
+    $res = $client->put('http://localhost:8080/server.php/users/user_put', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body),
@@ -172,7 +176,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
                          'exceptions' => false]);
     $this->assertEquals(STATUS_FORBIDDEN, $res->getStatusCode()); 
   }
-
+/*
   public function testDeleteUser()
   {
     $config = Util::getConfig();
@@ -180,23 +184,29 @@ class PermissionTest extends PHPUnit_Framework_TestCase
     Util::addUser("Gael", "Thomas", "gthomas", "toto", false, false);
     Util::addUser("Toto", "Sow", "tsow", "toto", true, true);
     $client = new GuzzleHttp\Client();
+    $body = array('info' => array('first_name' => 'user_delete', 'last_name' => 'user_delete'),
+                  'auth' => array('login' => 'user_delete', 
+                                  'password' => 'toto',
+                                  'admin_user' => true,
+                                  'can_public' => true));
     //authentified user
     $encoded = base64_encode("gthomas:toto");
-    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
+    $res = $client->put('http://localhost:8080/server.php/users/user_delete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body),
                          'exceptions' => false]);
-    $res = $client->delete('http://localhost:8080/server.php/users/tsow',
+    $res = $client->delete('http://localhost:8080/server.php/users/user_delete',
                            ['headers' => ['Authorization' => 'Basic '.$encoded.'=='],
                             'exceptions' => false]);
     $this->assertEquals(STATUS_FORBIDDEN, $res->getStatusCode()); 
     //not authentified user
-    $res = $client->put('http://localhost:8080/server.php/users/tsow', 
+    $res = $client->put('http://localhost:8080/server.php/users/user_delete', 
                         ['headers' => ['Content-Type' => 'application/json'],
                          'body' => json_encode($body),
                          'exceptions' => false]);
-    $res = $client->delete('http://localhost:8080/server.php/users/tsow', ['exceptions' => false]);
+    $res = $client->delete('http://localhost:8080/server.php/users/user_delete', ['exceptions' => false]);
     $this->assertEquals(STATUS_FORBIDDEN, $res->getStatusCode()); 
   }
+  */
 }

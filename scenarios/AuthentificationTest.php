@@ -2,43 +2,42 @@
 require_once 'Constants.php';
 use GuzzleHttp\Stream;
 
-/**
-# User Authentication Test
-  ========================
 
-This test covers user authentification. Many 
-cases (cases success or cases failure or 
-cases errors) can have present itself to us : 
+// # User Authentication Test
+// 
+// 
+// This test covers user authentification. Many 
+// cases (Success cases  or failure cases  or 
+// errors cases ) can have present itself to us : 
+// 
+// Success cases:
+//   -------------
+// 1. User authentified,
+// 2. User not authentified.
+// 
+// Failure cases :
+// -------------
+// 1. Authentified user failure.
+// 
+// Errors cases :
+// ------------
+// 1. Query contains syntax errors,
+// 2. Internal server error.
 
-  Cases success :
-  -------------
-    1. User authentified,
-    2. User not authentified.
-
-  Cases failure :
-  -------------
-    1. Authentified user failure.
-
-  Cases errors :
-  ------------
-    1. Query contains syntax errors,
-    2. Internal server error.
-*/
 
 class AuthentificationTest extends PHPUnit_Framework_TestCase
 {
-  /* Cases success : 
-     ==============
-  */
+// Success cases
+// -------------
 
-  /**
-  ##### User authentified
-  This test authentificates a user in to server. The test
-  user is user root. This test start in create a new 
-  resource manually for the test. Good username and password 
-  is required (username : root/password : toto). If this test
-  passed the server returns `status code 200` (Success).
-  */
+
+// ##### User authentified
+// This test authentificates a user in to server. The test
+// user is user root. This test start in create a new 
+// resource manually for the test. Good username and password 
+// is required (username : root/password : toto). If this test
+// passed the server returns `status code 200` (Success).
+
   public function testUserAuthentified()
   {
     /* Prepares the request    */
@@ -57,14 +56,14 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_OK, $res->getStatusCode());
   }
 
-  /**
-  ##### User not authentified
-  This test user not provided a username and password. the 
-  server accepted the public resource use by any user. So,
-  the server satisfied the query. In the test, it creates
-  a new user and get its without provided a username and 
-  password.
-  */
+
+// ##### User not authentified
+// This test user not provided a username and password. the 
+// server accepted the public resource use by any user. So,
+// the server satisfied the query. In the test, it creates
+// a new user and get its without provided a username and 
+// password.
+
   public function testUserNotAuthentified()
   {
     /* Add a new user */
@@ -78,18 +77,17 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_OK, $res->getStatusCode());
   }
 
-  /* Cases failure : 
-     ==============
-  */
+// Failure cases
+// -------------
 
-  /**
-  ##### Authentified user failure
-  The request of the test does not pass because username 
-  and/or password are incorrects. So, the server does not 
-  satisfied the request and return `status code 401` 
-  (Unauthorized) and it add `WWW-Authenticate` header 
-  in the response.
-  */
+
+// ##### Authentified user failure
+// The request of the test does not pass because username 
+// and/or password are incorrects. So, the server does not 
+// satisfied the request and return `status code 401` 
+// (Unauthorized) and it add `WWW-Authenticate` header 
+// in the response.
+
   public function testNotAcceptAuthentification()
   {
     $client = new GuzzleHttp\Client();
@@ -103,19 +101,15 @@ class AuthentificationTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(STATUS_UNAUTHORIZED, $res->getStatusCode());
   }
 
-  /* Cases errors : 
-     ==============
-  */
+// Errors cases
+// ------------
 
-  /**
-  ##### Query contains syntax errors
-  
-  */
 
-  /**
-  ##### Internal server error
-  
-  */
 
+// ##### Query contains syntax errors
+
+
+
+// ##### Internal server error
 
 }

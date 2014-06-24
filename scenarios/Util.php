@@ -66,12 +66,50 @@ class Util
     file_put_contents($config["base_dir"]."/users/".$login."/projects/info.json", json_encode($info));
   }
 
+  public static function addModel($user_name, $model_name, $model_data)
+  {
+    $config = Util::getConfig();
+
+    mkdir($config["base_dir"]."/users/".$user_name."/models/".$model_name);
+    $info = array('name' => $model_name);
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/info.json", json_encode($info));
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/model.lua", $model_data);
+
+    mkdir($config["base_dir"]."/users/".$user_name."/models/".$model_name."/editor");
+    $info = array();
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/editor/info.json", json_encode($info));
+
+    mkdir($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches");
+    $info = array("patch_number" => 1);
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches/info.json", json_encode($info));
+
+    $patch_data = "local p1 = function (model) model.x = 1 end";
+    Util::addPatch($user_name, $model_name, $patch_data);
+  }
+
+  public static function addPatch($user_name, $model_name, $patch_data)
+  {
+    $config = Util::getConfig();
+    $tmp = json_decode(file_get_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches/info.json"), TRUE);
+    $patch_number = $tmp["patch_number"];
+    $info = array('patch_number' => ($patch_number + 1));
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches/info.json", json_encode($info));
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches/".$patch_number.".lua", $patch_data);
+  }
+
+  public static function enterEditMode($user_name, $model_name, $url, $port)
+  {
+    $config = Util::getConfig();
+    $info = array('url' => $url, 'port' => $port);
+    file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/editor/info.json", json_encode($info));
+  }
+
   public static function rrmdir($path, $newPath)
   {
     foreach(glob($newPath . '/*') as $file) 
     {
       if(is_dir($file))
-        Util::rrmdir($path, $file);
+        Util::rrmdir($newPath, $file);
       else
         unlink($file);      
     }
