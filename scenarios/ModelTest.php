@@ -10,9 +10,9 @@ use GuzzleHttp\Stream;
 // #Test of adding a user
 //
 //
-//This test covers adding, getting, deleting users. 
-//many cases (Success cases or failure cases or 
-//errors cases) can have present itself to us : 
+// This test covers adding, getting, deleting users. 
+// many cases (Success cases or failure cases or 
+// errors cases) can have present itself to us : 
 //
 // Success cases
 // -------------
@@ -24,14 +24,16 @@ use GuzzleHttp\Stream;
 //
 // ##### No edit mode
 //
-// 1. get a model (get .../:model),
-// 2. get model list (get .../models)
-// 3. put a model (put .../:model),
-// 4. patch a model (patch .../:model),
-// 5. delete a model (delete .../:model),
-// 6. get patches (get .../:model/patches),
-// 7. put patches (put .../:model/patches),
-// 8. delete patches (delete .../:model/patches).
+// 1. get a model (get .../models/:model),
+// 2. get model list (get .../models),
+// 3. put a model (put .../models/:model),
+// 4. patch a model (patch .../models/:model),
+// 5. delete a model (delete .../models/:model),
+// 6. get a patch (get .../models/:model/patches/:patch),
+// 7. get patches (get .../models/:model/patches?from=...&to=...),
+// 8. put a patch (put .../models/:model/patches/:patch),
+// 9. delete a patch (delete .../models/:model/patches/:patch),
+// 10. delete patches (delete .../models/:model/patches?from=...&to=...).
 //
 // Failure cases
 // -------------
@@ -46,8 +48,11 @@ use GuzzleHttp\Stream;
 // 2. patch a not found model (patch .../:model),
 // 3. put a not found patches (put .../:model),
 // 4. delete a not found/deleted model (delete .../:model),
-// 5. get a not found patches (get .../:model/patches),
-// 6. delete a not found patches (delete .../:model/patches).
+// 5. get a not found patch (get .../models/:model/patches/:patch),
+// 6. get a not found patches (get .../:model/patches),
+// 7. put a not found patch (put .../models/:model/patches/:patch),  
+// 8. delete a not found patch (delete .../models/:model/patches/:patch),
+// 9. delete a not found patches (delete .../:model/patches).
 //
 // Errors cases
 // --------------
@@ -60,7 +65,9 @@ class ModelTest extends PHPUnit_Framework_TestCase
 {
 // Success cases
 // -------------
-
+//
+// #### Edit mode
+//
 // ##### Enter edit mode of a edit model started
 // This is enter edit mode test but edit model is started. This test start
 // in create a new user (enter_edit_mode_user), a new model (model_1) and 
@@ -132,10 +139,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
     $this->assertEquals(300, $data["port"]);      
   }
 
-// ##### Get a model (get .../:model)
+// #### No edit mode
+//
+// ##### Get a model (get .../models/:model)
 // This is get a model in to server test. This test start in create a new
 // user (get_model_user) and a new model (model_1) manually. After, it 
-//get model (.../models/model_1) and verify status code if that is 
+// get model (.../models/model_1) and verify status code if that is 
 // `status code 200` (success) and verify model data.
 
   public function testGetModel()
@@ -162,5 +171,82 @@ class ModelTest extends PHPUnit_Framework_TestCase
     $this->assertEquals($model_data, $data);   
   }
 
+// ##### Get model list (get .../:user/models)
+// This is get all models of a user test. This test start in create 
+// a new user (get_modelList_user) and tree new models manually. 
+// After, it get model list (.../models) and verify status code 
+// if that is `status code 200` (success). 
+
+  public function testGetModelList()
+  {
+    /* Prepares the request    */
+    $config = Util::getConfig();
+    Util::addUserRoot();
+    /* Add new user   */
+    Util::addUser("get_modelList_user", "get_modelList_user", "get_modelList_user", "toto", true, true);
+
+    /* Add tree new model manually */
+    $model_data = '{ x = 1, a = "", y = { 1, 2, 3 }}';
+    Util::addModel("get_modelList_user", "model_1", $model_data);
+    Util::addModel("get_modelList_user", "model_2", $model_data);
+    Util::addModel("get_modelList_user", "model_3", $model_data);
+    $client = new GuzzleHttp\Client();
+    $encoded = base64_encode("get_modelList_user:toto");
+    /* Get model list : model_1, model_2, model_3 */
+    $res = $client->get('http://localhost:8080/server.php/users/get_modelList_user/models', 
+                        ['headers' => ['Accept' => 'application/json', 
+                                       'Authorization' => 'Basic '.$encoded.'==']]);
+    /* Verify status code if that is 200 (Success) */
+    $this->assertEquals(STATUS_OK, $res->getStatusCode());   
+  }
+
   
+// ##### Put a model (put .../models/:model)
+// This is put a model test. This test start in create 
+// a new user (get_modelList_user) and tree new models manually. 
+// After, it get model list (.../models) and verify status code 
+// if that is `status code 200` (success). 
+
+  public function testPutModel()
+  {
+    /* Prepares the request    */
+    $config = Util::getConfig();
+    Util::addUserRoot();
+    /* Add new user   */
+    Util::addUser("put_model_user", "put_model_user", "put_model_user", "toto", true, true);
+    /* Prepares the model data */
+    $model_data = '{ x = 1, a = "", y = { 1, 2, 3 }}';
+    /* Add a new model (model_1) and verify status code (201 : created) */
+    $client = new GuzzleHttp\Client();
+    $encoded = base64_encode("put_model_user:toto");
+    $res = $client->put('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
+                        ['headers' => ['Content-Type' => 'cosy/model', 
+                                       'Authorization' => 'Basic '.$encoded.'=='],
+                         'body' => $model_data]);
+    $this->assertEquals(STATUS_CREATED, $res->getStatusCode());
+    /* Get model for verify if model is created in the server : verify model data */ 
+    /* and verify status code (200 : success) */
+    $res = $client->get('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
+                        ['headers' => ['Accept' => 'application/json', 
+                                       'Authorization' => 'Basic '.$encoded.'==']]);   
+    $this->assertEquals(STATUS_OK, $res->getStatusCode()); 
+    $data = $res->getBody();
+    $this->assertEquals($model_data, $data); 
+    /* Update a model (model_1) and verify status code (200 : success) and model data */
+    $model_data = '{ x = 33, a = "", y = { 1, 2, 3, 4, 6}}';
+    $res = $client->put('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
+                        ['headers' => ['Content-Type' => 'cosy/model', 
+                                       'Authorization' => 'Basic '.$encoded.'=='],
+                         'body' => $model_data]);
+    $this->assertEquals(STATUS_OK, $res->getStatusCode());
+    /* Get model for verify if model is updating in the server : verify model data */ 
+    /* and verify status code (200 : success) */
+    $res = $client->get('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
+                        ['headers' => ['Accept' => 'application/json', 
+                                       'Authorization' => 'Basic '.$encoded.'==']]);   
+    $this->assertEquals(STATUS_OK, $res->getStatusCode()); 
+    $data = $res->getBody();
+    $this->assertEquals($model_data, $data); 
+  }
+
 }

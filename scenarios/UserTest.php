@@ -15,7 +15,7 @@ use GuzzleHttp\Stream;
 // 1. add a new user,
 // 2. update a user,
 // 3. get a user,
-// 4. get users,
+// 4. get user list,
 // 5. delete a user.
 // 
 // Failure cases
@@ -67,7 +67,7 @@ class UserTest extends PHPUnit_Framework_TestCase
                          'body' => json_encode($body)]);
     /* Verify status code  201 (created) */
     $this->assertEquals(STATUS_CREATED, $res->getStatusCode()); 
-    /* get user for verify if user data exist in the server : verify first name */
+    /* Get user for verify if user data exist in the server : verify first name */
     $res = $client->get('http://localhost:8080/server.php/users/new_user', 
                         ['headers' => ['Accept' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'==']]);   
@@ -151,13 +151,13 @@ class UserTest extends PHPUnit_Framework_TestCase
   }
 
 
-// ##### Get users
+// ##### Get user list
 // This test get all users in server. This test start
-// in create a new tree users manually. After, it get 
+// in create tree new users manually. After, it get 
 // users collection and verify status code if that is 
 // `status code 200` (success). 
 
-  public function testGetUsers()
+  public function testGetUserList()
   {
     /* Prepares the request    */
     $config = Util::getConfig();
