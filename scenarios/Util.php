@@ -97,10 +97,10 @@ class Util
     file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/patches/".$patch_number.".lua", $patch_data);
   }
 
-  public static function enterEditMode($user_name, $model_name, $url, $port)
+  public static function enterEditMode($user_name, $model_name, $token, $url)
   {
     $config = Util::getConfig();
-    $info = array('url' => $url, 'port' => $port);
+    $info = array('token' => $token, 'url' => $url);
     file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/editor/info.json", json_encode($info));
   }
 
