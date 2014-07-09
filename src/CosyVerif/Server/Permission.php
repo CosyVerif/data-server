@@ -24,6 +24,10 @@ class Permission extends \Slim\Middleware
     $params = $this->app->router()->getCurrentRoute()->getParams();
     $pattern = $this->app->router()->getCurrentRoute()->getPattern();
     $routeName = $this->app->router()->getCurrentRoute()->getName();
+    if ($routeName == "website")
+    {
+      return true;
+    }
     if (!file_exists($app->config["base_dir"].$app->request->getResourceUri()) && $method != "PUT")
     { // Resource not exists
       $app->halt(STATUS_NOT_FOUND);

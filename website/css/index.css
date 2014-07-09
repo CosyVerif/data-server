@@ -1,0 +1,81 @@
+/* ############################ ENTÊTE #######################################*/
+
+#entete {
+	width: 1000px;
+	height: 100px;
+	background-color: #8de10f;
+	margin: auto;
+}
+
+#logo {
+	margin-left: 5px;
+	margin-top: 5px;
+	border-radius:0 0 90px 0;
+	border:5px solid #8de10f;
+	width: 155px;
+	height: 80px;
+}
+
+#logo div {
+	margin-left: 5px;
+	margin-top: 5px;
+	border-radius:0 0 90px 0;
+	width: 140px;
+	height: 70px;
+	background-color:#FF3366;
+	background-image: url(../img/logo.jpg);
+	background-position:right top;
+}
+
+/* ############################ MENU #######################################*/
+
+#menuHaut  {
+	margin: auto;
+	margin-top: 10px;
+	width: 1000px;
+	height: auto;
+	background-color: #282830;
+}
+
+#menuGauche  {
+	margin-top: 0px;
+	float:left;
+	width:215px;
+	height: auto;
+	/*border-radius: 0 0 200px 0;*/
+}
+
+/* ############################ CORPS #######################################*/
+
+#corps {
+	max-with:1000px;
+	width: 1000px;
+	margin: auto;
+}
+
+#contenu {
+	padding:1px 0;
+	border:1px solid #9966FF;
+	background: #f1f1f1;
+	margin-top: 10px;
+	margin-left:225px;
+	width: 773px;
+	min-height: 550px;
+	height: auto;
+}
+
+/* ############################ PIED #######################################*/
+
+#footer {
+	padding:1px 0;
+	margin: auto;
+	margin-top: 10px;	
+	border:1px solid #9966FF;
+	background: #f1f1f1;
+	width: 1000px;
+	height: 30px;
+	text-align:center;
+	clear:both;
+}
+
+

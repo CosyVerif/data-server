@@ -29,7 +29,7 @@ class StreamBase
       else if (!StreamBase::isEmptyDir($file))
       { 
         $tmp = json_decode(file_get_contents($file."/info.json"), TRUE);
-        $resourceList[] = array('href' => $file, 'name' => $tmp["name"]);
+        $resourceList[] = array('href' => $url."/".basename($file), 'name' => $tmp["name"]);
       }
     }
     $data["resource_list"] = $resourceList;

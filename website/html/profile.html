@@ -1,0 +1,56 @@
+<style type="text/css">
+@charset "utf-8";
+/* CSS Document */
+
+/* ---------- GENERAL ---------- */
+
+#profile{
+	padding-left:10px;
+	padding-right: 10px;
+	border:1px solid #9966FF;
+	background: #f1f1f1;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 193px;
+	height: auto;
+}
+
+</style>
+<script type="text/javascript">
+</script>
+<div id="profile">
+<p id="name" style="font-size:14px;font-weight: bold;"><p>
+
+<p id="street"></p>
+
+<p id="zip"></p>
+
+<p id="phone"></p>
+
+<p id="email"></p>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	var infoAuth = btoa(username + ":" + password);
+  jQuery.ajax({
+  	type: 'GET', // Le type de ma requete
+  	url: rootURL + '/users/' + username, 
+  	dataType: 'json',
+  	beforeSend: function (request)
+    	{
+        request.setRequestHeader("Authorization", "Basic  "+ infoAuth +"==");
+      },
+	  success: function(data, textStatus, jqXHR) 
+		  {
+		  	$("#name").text(data.name);
+		  	$("#street").text(data.street);
+		  	$("#zip").text(data.zip + " " + data.city + " (" + data.country + ")");
+		  	$("#phone").text(data.phone);
+		  	$("#email").text(data.email);
+		  },
+	  error: function(jqXHR, textStatus, errorThrown){
+		    $("#name").text("Server internal error");
+		  }
+	});
+});
+</script>

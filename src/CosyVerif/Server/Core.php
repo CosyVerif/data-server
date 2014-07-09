@@ -11,12 +11,46 @@ class Core  extends \Slim\Middleware
     // list router
     $app->get('/', function() use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), null, true);
-      if (!is_null($data)){$app->response->setBody($data);}
-    })->setName("list");
+      $data = file_get_contents("website/index.html");
+      if ($data == FALSE)
+      {
+        $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+      }
+      else
+      {
+        $app->response->setStatus(STATUS_OK);
+        $app->response->headers->set('Content-Type','text/html');
+        $app->response->setBody($data);
+      }
+    })->setName("website");
+    $app->get('/website/:type/:name', function($type, $name) use($app)
+    {
+      $data = file_get_contents("website/".$type."/".$name);
+      if ($data == FALSE)
+      {
+        $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+      }
+      else
+      {
+        $app->response->setStatus(STATUS_OK);
+        $app->response->setBody($data);
+        if ($type == "html")
+        {
+          $app->response->headers->set('Content-Type','text/html');
+        }
+        else if ($type == "css")
+        {
+          $app->response->headers->set('Content-Type','text/css');
+        }
+        else if ($type == "img")
+        {
+          $app->response->headers->set('Content-Type','image/jpeg');
+        }
+      }
+    })->setName("website");
     $app->get('/(users|projects)(/)', function() use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), null, true);
+      $data = $this->readList($app->request->getResourceUri());
       if (!is_null($data)){$app->response->setBody($data);}
     })->setName("list");
 
@@ -25,7 +59,7 @@ class Core  extends \Slim\Middleware
     // user router
     $app->get('/(users|projects)/:id(/)', function() use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), "user-project", true);
+      $data = $this->user("get-user", $app->request->getResourceUri(), $data = NULL);
       if (!is_null($data)){$app->response->setBody($data);}
     })->setName($type);
     $app->put('/(users|projects)/:id(/)', function() use($app)
@@ -35,7 +69,7 @@ class Core  extends \Slim\Middleware
       {
         $app->halt(STATUS_UNPROCESSABLE_ENTITY);
       }
-      $this->put($app->request->getResourceUri(), $data, "user-project");
+      $this->user("put-user", $app->request->getResourceUri(), $data);
     })->setName($type);
     $app->patch('/(users|projects)/:id(/)', function() use($app)
     {
@@ -43,12 +77,12 @@ class Core  extends \Slim\Middleware
     })->setName($type);
     $app->delete('/(users|projects)/:id(/)', function() use ($app)
     {
-      $this->delete($app->request->getResourceUri());
+      $this->user("delete-user", $app->request->getResourceUri(), $data = NULL);
     })->setName($type);
     // resource list router
     $app->get('/(users|projects)/:id/:others(/)', function($id, $others) use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), null, true);
+      $data = $this->readList($app->request->getResourceUri());
       if (!is_null($data)){$app->response->setBody($data);}
     })->setName($type."-resourceList"); 
     // formalisms router
@@ -71,7 +105,7 @@ class Core  extends \Slim\Middleware
       // converters router
     $app->get('/(users|projects)/:id/formalisms/:formalism/converters(/)', function() use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), null, true);
+      $data = $this->readList($app->request->getResourceUri());
       if (!is_null($data)){$app->response->setBody($data);}
     })->setName($type."-resourceList"); 
     $app->get('/(users|projects)/:id/formalisms/:formalism/converters/:converter(/)', function() use($app)
@@ -93,22 +127,31 @@ class Core  extends \Slim\Middleware
     // models router
     $app->get('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
-      $data = $this->get($app->request->getResourceUri(), "model", false);
-      if (!is_null($data)){$app->response->setBody($data);}
+      $app->response->setBody($this->model("get-model", $app->request->getResourceUri(), $data = NULL));
     })->setName($type."-resource"); 
     $app->put('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
-      $data = $app->request->getBody();
-      $this->put($app->request->getResourceUri(), $data, "model");
+      $data = json_decode($app->request->getBody(), TRUE);
+      if (!is_array($data))
+      {
+        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+      }
+      $this->model("put-model", $app->request->getResourceUri(), $data);
     })->setName($type."-resource");   
     $app->patch('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
-      echo " :model: ";
+      $app->response->setStatus(STATUS_CREATED);
     })->setName($type."-resource"); 
     $app->delete('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
             echo " :model: ";
-    })->setName($type."-resource");  
+    })->setName($type."-resource");
+    $app->get('/(users|projects)/:id/models/:model/patches/:patch(/)', function() use($app)
+    {
+      $patch_data = "local p = function (model) model.x = 1 end";
+      $app->response->setBody($patch_data);
+      $app->response->setStatus(STATUS_OK);
+    })->setName($type."-resource");   
     $app->get('/(users|projects)/:id/models/:model/patches(/)', function() use($app)
     {
        echo " :patches : ".$app->request->params('from')." - ".$app->request->params('to');
@@ -123,7 +166,9 @@ class Core  extends \Slim\Middleware
     })->setName($type."-resource");
     $app->get('/(users|projects)/:id/models/:model/editor(/)', function() use($app)
     {
+      /*
       $data = json_decode(file_get_contents($app->config["base_dir"]."/users/enter_edit_mode_user/models/model_1/editor/info.json"), TRUE);
+        
       if (count($data) == 0) 
       {
         $info = array('url' => "127.0.0.1", 'port' => 300);
@@ -131,7 +176,10 @@ class Core  extends \Slim\Middleware
       }
       $data = json_decode(file_get_contents($app->config["base_dir"]."/users/enter_edit_mode_user/models/model_1/editor/info.json"), TRUE);
       $app->response->setBody(json_encode($data));
-      $app->response->headers->set('Content-Type','application/json');
+      $app->response->headers->set('Content-Type','application/json');*/
+
+      $app->response->setBody($this->model("edit-mode", $app->request->getResourceUri(), $data = NULL));
+
     })->setName($type."-resource"); 
 
     // scenarios router
@@ -207,55 +255,82 @@ class Core  extends \Slim\Middleware
     $this->next->call();
   }
 
-  private function get($url, $contentType, $isList)
-  { 
-    if ($isList)
-    {
-      $resource = StreamBase::readList($url); 
-      if (is_array($resource)){$resource = json_encode($resource);}
-    } 
-    else 
-    {
-      switch ($contentType) 
-      {
-        case 'user-project' :
-          $resource = StreamUserProject::read($url); 
-          if (is_array($resource)){$resource = json_encode($resource);}
-          break;
-        case 'model' :
-          $resource = StreamModel::read($url);
-          break;
-        
-        default:
-          # code...
-          break;
-      }
-      
-    }
-    return $resource;
-  }
-
-  private function put($url, $data, $contentType)
+  private function readList($url)
   {
-    $is_ok = false;
-    switch ($contentType) {
-      case 'user-project':
-        $is_ok = StreamUserProject::write($url, $data);
+      $resource = StreamBase::readList($url); 
+      if (is_array($resource))
+        return json_encode($resource);
+      else
+        return NULL;
+  }
+  private function model($action, $url, $data)
+  {
+    global $app;
+    $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+    switch ($action) {
+      case 'edit-mode':
+        $luaURL = StreamModel::getUrl($url);
+        $userToken = StreamModel::generateToken();
+        $can_ok = true; // verify if server lua exist that port
+        if ($can_ok)
+        {
+          // formToken {user_token, user_read, user_write} 
+          $serverToken = StreamModel::getToken($url);
+          // send to lua server 
+        }
+        else
+        {
+          //create server tocken and choice port and create server lua
+          $serverToken = StreamModel::generateToken();
+          $luaURL = "ws://localhost:300"; // Choice port
+          //create lua server
+          StreamModel::saveUrl($url, $luaURL);
+          StreamModel::saveToken($url, $serverToken);
+        }
+        $app->response->headers->set('Content-Type','application/json');
+        $app->response->setStatus(STATUS_OK);
+        return json_encode(array('url' => $luaURL, 'token' => $userToken));
         break;
-      case 'model':
-        $is_ok = StreamModel::write($url, $data);
+
+      case 'get-model':
+        $data = StreamModel::read($url);
+        if (is_array($data))
+          return json_encode($data);
         break;
+
+      case 'put-model':
+        return StreamModel::write($url, $data);
+        break;
+
       default:
         # code...
         break;
     }
-    
-    return $is_ok;
   }
 
-  private function delete($url)
+  private function user($action, $url, $data)
   {
-    $is_ok = StreamUserProject::delete($url);
-    return $is_ok;
+    global $app;
+    $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+    switch ($action) {
+      case 'get-user':
+        $data = StreamUserProject::read($url);
+        if (is_array($data))
+          return json_encode($data);
+        else
+          return NULL;
+        break;
+      case 'put-user':
+        return StreamUserProject::write($url, $data);
+        break;
+
+      case 'delete-user':
+        return StreamUserProject::delete($url);
+        break;
+
+      default:
+        # code...
+        break;
+    }
   }
 }
