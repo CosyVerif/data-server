@@ -24,7 +24,7 @@ class Permission extends \Slim\Middleware
     $params = $this->app->router()->getCurrentRoute()->getParams();
     $pattern = $this->app->router()->getCurrentRoute()->getPattern();
     $routeName = $this->app->router()->getCurrentRoute()->getName();
-    if ($routeName == "website")
+    if ($routeName == "webclient")
     {
       return true;
     }
@@ -115,5 +115,7 @@ class Permission extends \Slim\Middleware
     $auth = json_decode(file_get_contents($app->config["base_dir"].$url."/auth.json"), TRUE);
     return ($auth["can_public"] ==  IS_PUBLIC);
   }
+}
+
 }
 ?>

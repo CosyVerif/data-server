@@ -7,6 +7,12 @@ class HttpBasicAuthentification extends \Slim\Middleware
 {
   protected $realm = "CosyVerif";
 
+  public static function register()
+  {
+    global $app;
+    $app->add(new HttpBasicAuthentification());
+  }
+
   public function call()
   {
     global $app;

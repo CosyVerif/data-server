@@ -9,49 +9,19 @@ class Core  extends \Slim\Middleware
   {
     global $app;
     // list router
-    $app->get('/', function() use($app)
+    $app->get('/(webclient|html|js|lua|css|img)(/:name+)', function() use($app)
     {
-      $data = file_get_contents("website/index.html");
-      if ($data == FALSE)
-      {
-        $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-      }
+      $url = $app->request->getResourceUri();
+      if ($url == "/")
+        $this->website("webclient/index.html");
+      else if (substr($url, 1,9) == "webclient")
+        $this->website(substr($url, 1));
       else
-      {
-        $app->response->setStatus(STATUS_OK);
-        $app->response->headers->set('Content-Type','text/html');
-        $app->response->setBody($data);
-      }
-    })->setName("website");
-    $app->get('/website/:type/:name', function($type, $name) use($app)
-    {
-      $data = file_get_contents("website/".$type."/".$name);
-      if ($data == FALSE)
-      {
-        $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-      }
-      else
-      {
-        $app->response->setStatus(STATUS_OK);
-        $app->response->setBody($data);
-        if ($type == "html")
-        {
-          $app->response->headers->set('Content-Type','text/html');
-        }
-        else if ($type == "css")
-        {
-          $app->response->headers->set('Content-Type','text/css');
-        }
-        else if ($type == "img")
-        {
-          $app->response->headers->set('Content-Type','image/jpeg');
-        }
-      }
-    })->setName("website");
+        $this->website("webclient".$url);
+    })->setName("webclient");
     $app->get('/(users|projects)(/)', function() use($app)
-    {
-      $data = $this->readList($app->request->getResourceUri());
-      if (!is_null($data)){$app->response->setBody($data);}
+    { 
+      $this->readList(); 
     })->setName("list");
 
     $type = (preg_match('#^/users#', $app->request->getResourceUri())) ? "user" : "project";
@@ -59,17 +29,11 @@ class Core  extends \Slim\Middleware
     // user router
     $app->get('/(users|projects)/:id(/)', function() use($app)
     {
-      $data = $this->user("get-user", $app->request->getResourceUri(), $data = NULL);
-      if (!is_null($data)){$app->response->setBody($data);}
+      $this->userORproject("get-user");
     })->setName($type);
     $app->put('/(users|projects)/:id(/)', function() use($app)
     {
-      $data = json_decode($app->request->getBody(), TRUE);
-      if (!is_array($data))
-      {
-        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
-      }
-      $this->user("put-user", $app->request->getResourceUri(), $data);
+      $this->userORproject("put-user");
     })->setName($type);
     $app->patch('/(users|projects)/:id(/)', function() use($app)
     {
@@ -77,13 +41,12 @@ class Core  extends \Slim\Middleware
     })->setName($type);
     $app->delete('/(users|projects)/:id(/)', function() use ($app)
     {
-      $this->user("delete-user", $app->request->getResourceUri(), $data = NULL);
+      $this->userORproject("delete-user");
     })->setName($type);
     // resource list router
     $app->get('/(users|projects)/:id/:others(/)', function($id, $others) use($app)
-    {
-      $data = $this->readList($app->request->getResourceUri());
-      if (!is_null($data)){$app->response->setBody($data);}
+    { 
+      $this->readList(); 
     })->setName($type."-resourceList"); 
     // formalisms router
     $app->get('/(users|projects)/:id/formalisms/:formalism(/)', function() use($app)
@@ -105,8 +68,7 @@ class Core  extends \Slim\Middleware
       // converters router
     $app->get('/(users|projects)/:id/formalisms/:formalism/converters(/)', function() use($app)
     {
-      $data = $this->readList($app->request->getResourceUri());
-      if (!is_null($data)){$app->response->setBody($data);}
+      $this->readList();
     })->setName($type."-resourceList"); 
     $app->get('/(users|projects)/:id/formalisms/:formalism/converters/:converter(/)', function() use($app)
     {
@@ -127,16 +89,11 @@ class Core  extends \Slim\Middleware
     // models router
     $app->get('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
-      $app->response->setBody($this->model("get-model", $app->request->getResourceUri(), $data = NULL));
+      $this->model("get-model");
     })->setName($type."-resource"); 
     $app->put('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
-      $data = json_decode($app->request->getBody(), TRUE);
-      if (!is_array($data))
-      {
-        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
-      }
-      $this->model("put-model", $app->request->getResourceUri(), $data);
+      $this->model("put-model");
     })->setName($type."-resource");   
     $app->patch('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
@@ -148,13 +105,11 @@ class Core  extends \Slim\Middleware
     })->setName($type."-resource");
     $app->get('/(users|projects)/:id/models/:model/patches/:patch(/)', function() use($app)
     {
-      $patch_data = "local p = function (model) model.x = 1 end";
-      $app->response->setBody($patch_data);
-      $app->response->setStatus(STATUS_OK);
+      $this->model("get-patch");
     })->setName($type."-resource");   
     $app->get('/(users|projects)/:id/models/:model/patches(/)', function() use($app)
     {
-       echo " :patches : ".$app->request->params('from')." - ".$app->request->params('to');
+      $this->model("get-patches");
     })->setName($type."-resource"); 
     $app->put('/(users|projects)/:id/models/:model/patches(/)', function() use($app)
     {
@@ -178,7 +133,7 @@ class Core  extends \Slim\Middleware
       $app->response->setBody(json_encode($data));
       $app->response->headers->set('Content-Type','application/json');*/
 
-      $app->response->setBody($this->model("edit-mode", $app->request->getResourceUri(), $data = NULL));
+      $this->model("edit-mode");
 
     })->setName($type."-resource"); 
 
@@ -237,10 +192,10 @@ class Core  extends \Slim\Middleware
     })->setName($type."-resource"); 
 
     // user project router
-    $app->get('/users/:id/projects/:project+', function() use($app){})->setName("user-project");
-    $app->put('/users/:id/projects/:project+', function() use($app){})->setName("user-project");
-    $app->patch('/users/:id/projects/:project+', function() use($app){})->setName("user-project");
-    $app->delete('/users/:id/projects/:project+', function() use($app){})->setName("user-project");
+    $app->get('/users/:id/projects/:project(/:name+)', function() use($app){})->setName("user-project");
+    $app->put('/users/:id/projects/:project(/:name+)', function() use($app){})->setName("user-project");
+    $app->patch('/users/:id/projects/:project(/:name+)', function() use($app){})->setName("user-project");
+    $app->delete('/users/:id/projects/:project(/:name+)', function() use($app){})->setName("user-project");
 
     // project user router
     $app->get('/projects/:id/users/:user(/)', function() use($app){})->setName("project-user"); 
@@ -255,18 +210,18 @@ class Core  extends \Slim\Middleware
     $this->next->call();
   }
 
-  private function readList($url)
+  private function readList()
   {
-      $resource = StreamBase::readList($url); 
-      if (is_array($resource))
-        return json_encode($resource);
-      else
-        return NULL;
+    global $app;
+    $data = StreamBase::readList($app->request->getResourceUri()); 
+    if (is_array($data))
+      return $app->response->setBody(json_encode($data));
   }
-  private function model($action, $url, $data)
+  private function model($action)
   {
     global $app;
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+    $url = $app->request->getResourceUri();
     switch ($action) {
       case 'edit-mode':
         $luaURL = StreamModel::getUrl($url);
@@ -289,17 +244,38 @@ class Core  extends \Slim\Middleware
         }
         $app->response->headers->set('Content-Type','application/json');
         $app->response->setStatus(STATUS_OK);
-        return json_encode(array('url' => $luaURL, 'token' => $userToken));
+        $app->response->setBody(json_encode(array('url' => $luaURL, 'token' => $userToken)));
         break;
 
       case 'get-model':
         $data = StreamModel::read($url);
         if (is_array($data))
-          return json_encode($data);
+          $app->response->setBody(json_encode($data));
         break;
 
       case 'put-model':
-        return StreamModel::write($url, $data);
+        $data = json_decode($app->request->getBody(), TRUE);
+        if (!is_array($data))
+        {
+          $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+        }
+        StreamModel::write($url, $data);
+        $app->response->setBody("{}");
+
+        break;
+
+      case 'get-patch':
+        $data = StreamModel::readPatch($url);
+        if (is_array($data))
+          $app->response->setBody(json_encode($data));
+        break;
+
+      case 'get-patches':
+        //$from = $app->request->getParam("from");
+        //$to = $app->request->getParam("to");
+        $data = StreamModel::readPatchList($url, $from = NULL, $to = NULL);
+        if (is_array($data))
+          $app->response->setBody(json_encode($data));
         break;
 
       default:
@@ -308,29 +284,71 @@ class Core  extends \Slim\Middleware
     }
   }
 
-  private function user($action, $url, $data)
+  private function userORproject($action)
   {
     global $app;
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+    $url = $app->request->getResourceUri();
     switch ($action) {
       case 'get-user':
         $data = StreamUserProject::read($url);
         if (is_array($data))
-          return json_encode($data);
-        else
-          return NULL;
+          $app->response->setBody(json_encode($data));
         break;
       case 'put-user':
-        return StreamUserProject::write($url, $data);
+        $data = json_decode($app->request->getBody(), TRUE);
+        if (!is_array($data))
+        {
+          $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+        }
+        StreamUserProject::write($url, $data);
         break;
 
       case 'delete-user':
-        return StreamUserProject::delete($url);
+        StreamUserProject::delete($url);
         break;
 
       default:
         # code...
         break;
+    }
+  }
+
+  private function website($url)
+  {
+    global $app;
+    $data = file_get_contents($url);
+    if ($data == FALSE)
+    {
+      $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
+    }
+    else
+    {
+      $app->response->setStatus(STATUS_OK);
+      $app->response->setBody($data);
+      $pathInfo = pathinfo($url);
+      $extension = $pathInfo['extension'];
+      if ($extension == "html")
+      {
+        $app->response->headers->set('Content-Type','text/html');
+      }
+      else if ($extension == "css")
+      {
+        $app->response->headers->set('Content-Type','text/css');
+      }
+      else if ($extension == "js")
+      {
+        $app->response->headers->set('Content-Type','application/javascript');
+      }
+      else if ($extension == "jpg")
+      {
+        $app->response->headers->set('Content-Type','image/jpeg');
+      } 
+      else if ($extension == "png")
+      {
+        $app->response->headers->set('Content-Type','image/png');
+      } 
+      
     }
   }
 }
