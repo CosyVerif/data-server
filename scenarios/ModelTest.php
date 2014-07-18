@@ -212,6 +212,8 @@ class ModelTest extends PHPUnit_Framework_TestCase
     Util::addUserRoot();
     /* Add new user   */
     Util::addUser("put_model_user", "put_model_user", "put_model_user", "toto", true, true);
+        Util::addUser("idrissa", "SOKHONA", "idrissa", "toto", true, true);
+    Util::addUser("francisco", "GIMENEZ", "francisco", "toto", true, true);
     /* Prepares the model data */
     $model_data = '{ x = 1, a = "", y = { 1, 2, 3 }}';
     $data = json_encode(array('name' => "model 1", 'data' => $model_data));
@@ -301,7 +303,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
   {
     /* Prepares the request    */
     $config = Util::getConfig();
-    //Util::addUserRoot();
+    Util::addUserRoot();
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode($config["user_root"].":toto");
     /* Add a new user */

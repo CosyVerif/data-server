@@ -15,7 +15,7 @@ class Util
   public static function addUserRoot()
   {
     $config = Util::getConfig();
-    Util::rrmdir($config["base_dir"], $config["base_dir"]);
+    Util::rrmdir($config["base_dir"]);
     $info = array('name' => 'Root base');
     $auth = array('login' => $config["user_root"],
                   'password' => password_hash($config["user_root"].'toto', PASSWORD_DEFAULT));
@@ -104,16 +104,17 @@ class Util
     file_put_contents($config["base_dir"]."/users/".$user_name."/models/".$model_name."/editor/info.json", json_encode($info));
   }
 
-  public static function rrmdir($path, $newPath)
+  public static function rrmdir($path)
   {
-    foreach(glob($newPath . '/*') as $file) 
+    foreach(glob($path . '/*') as $file) 
     {
       if(is_dir($file))
-        Util::rrmdir($newPath, $file);
+      {
+        Util::rrmdir($file);
+        rmdir($file);
+      }
       else
         unlink($file);      
     }
-    if($newPath != $path)
-      rmdir($newPath);
   }
 }
