@@ -1,0 +1,66 @@
+#menu_top #cssmenuh,
+#menu_top #cssmenuh ul,
+#menu_top #cssmenuh ul li,
+#menu_top #cssmenuh ul li a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  line-height: 1;
+  display: block;
+  position: relative;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#menu_top #cssmenuh {
+  border-bottom: 3px solid #333333;
+  padding: 0 5px;
+  padding-left: 215px;
+  width: auto;
+  font-family: Helvetica, Arial, sans-serif;
+  background: #dddddd;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+#menu_top #cssmenuh:after,
+#menu_top #cssmenuh ul:after {
+  content: '.';
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+#menu_top #cssmenuh ul li {
+  display: inline-block;
+}
+#menu_top #cssmenuh.align-right ul li {
+  float: right;
+}
+#menu_top #cssmenuh.align-center ul {
+  text-align: center;
+}
+#menu_top #cssmenuh ul li a {
+  font-size: 14px;
+  padding: 15px;
+  text-decoration: none;
+  color: #0e83cd;
+}
+#menu_top #cssmenuh ul li:hover a,
+#menu_top #cssmenuh ul li a:hover,
+#menu_top #cssmenuh ul li.active a {
+  color: #333333;
+}
+@media all and (max-width: 640px) {
+  #menu_top #cssmenuh {
+    padding: 0;
+    border-radius: 0;
+    border: 0;
+  }
+  #menu_top #cssmenuh ul li,
+  #menu_top #cssmenuh.align-center,
+  #menu_top #cssmenuh.align-right {
+    display: block;
+  }
+}
