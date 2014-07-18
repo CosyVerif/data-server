@@ -1,0 +1,49 @@
+<script type='text/javascript'>
+$( document ).ready(function() {
+   $('#menu_left_default #cssmenu li.has-sub>a').on('click', function(){
+         $(this).removeAttr('href');
+         var element = $(this).parent('li');
+         if (element.hasClass('open')) {
+            element.removeClass('open');
+            element.find('li').removeClass('open');
+            element.find('ul').slideUp();
+         }
+         else {
+            element.addClass('open');
+            element.children('ul').slideDown();
+            element.siblings('li').children('ul').slideUp();
+            element.siblings('li').removeClass('open');
+            element.siblings('li').find('li').removeClass('open');
+            element.sibl5ngs('li').find('ul').slideUp();
+         }
+   });
+});
+</script>
+<link rel="stylesheet" type="text/css" href="css/menu_left_default.css">
+<div id="menu_left_default">
+<div id='cssmenu'>
+<input type="search" id="search" results="5" placeholder="Search..." name="s" style="-webkit-appearance: textfield;-webkit-box-sizing: content-box; width:207px; height:25px;font-size:14px;">
+<ul>
+<li class='has-sub'><a href='#'><span>Formalisms</span></a>
+  <ul>
+    <li><a href='#'><span>Sub Item</span></a></li>
+    <li class='last'><a href='#'><span>Sub Item</span></a></li>
+  </ul>
+</li>
+<li class='has-sub'><a href='#'><span>Models</span></a>
+  <ul>
+    <li><a href='#'><span>Sub Item</span></a></li>
+    <li class='last'><a href='#'><span>Sub Item</span></a></li>
+  </ul>
+</li>
+<li><a href='#'><span>Services</span></a></li>
+<li class='last'><a href='#'><span>Executions</span></a></li>
+</ul>
+<select name="nom" size="1" style="width:215px;height:25px;font-size:14px;">
+  <option>Username</option>
+  <option>Project1</option>
+  <option>Project2</option>
+  <option>Project3</option>
+</select>
+</div>
+</div>

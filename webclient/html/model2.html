@@ -1,0 +1,78 @@
+
+<script type="text/javascript">
+
+
+
+function modifyModelInfo(){
+	var data = JSON.stringify({"name":$('#model-name').text()});
+	var infoAuth = btoa(username + ":" + password);
+  jQuery.ajax({
+  	type: 'PUT', // Le type de ma requete
+  	url: rootURL + url, 
+  	dataType: 'json',
+  	data : data,
+  	contentType:'application/json',
+  	beforeSend: function (request)
+    	{
+        request.setRequestHeader("Authorization", "Basic  "+ infoAuth +"==");
+      },
+	  success: function(data, textStatus, jqXHR) 
+		  {
+		  	/*$("#model-name").text(data.name);
+		  	$("#model-content").text(data.data);*/
+		  	alert("ok ok");
+		  },
+	  error: function(jqXHR, textStatus, errorThrown){
+	  	 alert(errorThrown);
+		    //$("#model-name").text("Server internal error");
+		  }
+	});
+}
+
+</script>
+<link rel="stylesheet" type="text/css" href="css/model.css">
+<div id="model">
+<div>
+	<p id="model-name" style=""><p>
+	<a href="#" id="model-name-modify" onclick="javascript:modifyModelInfo();">Modify</a>
+	<a href="#" id="model-name-modify" onclick="javascript:cancelModelInfo();" style="display:none;" >Cancel</a>
+</div>
+<div>
+	<p id="model-content"> </p>
+	<a href="#" id="model-content-modify" onclick="javascript:modifyModelData();">Modify</a>
+	<a href="#" id="model-content-cancel" onclick="javascript:cancelModelData();"  style="display:none;" >Cancel</a>
+</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	var infoAuth = btoa(username + ":" + password);
+  jQuery.ajax({
+  	type: 'GET', // Le type de ma requete
+  	url: rootURL + url, 
+  	dataType: 'json',
+  	beforeSend: function (request)
+    	{
+        request.setRequestHeader("Authorization", "Basic  "+ infoAuth +"==");
+      },
+	  success: function(data, textStatus, jqXHR) 
+		  {
+		  	$("#model-name").text(data.name);
+		  	$("#model-content").text(data.data);
+		  },
+	  error: function(jqXHR, textStatus, errorThrown){
+		    $("#model-name").text("Server internal error");
+		  }
+	});
+});
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+
+  </div> 
+  </script>  

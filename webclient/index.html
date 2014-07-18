@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="css/index.css" media="all"/>
+		<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+		<script type="text/javascript" src="js/script.js"></script>
+		<title>CosyVerif</title>
+	</head>
+	<body>
+		<!-- entete -->
+		<!--
+		<div id="entete">
+			<div id="logo"><div></div></div>
+		</div>
+    -->
+		<!-- menu haut -->
+		<div id="menuHaut">
+		</div>
+
+		<!-- Corps -->
+		<div id="corps">
+			<!-- menu gauche -->
+		 	<div id="menuGauche">
+		 		<div id="menu"></div>
+		 		<div id="menu-profile"></div>
+		 	</div>
+
+			<!-- contenu -->
+		  <div id="contenu">
+				
+			</div>
+		</div>
+		<!-- Bas de page -->
+		<div id="footer">
+		 CosyVerif
+		</div>
+		<script type="text/javascript">
+			$(document).ready(function()
+			{
+				$('#menuHaut').load("html/menu_top.html");
+				loadMenu("menu_left_default");
+				loadPage("home_default");
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CosiVerif Beta Client</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
+    
+    <!-- Model Graph styles-->      
+    <link rel="stylesheet" type="text/css" href="css/model_gui.css">
+    <link rel="stylesheet" type="text/css" href="css/web_client.css">
+    <link rel="stylesheet" type="text/css" href="css/model.css">
+    
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+    <![endif]-->
+
+    <!-- Codemirror styles -->
+    <link rel="stylesheet" href="css/codemirror.css">
+    
+    
+    <!-- We include all the js we need-->
+    <script src="js/codemirror.js"></script>
+    <script src="lua/js.lua" type="text/lua"></script>
+    <script src="js/lua.js"></script>
+    <script type="text/javascript" src="js/d3.js"></script>
+    <script type="text/javascript" src="js/model_gui.js"></script>
+    <script type="text/javascript" src="js/lua.vm.js"></script> 
+
+<script type="text/javascript">
+  model_data = "";
+  patches_data = "";
+  lua_code = "";
+  token = "";
+  ws_url = "";
+
+  function enterEditorMode()
+  {
+    function success(data)
+    {
+      token = data.token;
+      ws_url = data.url;
+
+      alert(token + " " + ws_url);
+    }
+    function error(){
+      $("#model-name").text("Server internal error");
+    }
+    get(url + "/editor", success, error);
+  }
+
+  function modifyLua(){
+    var jsonData = JSON.stringify({"name":$('#model-name').text(),"data":lua_code.getValue()});
+    function success(data)
+    {
+      model_data = lua_code.getValue();
+    }
+    function error(){
+      $("#model-name").text("Server internal error");
+    }
+    put(url, jsonData, success, error);
+  }
+  function loadit(element)
+  {
+    var container = document.getElementById('container');
+    var tabs=document.getElementById('tabs').getElementsByTagName("a");
+    for (var i=0; i < tabs.length; i++)
+    {
+      if(tabs[i].rel == element.rel) 
+        tabs[i].className="selected";
+      else
+        tabs[i].className="";
+    }
+    if (element.rel == "lua")
+    {
+      $('#model_gui').css("display","none");
+      $('#container_lua').css("display","block");
+      //$('#edit_mode').css("visibility","hidden");
+    }
+    else if (element.rel == "model")
+    {
+      executeLua(lua_code.getValue(), true);
+      $('#container_lua').css("display","none");
+      $('#model_gui').css("display","block");
+      //$('#edit_mode').css("visibility","visible");
+    }
+    else 
+    {
+      if ($('#edit_mode').text() == "Edit mode")
+      {
+        enterEditorMode();
+        $('#edit_mode').text("Cancel edit");
+        $('#valide_button').css("visibility","visible");
+        lua_code.setOption("readOnly", false);
+      }
+      else
+      {
+        $('#edit_mode').text("Edit mode");
+        $('#valide_button').css("visibility","hidden");
+        lua_code.setValue(model_data);
+        lua_code.setOption("readOnly", true);
+      }
+
+    } 
+  }
+  function startit()
+  {
+    var tabs=document.getElementById('tabs').getElementsByTagName("a");
+    var container = document.getElementById('container');
+    container.src = container.src="webclient/web_client.html";
+  }
+</script>
+</head>
+<body>
+  <div id="model">
+    <p id="model-name"><p>
+    <div id="tabs">
+      <ul>
+          <li><a href="#" rel="lua" onClick="loadit(this)">Lua</a></li> 
+          <li><a href="#" rel="model" onClick="loadit(this)">Model</a></li> 
+          <li><a href="#" rel="edit" id="edit_mode" onClick="loadit(this)" style="margin-left:745px;">Edit mode</a></li> 
+      </ul>
+    </div>
+    <div id="containerr">
+    
+      <div id="container_lua">
+        <div class="container">
+          <div class="row">
+            <div class="span7" border=1>
+                <textarea id="model_code"></textarea>
+            </div>
+            <input type="button" id="valide_button" onclick="javascript:modifyLua();" value="Modify" style="visibility:hidden" />
+            <div class="span5">
+              <h4>Lua Code Output</h4>
+              <pre id="output">In here we can watch any output of the lua code. Also, any exception during execution time will be posted here</pre>
+            </div>
+          </div> 
+        </div> <!-- /container -->
+      </div>
+      <div class="tabContent" id="model_gui" style="display:none;">
+          <h4>Lua Model</h4>
+          <div id="model_container" class="span7"></div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript">
+      // CodeMirror
+  lua_code = CodeMirror.fromTextArea(document.getElementById('model_code'),{
+      lineNumbers: true,
+      readOnly: true
+
+  });
+  
+  lua_code.setSize(950, 800);
+
+  lua_code.setValue("");
+  
+  // Execution
+  var outputElement = document.getElementById('output');
+  var Module = {
+      print: function(x) {
+          console.log(""+x);
+          outputElement.innerHTML = (outputElement.innerHTML ? outputElement.innerHTML + '<br>' : '') + x;
+      }
+  };
+
+  
+  function executeLua(code, clear) {
+      if (clear) outputElement.innerHTML = '';
+      
+      var js_declarations = ' local keys = {}; \
+                          for k in pairs(model) \
+                          do \
+                          keys[#keys+1] = k; \
+                          end \
+                          local window    = js.global; \
+                          window.model    = model; \
+                          window.keys     = keys; \
+                          window.count    = #keys; \
+                          window.var_type = type; \
+                          window.type_place      = place; \
+                          window.type_transition = transition; \
+                          window.type_arc        = arc;';
+      
+      try {
+          L.execute(code + js_declarations);
+          //~ L.execute(code);
+      } catch(err) {
+              Module.print('ERROR: ' + err);
+              throw(err);
+      }
+      
+      updateModel();
+  }
+
+  $(document).ready(function(){
+    function success(data)
+    {
+      $("#model-name").text(data.name);
+      model_data = data.data;
+      //lua_code.setValue(model_data);
+    }
+    function error()
+    {
+      $("#model-name").text("Server internal error");
+    }
+    get(url, success, error);
+
+    function success(data)
+    {
+      patches_data = data;
+      var tmp = "";
+      if (data.length > 0)
+        tmp = tmp + "Patch " + data[0].name + " : \n" + data[0].data;
+      for(var i=1 ; i< data.length ; i++) 
+      {
+        tmp = tmp + "\n\n\nPatch " + data[i].name + " : \n" + data[i].data;
+      }
+      lua_code.setValue(model_data + "\n" + tmp);
+    }
+    function error(){
+      $("#model-name").text("Server internal error");
+    }
+    get(url + "/patches", success, error);
+  });
+</script>
+</body>
+</html>
