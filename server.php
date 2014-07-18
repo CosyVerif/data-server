@@ -9,8 +9,14 @@ $config = array_merge($server_config_file, $user_config_file);
 
 $app = new \Slim\Slim();
 $app->config = $config;
-$app->add(new \CosyVerif\Server\Core());
-$app->add(new \CosyVerif\Server\Permission());
-$app->add(new \CosyVerif\Server\HttpBasicAuthentification());
+\CosyVerif\Server\Routing\WebSiteMiddleware::register();
+\CosyVerif\Server\Routing\UserMiddleware::register();
+\CosyVerif\Server\Routing\ProjectMiddleware::register();
+\CosyVerif\Server\Routing\ModelMiddleware::register();
+\CosyVerif\Server\HttpBasicAuthentification::register();
+\CosyVerif\Server\Constants::register();
+//$app->add(new \CosyVerif\Server\Core());
+//$app->add(new \CosyVerif\Server\Permission());
+
 
 $app->run();
