@@ -21,6 +21,7 @@ class Constants
 		define('STATUS_FORBIDDEN', 403);
 		define('STATUS_NOT_FOUND', 404);
 		define('STATUS_METHOD_NOT_ALLOWED', 405);
+		define('STATUS_CONFLICT', 409);
 		define('STATUS_GONE', 410);
 		define('STATUS_UNPROCESSABLE_ENTITY', 422);
 		define('STATUS_INTERNAL_SERVER_ERROR', 500);

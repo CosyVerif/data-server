@@ -29,7 +29,7 @@ class ModelMiddleware  extends \Slim\Middleware
         $app->halt(STATUS_NOT_FOUND);
       else if (!$app->resource->canRead($app->user))
         $app->halt(STATUS_FORBIDDEN);
-      $data = $app->resource->readList(); 
+      $data = $app->resource->model_readList(); 
       if (is_array($data))
         $app->response->setBody(json_encode($data));
     })->setName("model"); 
@@ -37,14 +37,34 @@ class ModelMiddleware  extends \Slim\Middleware
     {
       if (!$app->resource->exists())
         $app->halt(STATUS_NOT_FOUND);
+      else if ($app->resource->deleted())
+        $app->halt(STATUS_GONE);
       else if (!$app->resource->canRead($app->user))
         $app->halt(STATUS_FORBIDDEN);
-      $data = $app->resource->read();
+      $data = $app->resource->model_read();
       if (is_array($data))
         $app->response->setBody(json_encode($data));
     })->setName("model"); 
+    $app->post('/(users|projects)/:id/models/:model(/)', function() use($app)
+    {
+      if ($app->resource->exists() && !$app->resource->deleted())
+        $app->halt(STATUS_CONFLICT);
+      if (!$app->resource->canCreate($app->user))
+        $app->halt(STATUS_FORBIDDEN);
+      $data = json_decode($app->request->getBody(), TRUE);
+      if (!is_array($data))
+      {
+        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+      }
+      $app->resource->model_create($data);
+      $app->response->setBody("{}");
+    })->setName("model"); 
     $app->put('/(users|projects)/:id/models/:model(/)', function() use($app)
     {
+      if (!$app->resource->exists())
+        $app->halt(STATUS_NOT_FOUND);
+      else if ($app->resource->deleted())
+        $app->halt(STATUS_GONE);
       if (!$app->resource->canWrite($app->user))
         $app->halt(STATUS_FORBIDDEN);
       $data = json_decode($app->request->getBody(), TRUE);
@@ -52,7 +72,7 @@ class ModelMiddleware  extends \Slim\Middleware
       {
         $app->halt(STATUS_UNPROCESSABLE_ENTITY);
       }
-      $app->resource->write($data);
+      $app->resource->model_write($data);
       $app->response->setBody("{}");
     })->setName("model");   
     $app->patch('/(users|projects)/:id/models/:model(/)', function() use($app)
@@ -69,7 +89,7 @@ class ModelMiddleware  extends \Slim\Middleware
         $app->halt(STATUS_NOT_FOUND);
       else if (!$app->resource->canRead($app->user))
         $app->halt(STATUS_FORBIDDEN);
-      $data = $app->resource->readPatch();
+      $data = $app->resource->patch_read();
       if (is_array($data))
         $app->response->setBody(json_encode($data));
     })->setName("model");   
@@ -81,7 +101,7 @@ class ModelMiddleware  extends \Slim\Middleware
         $app->halt(STATUS_FORBIDDEN);
       //$from = $app->request->getParam("from");
       //$to = $app->request->getParam("to");
-      $data = $app->resource->readPatchList($from = NULL, $to = NULL);
+      $data = $app->resource->patch_readList($from = NULL, $to = NULL);
       if (is_array($data))
         $app->response->setBody(json_encode($data));
     })->setName("model"); 
@@ -133,22 +153,45 @@ class ModelResource extends BaseResource
     return new ModelResource($url);
   }
 
-  public function read()
+  public function model_create($data)
   {
     global $app;
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-    //Verify existing resource
-    if (!file_exists($app->config["base_dir"].$this->getURL()))
+    if(!$this->exists())
     {
-      // Resource not found
-      $app->response->setStatus(STATUS_NOT_FOUND);
-      return null;
-    } 
-    else if($this->isEmptyDir($app->config["base_dir"].$this->getURL()))
-    {
-      $app->response->setStatus(STATUS_GONE);
-      return null;
+      mkdir($app->config["base_dir"].$this->getURL());
     }
+    $tmp = array();
+    mkdir($app->config["base_dir"].$this->getURL()."/patches");
+    $tmp["name"] = "Patch list";
+    file_put_contents($app->config["base_dir"].$this->getURL()."/patches/info.json", json_encode($tmp));
+    mkdir($app->config["base_dir"].$this->getURL()."/editor");
+    $tmp["name"] = "Editor information file";
+    $tmp["token"] = "";
+    $tmp["url"] = "";
+    file_put_contents($app->config["base_dir"].$this->getURL()."/editor/info.json", json_encode($tmp));
+    if (array_key_exists("name", $data))
+      file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode(array('name' => $data["name"])));
+    if (array_key_exists("data", $data))
+      file_put_contents($app->config["base_dir"].$this->getURL()."/model.lua", $data["data"]);
+    $app->response->setStatus(STATUS_CREATED);
+  }
+
+  public function model_write($data)
+  {
+    global $app;
+    $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR); 
+    if (array_key_exists("name", $data))
+      file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode(array('name' => $data["name"])));
+    if (array_key_exists("data", $data))
+      file_put_contents($app->config["base_dir"].$this->getURL()."/model.lua", $data["data"]);
+    $app->response->setStatus(STATUS_OK); 
+  }
+
+  public function model_read()
+  {
+    global $app;
+    $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
     $info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
     $lua = file_get_contents($app->config["base_dir"].$this->getURL()."/model.lua");
     if ($lua == FALSE || $info == FALSE)
@@ -156,89 +199,66 @@ class ModelResource extends BaseResource
       return null;
     } 
     $data = array ('name' => $info["name"], 'data' => $lua);
-    $app->response->setStatus(STATUS_OK);
     $app->response->headers->set('Content-Type','application/json');
+    $app->response->setStatus(STATUS_OK);
     return $data;
   }
 
-  public function write($data)
+  public function model_readList()
   {
     global $app;
-    //Write ressource
-    $is_ok = false;
-    $info = "";
-    $auth = "";
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-    if (!file_exists($app->config["base_dir"].$this->getURL()) ||   
-        $this->isEmptyDir($app->config["base_dir"].$this->getURL()))
+    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $resourceList = array();
+    foreach (glob($app->config["base_dir"].$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
     {
-      if(!file_exists($app->config["base_dir"].$this->getURL()))
-      {
-        mkdir($app->config["base_dir"].$this->getURL());
+      if (!is_dir($file))
+        continue;
+      else if (!$this->isEmptyDir($file))
+      { 
+        $tmp = json_decode(file_get_contents($file."/info.json"), TRUE);
+        $resourceList[] = array('href' => $this->getURL()."/".basename($file), 'name' => $tmp["name"]);
       }
-      $tmp = array();
-      mkdir($app->config["base_dir"].$this->getURL()."/patches");
-      $tmp["name"] = "Patch list";
-      file_put_contents($app->config["base_dir"].$this->getURL()."/patches/info.json", json_encode($tmp));
-      mkdir($app->config["base_dir"].$this->getURL()."/editor");
-      $tmp["name"] = "Editor information file";
-      $tmp["token"] = "";
-      $tmp["url"] = "";
-      file_put_contents($app->config["base_dir"].$this->getURL()."/editor/info.json", json_encode($tmp));
-      $app->response->setStatus(STATUS_CREATED);
-    } 
-    else 
-      $app->response->setStatus(STATUS_OK);
-    if (array_key_exists("name", $data))
-      file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode(array('name' => $data["name"])));
-    if (array_key_exists("data", $data))
-      file_put_contents($app->config["base_dir"].$this->getURL()."/model.lua", $data["data"]);
-    return $is_ok = true; 
+    }
+    $data["resource_list"] = $resourceList;
+    $app->response->headers->set('Content-Type','application/json');
+    $app->response->setStatus(STATUS_OK);
+    return $data;
   }
 
-  public function writePatch($data)
+  public function patch_create($data)
   {
     global $app;
-    $is_ok = false;
-    $info = "";
-    $auth = "";
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-    if (!file_exists($app->config["base_dir"].$this->getURL()) ||   
-        $this->isEmptyDir($app->config["base_dir"].$this->getURL()))
-    {
-      if(!file_exists($app->config["base_dir"].$this->getURL()))
-      {
-        mkdir($app->config["base_dir"].$this->getURL());
-      }
-      $tmp = array();
-      mkdir($app->config["base_dir"].$this->getURL()."/patches");
-      $tmp["name"] = "Patch list";
-      file_put_contents($app->config["base_dir"].$this->getURL()."/patches/info.json", json_encode($tmp));
-      mkdir($app->config["base_dir"].$this->getURL()."/editor");
-      $tmp["name"] = "Editor information file";
-      file_put_contents($app->config["base_dir"].$this->getURL()."/editor/info.json", json_encode($tmp));
-      $app->response->setStatus(STATUS_CREATED);
-    } 
-    else 
-      $app->response->setStatus(STATUS_OK);
+    $tmp = array();
+    mkdir($app->config["base_dir"].$this->getURL()."/patches");
+    $tmp["name"] = "Patch list";
+    file_put_contents($app->config["base_dir"].$this->getURL()."/patches/info.json", json_encode($tmp));
+    mkdir($app->config["base_dir"].$this->getURL()."/editor");
+    $tmp["name"] = "Editor information file";
+    file_put_contents($app->config["base_dir"].$this->getURL()."/editor/info.json", json_encode($tmp));
     $pathInfo = pathinfo($app->config["base_dir"].$this->getURL());
     $info = array('name' => $pathInfo['basename']);
     file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode($info));
     file_put_contents($app->config["base_dir"].$this->getURL()."/model.lua", $data);
-    return $is_ok = true; 
+    $app->response->setStatus(STATUS_CREATED);
   }
 
-  public function readPatch()
+  public function patch_write($data)
   {
     global $app;
-    //Verify existing resource
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-    if (!file_exists($app->config["base_dir"].$this->getURL()))
-    {
-      // Resource not found
-      $app->response->setStatus(STATUS_NOT_FOUND);
-      return null;
-    } 
+    $pathInfo = pathinfo($app->config["base_dir"].$this->getURL());
+    $info = array('name' => $pathInfo['basename']);
+    file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode($info));
+    file_put_contents($app->config["base_dir"].$this->getURL()."/model.lua", $data);
+    $app->response->setStatus(STATUS_OK);
+  }
+
+  public function patch_read()
+  {
+    global $app;
+    $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR); 
     $lua = file_get_contents($app->config["base_dir"].$this->getURL());
     if ($lua == FALSE)
     {
@@ -246,20 +266,15 @@ class ModelResource extends BaseResource
     } 
     $pathInfo = pathinfo($app->config["base_dir"].$this->getURL(), PATHINFO_FILENAME);
     $data = array ('name' => $pathInfo["filename"], 'data' => $lua);
-    $app->response->setStatus(STATUS_OK);
     $app->response->headers->set('Content-Type','application/json');
+    $app->response->setStatus(STATUS_OK);
     return $data;    
   }
 
-  public function readPatchList($from, $to)
+  public function patch_readList($from, $to)
   {
     global $app;
     $app->response->setStatus(STATUS_INTERNAL_SERVER_ERROR);
-    if (!file_exists($app->config["base_dir"].$this->getURL()))
-    {
-      $app->response->setStatus(STATUS_NOT_FOUND);
-      return null;
-    } 
     $data = array();
     foreach(glob($app->config["base_dir"].$this->getURL(). '/*') as $file) 
     {
@@ -273,8 +288,8 @@ class ModelResource extends BaseResource
         continue;
       $data[] = array('name' => $filename, 'data' => file_get_contents($file));
     }
-    $app->response->setStatus(STATUS_OK);
     $app->response->headers->set('Content-Type','application/json');
+    $app->response->setStatus(STATUS_OK);
     return $data;    
   }
 
