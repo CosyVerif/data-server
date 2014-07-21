@@ -61,7 +61,7 @@ class UserTest extends PHPUnit_Framework_TestCase
                                   'admin_user' => false,
                                   'can_public' => true));
     /* Sends data into server by put method */
-    $res = $client->put('http://localhost:8080/server.php/users/new_user', 
+    $res = $client->post('http://localhost:8080/server.php/users/new_user', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body)]);
@@ -97,7 +97,7 @@ class UserTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => false,
                                   'can_public' => true));
-    $client->put('http://localhost:8080/server.php/users/update_user', 
+    $client->post('http://localhost:8080/server.php/users/update_user', 
                  ['headers' => ['Content-Type' => 'application/json', 
                                 'Authorization' => 'Basic '.$encoded.'=='],
                   'body' => json_encode($body),
@@ -199,7 +199,7 @@ class UserTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => false,
                                   'can_public' => true));
-    $res = $client->put('http://localhost:8080/server.php/users/user_delete', 
+    $res = $client->post('http://localhost:8080/server.php/users/user_delete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body)]);
@@ -269,7 +269,7 @@ class UserTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => false,
                                   'can_public' => true));
-    $client->put('http://localhost:8080/server.php/users/user_delete', 
+    $client->post('http://localhost:8080/server.php/users/user_delete', 
                  ['headers' => ['Content-Type' => 'application/json',
                                 'Authorization' => 'Basic '.$encoded.'=='],
                   'body' => json_encode($body)]);

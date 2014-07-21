@@ -220,7 +220,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
     /* Add a new model (model_1) and verify status code (201 : created) */
     $client = new GuzzleHttp\Client();
     $encoded = base64_encode("put_model_user:toto");
-    $res = $client->put('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
+    $res = $client->post('http://localhost:8080/server.php/users/put_model_user/models/model_1', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => $data]);
@@ -312,7 +312,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => false,
                                   'can_public' => true));
-    $res = $client->put('http://localhost:8080/server.php/users/user_delete', 
+    $res = $client->post('http://localhost:8080/server.php/users/user_delete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body)]);

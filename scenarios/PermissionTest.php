@@ -68,7 +68,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => true,
                                   'can_public' => true));
-    $res = $client->put('http://localhost:8080/server.php/users/root_put', 
+    $res = $client->post('http://localhost:8080/server.php/users/root_put', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body)]);
@@ -88,7 +88,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
                                   'password' => 'toto',
                                   'admin_user' => true,
                                   'can_public' => true));
-    $res = $client->put('http://localhost:8080/server.php/users/root_delete', 
+    $res = $client->post('http://localhost:8080/server.php/users/root_delete', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body)]);
@@ -147,7 +147,7 @@ class PermissionTest extends PHPUnit_Framework_TestCase
                                   'can_public' => true));
     //authentified user
     $encoded = base64_encode("nnana:toto");
-    $res = $client->put('http://localhost:8080/server.php/users/user_put', 
+    $res = $client->post('http://localhost:8080/server.php/users/user_put', 
                         ['headers' => ['Content-Type' => 'application/json', 
                                        'Authorization' => 'Basic '.$encoded.'=='],
                          'body' => json_encode($body),
