@@ -5,7 +5,8 @@
    },
   "require-dev": {
     "guzzlehttp/guzzle": "*",
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "*",
+    "phpunit/php-code-coverage": "*"
   },
   "autoload": {
     "psr-0": {"": "src/"}

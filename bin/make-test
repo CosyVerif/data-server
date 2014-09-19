@@ -2,15 +2,18 @@
 
 set -e
 
+rm -rf coverage
+
 ./bin/composer.phar update  --dev
 php -S localhost:8080 -t . server.php &
 pid=$!
 
 ./vendor/bin/phpunit \
-  --coverage-text \
   --strict \
   --colors \
   --bootstrap=vendor/autoload.php \
   scenarios/
+
+curl http://localhost:8080/server.php/STOP
 
 kill -9 ${pid}
