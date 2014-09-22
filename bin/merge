@@ -21,17 +21,7 @@ foreach(glob('coverage/*.cov') as $filename) {
 print "\nGenerating code coverage report in HTML format ...";
 
 // Based on PHPUnit_TextUI_TestRunner::doRun
-$writer = new PHP_CodeCoverage_Report_HTML(
-  'UTF-8',
-  false, // 'reportHighlight'
-  35, // 'reportLowUpperBound'
-  70, // 'reportHighLowerBound'
-  sprintf(
-    ' and <a href="http://phpunit.de/">PHPUnit %s</a>',
-    PHPUnit_Runner_Version::id()
-      )
-  );
-
+$writer = new PHP_CodeCoverage_Report_HTML(35, 70);
 $writer->process($codeCoverage, 'coverage');
 
 print " done\n";
