@@ -14,6 +14,6 @@ pid=$!
   --bootstrap=vendor/autoload.php \
   scenarios/
 
-curl http://localhost:8080/server.php/STOP
+./bin/merge
 
 kill -9 ${pid}
