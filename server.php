@@ -7,18 +7,24 @@ $user_config_file = parse_ini_file("config.ini");
 $user_config_file = array_map('strtolower', $user_config_file);
 $config = array_merge($server_config_file, $user_config_file);
 
+if (array_key_exists("coverage", $config) && $config["coverage"]) {
+  if (!is_dir("coverage")) {
+    mkdir("coverage");
+  }
+  $coverage = new PHP_CodeCoverage;
+  $coverage->start('Site coverage');
+  function shutdown()
+  {
+    global $coverage;
+    $coverage->stop();
+    $cov = serialize($coverage); //serialize object to disk
+    file_put_contents('coverage/data.' . date('U') . '.cov', $cov);
+  }
+  register_shutdown_function('shutdown');
+}
+
 $app = new \Slim\Slim();
 $app->config = $config;
-
-if (array_key_exists("coverage", $config) && $config["coverage"]) {
-  $coverage = new PHP_CodeCoverage;
-  $coverage->start('server');
-  $app->get('/STOP', function () use ($app, $coverage) {
-    $coverage->stop();
-    $writer = new PHP_CodeCoverage_Report_HTML;
-    $writer->process($coverage, 'coverage');
-  });
-}
 
 \CosyVerif\Server\Routing\WebSiteMiddleware::register();
 \CosyVerif\Server\Routing\UserMiddleware::register();
