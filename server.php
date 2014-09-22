@@ -8,6 +8,7 @@ $user_config_file = array_map('strtolower', $user_config_file);
 $config = array_merge($server_config_file, $user_config_file);
 
 if (array_key_exists("coverage", $config) && $config["coverage"]) {
+  // http://stackoverflow.com/questions/19821082/collate-several-xdebug-coverage-results-into-one-report
   if (!is_dir("coverage")) {
     mkdir("coverage");
   }
