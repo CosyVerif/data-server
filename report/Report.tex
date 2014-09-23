@@ -1,0 +1,1044 @@
+\documentclass{book}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[francais]{babel}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage[table]{xcolor}
+\usepackage{listings, color}
+\definecolor{forestgreen}{rgb}{0.34,0.139,0.34}
+\definecolor{orangered}{rgb}{0.239,0.134,0.64}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\usepackage[left=2.5cm, right=2.5cm]{geometry}
+
+\let
+\cleardoublepage
+\clearpage
+
+\title{\textbf{Rapport de stage \\ -- \\ CONCEPTION ET DÉVELOPPEMENT DU 
+               SERVEUR COSYVERIF}}
+\author{%
+  Idrissa \textsc{Sokhona}
+}%
+\date{\today}
+
+\begin{document}
+  \lstdefinestyle{XML}{
+    language=XML,
+    extendedchars=true,
+    breaklines=true,
+    breakatwhitespace=true,
+    emph={}
+    emphstyle=\color{red},
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    commentstyle=\color{gray}\upshape,
+    morestring=[b]",
+    morecomment=[s]{<?}{?>},
+    morecomment=[s][\color{forestgreen}]{<!--}{-->},
+    keywordstyle=\color{orangered},
+    stringstyle=\ttfamily\color{black}\normalfont,
+    tagstyle=\color{darkblue}\bf,
+    morekeywords={attribute,xmlns,version,type,release},
+    otherkeywords={attribute=, xmlns=, encoding=, version=}
+  }
+
+  \lstdefinestyle{JSON}{
+    language=JSON,
+    extendedchars=true,
+    breaklines=true,
+    breakatwhitespace=true,
+    emph={}
+    emphstyle=\color{red},
+    basicstyle=\ttfamily,
+    columns=fullflexible,
+    commentstyle=\color{gray}\upshape,
+    morestring=[b]",
+    morecomment=[s]{{}{}},
+    morecomment=[s][\color{forestgreen}]{<!--}{-->},
+    keywordstyle=\color{orangered},
+    stringstyle=\ttfamily\color{black}\normalfont,
+    tagstyle=\color{darkblue}\bf,
+    morekeywords={user,first-name,last-name,login,phone},
+    otherkeywords={attribute=, xmlns=, encoding=, version=}
+  }
+
+\maketitle
+\thispagestyle{empty}
+\tableofcontents
+ 
+\setcounter{page}{1}
+  
+\chapter*{Résumé}
+\addcontentsline{toc}{chapter}{Résumé}
+
+\paragraph{}
+
+  
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+
+\paragraph{}
+Je tiens à remercier chaleureusement toutes les équipes du laboratoire de LIPN et du laboratoire de LSV de l'ENS de Cachan 
+pour m’avoir accueillie dans leur laboratoire et permis de participer au développement de la plate-forme CosyVerif. 
+Je remercie particulièrement M. Alban Linard et Laure Petrucci (Directrice de LIPN) qui m'ont permis d'effectuer mon stage 
+dans les meilleurs conditions ; leur expérience et leur pédagogie ont su enrichir mon stage. Ensuite, je tiens à remercier 
+également madame Béatrice Bérard pour avoir assuré le rôle de maitre de stage.
+
+\paragraph{}
+Je tiens aussi à remercier toute l'équipe pédagogique de l'Université Pierre et Marie Curie et tous les intervenants 
+responsables de la formation du Master Informatique filière Systèmes et Applications Répartis pour avoir assuré la qualité
+d’enseignement de celle-ci.
+
+\paragraph{}
+Enfin, je tiens à remercier particulièrement M. Alban Linard pour m'avoir accompagné et très bien suivi pendant toute la 
+durée de mon stage.
+
+
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\paragraph{}
+Etudiant en Master 2 informatique à l’Université Pierre et Marie Curie (Paris VI), spécialité Systèmes et Applications 
+Répartis, parcours Systèmes Répartis Embarqués et Temps Réel, je réalise un stage de fin d'études au sein du laboratoire 
+LIPN et LSV de l'ENS de Cachan. 
+
+\paragraph{}
+Ce stage me donne les moyens de mettre en pratique des connaissances et compétences dans un cadre professionnel. La 
+tâche qui m'est confiée est de concevoir et de développer le serveur et un client de la nouvelle plate-forme de vérification
+ CosyVerif dédiée à la vérification formelle des logiciels.
+
+\paragraph{}
+Dans ce rapport de stage, je vous présenterai dans un premier temps le projet CosyVerif, son évolution et les missions 
+qui m'ont été confiées.  Dans un second temps, j'aborderai la description du travail accompli. Enfin, je vous parlerai du
+bilan et les perspectives.
+
+
+\chapter{Description de la problématique}
+
+\section{Présentation des organismes d'accueil}
+
+\paragraph{}
+Le stage est co-encadré par le LIPN et LSV, et financé par LIPN. Il se déroule dans leur locaux : LIPN (3 jours par semaine)  
+et LSV ( 2 jours par semaine).
+
+\subsection{LIPN}
+
+\paragraph{}
+Le Laboratoire d'Informatique de Paris-Nord (LIPN) est associé au CNRS depuis janvier 1992 et a le statut d'unité mixte 
+de recherche  (UMR 7030) depuis janvier 2001. Le LIPN poursuit ses recherches autour de ses axes forts en s'appuyant 
+sur les compétences de ses membres, en particulier en combinatoire, en optimisation combinatoire, en algorithmique, 
+en logique, en logiciel, en langage naturel, en apprentissage. Le laboratoire est structuré en cinq équipes :\\
+\begin{itemize}
+     \item A3 : Apprentissage Artificiel et Applications,
+     \item AOC : Algorithmes et Optimisation Combinatoire,
+     \item CALIN : Combinatoire, ALgorithmique et INteractions,
+     \item LCR : Logique, Calcul et Raisonnement,
+     \item RCLN : Représentation des Connaissances et Langage Naturel. 
+\end{itemize}
+
+\paragraph{}
+Plus de 130 membres participent aux activités du laboratoire dont 78 chercheurs ou enseignants-chercheurs permanents, 
+pour la plupart en poste à l'Université Paris 13 (Institut Galilée, IUT de Villetaneuse).
+    
+\paragraph{}
+Le LIPN fait partie du pôle MathSTIC, un centre de recherche dans les domaines mathématiques et sciences et 
+technologies de l'information et de la communication.
+
+\paragraph{}
+Le stage se déroule au sein de l'équipe LCR avec mon encadrent Laure Petrucci (Directrice du laboratoire).
+    
+ % ToDo : l'organigramme et là oû je suis affecté%
+
+\subsection{LSV}
+
+\paragraph{}
+Fondé en 1997, le Laboratoire Spécification et Vérification (LSV) est le laboratoire d'informatique de l'ENS de Cachan, 
+et est aussi affilié au Centre National de la Recherche Scientifique (CNRS) en tant qu'UMR 8643. La recherche au LSV est
+centrée sur la vérification de logiciels et systèmes critiques, et sur la vérification de la sécurité des systèmes informatiques.
+
+\paragraph{}
+Il y a différents catégories de membre : \\
+
+\begin{itemize}
+    \item Personnel administratif et technique,
+    \item Membres permanents,
+    \item Membres associés ou temporaires,
+    \item Doctorants,
+    \item Membres du LSV en détachement.
+\end{itemize}
+    
+\paragraph{}
+Le stage se déroule avec mon encadrent Alban Linard qui est membre temporaire.
+
+\section{Présentation du projet CosyVerif}
+
+\paragraph{}
+\href{http://www.cosyverif.org}{CosyVerif} est un environnement logiciel dont le but est la spécification et la vérification
+formelle des systèmes dynamiques.
+
+\paragraph{}
+Il a été conçu de manière à :
+\begin{itemize}
+\item manipuler des formalismes différents avec la possibilité de créer facilement de nouveaux,
+\item fournir une interface graphique pour chaque formalisme permettant l'édition de modèles,
+\item inclure des outils de vérification appelées via l'interface en tant que Web service,
+\item offrir la possibilité pour un développeur d'intégrer son/sa propre outil, en le/la permettant d'interagir avec les 
+autres outils.
+\end{itemize}
+
+\paragraph{}
+Deux formalismes sont pris en charge: les automates et les réseaux de Petri, à la fois avec des extensions. La plupart 
+des outils sont liés à des réseaux de Petri. Certains d'entre eux procèdent à des analyses structurelles comme des calculs
+d'invariants. Tandis que d'autres outils effectuent des analyses comportementales : construction de graphe d'accessibilité, 
+etc ...
+
+\paragraph{}
+Cet environnement se compose actuellement de deux outils logiciels : Coloane, l'interface graphique, et Alligator, une 
+intégration d'outils basé sur les web services. Il est agrandie par les outils existants de vérification développés dans les laboratoires (membres ou partenaires fondateurs).
+
+\paragraph{}
+Tous les logiciels développés sont open source et logiciels libres.
+
+\paragraph{}
+CosyVerif est géré par un comité de pilotage composé de chercheurs et d'ingénieurs. Il décide des orientations 
+stratégiques ainsi que des choix techniques. Il est développé par ces ingénieurs quant-il y en a et des stagiaires.
+
+\subsection{Pourquoi ce projet ?}
+
+\paragraph{}
+Le développement de CosyVerif a été décidé et soutenu par trois partenaires  du groupe de vérification parisien,
+MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels).
+
+\paragraph{}
+Ce groupe est composé de sept équipes, et les membres fondateurs de CosyVerif sont LIP6 (Laboratoire d'Informatique de
+Paris 6) , LIPN (Laboratoire d'Informatique de Paris Nord) et LSV (Laboratoire Spécification et Vérification - Laboratoire 
+d'informatique de l'ENS de Cachan).
+
+\paragraph{}
+Tout d'abord, ces membres visent à partager leurs outils, à comparer et à soutenir des études de cas industriels.
+
+\paragraph{}
+Deuxièmement, ils veulent aussi promouvoir la pratique de la vérification formelle dans l'industrie et donc ils ont 
+l'intention de faciliter la tâche de l'intégration de nouveaux formalismes et des outils.
+    
+\subsection{Architecture de l'existant}
+
+\newpage
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.50]{img/cosyverif_schema.pdf}
+    \caption{Architecture de CosyVerif}
+\end{figure}
+
+\section{Sujet du stage}
+
+\subsection{Enjeux}
+
+\paragraph{}
+Le développement de la nouvelle plate-forme CosyVerif qui représente actuellement du serveur et d'un client web.
+Cette plate-forme constitue un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur
+d'édition collaboratif de modèles et formalismes et un gestionnaire de permissions et d'authentification des utilisateurs.
+
+\subsection{Critiques}
+
+\paragraph{}
+La communication et l'échange de données entre les clients (Coloane) et le serveur Alligator  de l'ancienne plate-forme 
+se sont basées sur l'architecture orienté service, en particulier, le protocole SOAP (Simple Object Access Protocol). 
+Cependant, l'utilisation de SOAP n'est pas pratique et laisse une forte couplage entre le serveur et ses clients. En plus, le 
+surcouche et le moteur de SOAP et Java ajoutent des dizaines de méga-octets supplémentaires. En effet, Java présente 
+beaucoup de dépendances (environ 100 Mo) et des difficultés de maintenance par les membres du projet, mais aussi, il 
+manque des fonctionnalités. Néanmoins, Java apporte une performance et une portabilité à Alligator. C'est alors à cause 
+des problèmes que présente la plate-forme existante que l'équipe a jugé nécessaire de repartir sur une nouvelle base, 
+en restant vigilant pour ne pas retomber sur les mêmes difficultés. Pour ces raisons, l'équipe a émis des exigences pour 
+la nouvelle plate-forme.
+
+\subsection{Objectifs}
+
+\paragraph{}
+L'objectif de ce stage pour ma part est donc de participer à la conception et au développement du nouveau serveur et du 
+client web de la plate-forme de vérification CosyVerif. Ce serveur aura comme fonctions, un dépôt de modèles et de 
+formalismes, un gestionnaire d'exécution d'outils, un serveur d'éditions collaboratif de modèles et formalismes, et un gestionnaire de permissions et d'authentification des utilisateurs. 
+
+\subsection{Que doit offrir la future plate-forme ?}
+
+La plate-forme doit permettre :
+
+\begin{itemize}
+\item La recherche de formalismes et de modèles selon certains critères,
+\item L'insertion des nouveaux formalismes et modèles et leur édition,
+\item L'authentification des utilisateurs,
+\item La gestion de permissions des utilisateurs,
+\item L'exécution d'outils
+\end{itemize}
+
+\subsection{Exigences de la future plate-forme}
+
+\paragraph{}
+Les exigences à prendre en compte, qui ont été imposées par l'équipe, pour réaliser la nouvelle plate-forme :
+
+\begin{itemize}
+\item Les tests doivent être effectuées en boîte noire avec une convertir complète du code,
+\item Le code doit être maintenable et simple,
+\item Le code source doit être commenté en anglais,
+\item Des technologies qui présentent une surcouche et un couplage forte seront évitées,
+\end{itemize}
+
+\subsection{Axes de ma contribution sur la future plate-forme}
+
+\paragraph{}
+La nouvelle plate-forme présente  5 composants distincts qui sont étudiés et réalisés séparément et intégrés par la suite : trois composants côté serveur et deux autres côté client web.
+
+\subsubsection{Côté serveur}
+
+\begin{itemize}
+\item Serveur dépôt : ce composant est chargé du dépôt de modèles et de formalismes, de la gestion d'authentifications 
+et de droits d'accès des utilisateurs, d'une base qui démarre et interagit avec les autres composants du serveur.
+\item Serveur d'édition : ce composant s'occupe de l'édition collaborative de modèles et de formalismes. Il interagit 
+directement avec le composant édition web du client au moment de l'édition collaborative.
+\item Serveur d'exécution : ce composant s'occupent de l'exécution d'outils .
+\end{itemize}
+
+\subsubsection{Côté client}
+
+\begin{itemize}
+\item Interface web : ce composant est l'interface web qu'un utilisateur a pour s'authentifier au près du serveur, pour utiliser le dépôt de modèles et de formalismes, pour participer à des projets avec d'autres utilisateurs, pour lancer des outils et observer leurs résultats. C'est le composant du client qui communique et échange des données avec le serveur dépôt.
+\item Editeur web : Ce composant est l'interface web qui permet l'édition de modèles et de formalismes. C'est le composant du client qui interagit directement avec le composant serveur d'édition.
+\end{itemize}
+
+\paragraph{}
+Mon stage consiste donc à concevoir et à réaliser le serveur de dépôt et l'interface web du client. Les serveurs d'édition et d'exécution sont réalisés par Alban Linard (Notre encadrent) et l'éditeur web par Francisco Gimenez (Un autre stagiaire argentin).
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.60]{img/cosyverif_composants.pdf}
+    \caption{Exemple d'interactions entre les différents composants (édition collaborative)}
+\end{figure}
+
+
+\section{Conduite du projet}
+\subsection{Processus de développement}
+\subsection{Planification du projet}
+\chapter{Etudes et réalisations du serveur dépôt}
+\section{Présentation}
+
+\paragraph{}
+Le serveur de dépôt est le composant centrale du serveur de la plate-forme CosyVerif. D'une part, il est chargé de la
+gestion de comptes utilisateurs et du dépôt de modèles et de formalismes de la plate-forme. D'autre part, c'est le composant  qui satisfait toute les requêtes de l'interface des clients (sauf une partie des requêtes de l'édition 
+collaborative et de l'exécution d'outils) et qui est initiateur de l'édition collaborative et de l'exécution d'outils. Il
+fonctionne sous une architecture client/serveur. Les clients attendus sont : Web, téléphone mobile, console et des 
+bibliothèques.
+
+\paragraph{}
+Le dépôt proprement dit de la plate-forme est constitué des ressources telles que des formalismes, 
+des modèles, des converteurs, des services, des exécutions de service et des scénarios :
+
+% -- Nota : Donner la définition des ressources 
+\begin{itemize}
+\item Formalismes : ,
+\item Modèles : ,
+\item Converter : ,
+\item Service : ,
+\item Exécution : ,
+\item Scénario : .
+\end{itemize}
+
+\paragraph{}
+Les ressources présentent dans le dépôt appartiennent à ses utilisateurs. Ces derniers peuvent avoir leurs propres
+ressources privées mais aussi partager des ressources entre eux. Par conséquent, il faut un système capable d'identifier
+les utilisateurs et de vérifier leurs droits correspondants à l'utilisation d'une ressource. A cet effet, un système 
+d'organisation et de protection des ressources a été réalisé.
+
+\subsection{Organisation de ressources}
+
+\paragraph{}
+Une des objectifs pour la plate-forme CosyVerif est de mettre à disposition de ses utilisateurs un moyen pour permettre
+d'avoir des ressources propres et de partager des ressources entre utilisateurs.
+
+\subsubsection{Ressources personnelles :}
+Pour permettre aux utilisateurs d'avoir leurs propres ressources, chaque utilisateur a un compte à sa disposition, lié à ses 
+ressources. A cet effet, un utilisateur peut créer des ressources, les utiliser et les mettre à jour mais aussi permettre à 
+d'autres utilisateurs d'utiliser ses ressources. Cependant, les autres ne peuvent qu'utiliser ses ressources sans le modifier.
+L'octroi de la permission d'utilisation ou pas de ses ressources par d'autres utilisateurs, un utilisateur a la possibilité de 
+rendre son compte publique ou privé. Ainsi, un compte publique donne droit d'utilisation de ses ressources à tout 
+utilisateur et un compte privé ne donne ce droit qu'au propriétaire du compte.
+
+\subsubsection{Ressources partagées :}
+Plusieurs moyens existent pour permettre aux utilisateurs de partager des ressources entre-eux. Notamment, un système
+de groupes, un système de projets, ... La solution de projets a été retenu car elle est beaucoup plus simple à mettre en 
+oeuvre et qu'il est largement suffisant pour répondre aux exigences de partage de la plate-forme. Quand, un utilisateur
+désire de partager des ressources avec un ou plusieurs utilisateurs, il crée un projet et invite les autres à y joindre (ou 
+les autres font eux mêmes la demande). Cependant, on peut aussi rendre un projet publique ou privé comme le compte
+utilisateur afin de donner le droit d'utilisation à d'autres utilisateurs.
+
+
+\subsection{Protection des ressources}
+La plate-forme de CosyVerif est une plate-forme publique et peut être accéder par n'importe qui, à partir du moment où
+l'on a l'accès à Internet. Donc, on a une contrainte de protéger les ressources personnelles des utilisateurs. Pour répondre 
+à ce besoin de protection, le serveur met en place une politique de sécurité basée sur un système d'authentification et un système d'authorisation des utilisateurs mais aussi un système de chiffrement des données échangées entre les clients et le serveur.
+
+\subsubsection{Système d'authentification :}
+La plate-forme disposant des ressources privées, un système d'authentification est mis en place. Ce dernier identifie les utilisateurs à l'aide d'un login et d'un mot de passe. Cependant, il y a des précautions à prendre pour éviter certaines 
+failles. Différentes techniques existent pour sécuriser les échanges de la plate-forme :
+
+\begin{itemize}
+\item Hachage de mot de passe : d'une part, il permet de ne pas faire circuler le mot de passe clairement sur le réseau et 
+d'autre part, il permet également de ne pas stocker le mot de passe de l’utilisateur en clair. Cependant, le mot de passe ainsi haché peut être retrouvé dans certains cas
+\item Utilisation d’un "salt" : même s'il est à priori impossible de retrouver le mot de passe à partir du hash, de 
+nombreux dictionnaires de conversion existent sur internet faisant le rapprochement entre un hash et un mot de passe.
+Une solution de contournement est l'utilisation d'un "salt" qui est une technique qui consiste à hasher une première fois 
+le mot de passe, à concaténer le hash à une chaîne de caractère (salt) et à le hasher une seconde fois. Le salt est unique 
+et connu à la fois du serveur et de l’application cliente, il n’est pas caché au yeux du hacker. Son seul but est de rendre 
+votre mot de passe indéchiffrable sur le réseau. Cependant, dans le cas où un hacker arrive à intercepter le mot de passe encrypté, il aura tout le temps qu’il souhaite pour exécuter n’importe quelle requête en notre nom.
+\item Token d’authentification : l’idée du token d’authentification est simple. Celle-ci consiste à envoyer dans un 1er temps un couple login/password et de récupérer un token en retour. Dans un second temps, ce token devra être utilisé 
+à la place du password. Ceci permet, coté serveur, de gérer la durée de validité des tokens (à 20 minutes par exemple). 
+Cependant, dans le cas où un hacker arrive à intercepter notre token d’authentification, il aura une vingtaine de 
+minutes pour exécuter n’importe quelle requête en notre nom. l’utilisation du token ne permet, du point de vue de l’utilisateur, que de se substituer au password. Il ne certifie en aucun cas que vous êtes l’émetteur de la requête. La technique consiste alors à remplacer notre token d’authentification par une signature sur la requête. 
+\item Signer ses requêtes : Le principe des signatures est d’ajouter un paramètre supplémentaire à notre requête afin de
+garantir au récepteur à la fois l’identité du rédacteur de la requête ainsi que l’intégrité de celle-ci. Avec cette signature, 
+même si un hacker parvient à récupérer notre requête, la seule action qu’il sera en mesure de réaliser sera de rejouer 
+cette même requête sans y changer aucun paramètre. Cependant, c'est aussi un problème.
+\item  Requêtes à usage unique : Ce type de requête est utilisée par la plupart des fournisseurs tels qu’Amazon Web 
+Services. La technique est simple, il suffit d’ajouter le timestamp à la signature ainsi qu’aux paramètres de la requête lors 
+de la génération de la requête. Ainsi, le serveur n’a qu’à stocker le timestamp de la dernière requête traitée et le 
+comparer avec celui de la requête en cours. Si le timestamp de la requête courante est inférieur ou égal à celui du dernier 
+timestamp enregistré, cela signifie que la requête à déjà été jouée. Sinon, cela signifie que la requête est jouée pour la 
+1ere fois. Cependant, même si votre requête ne peut être ni altérée ni rejouée, celle-ci peut être « vue » par un hacker. Dans la plupart des cas, ceci n’a que peu d’importance mais dans le cadre d’une application bancaire, il est n’est pas envisageable qu’une tiers personne puisse connaître les montants et les destinataires de vos virements.
+\item  SSL : SSL (pour Secure Socket Layer) est un système permettant de sécuriser les échanges de données entre deux 
+ordinateurs. Associés par exemple, le HTTP et le SSL donnent le HTTPS. Ce protocole est intégré à l’immense majorité des 
+navigateurs web et permet de sécuriser les échanges entre l’utilisateur et le serveur. En utilisant du HTTPS, vous pouvez 
+être sûr que personne n’interceptera vos requêtes. Ce mécanisme vous assure la sécurité du transport et uniquement de 
+celui-ci (pas de gestion d’authentification, d’unicité des requêtes, …).
+\end{itemize}
+
+\paragraph{}
+Le choix a été porté sur un système d'authentification basique basé sur la combinaison de la technique de hachage de 
+mot de passe et le protocole SSL. Ce choix va permettre de sécuriser les mots de passes présents dans le système de
+stockage du serveur dans le cas où un hacker parviendrait à les récupérer et, aussi de rendre la requête illisible par les 
+éventuels hackers qui récupéreraient cette requête sur internet.
+
+\paragraph{}
+Les ressources de la plate-forme sont utilisées par deux catégories d'utilisateurs : 
+
+\begin{itemize}
+\item Des utilisateurs authentifiés : ce sont des utilisateurs muni d'un login et d'un mot de passe qui font des requêtes au 
+serveur et qui sont identifiés par ce dernier. Cette catégorie d'utilisateurs peuvent se servir de leurs propres ressources et
+utiliser les ressources publiques des autres.
+\item Des utilisateurs non authentifiés : ce sont des utilisateurs qui font des requêtes au serveur sans présenter de login 
+et de mot de passe. Cette catégorie d'utilisateurs ne peuvent qu'utiliser les ressources publiques du premier catégorie 
+d'utilisateurs.
+\end{itemize}
+
+\paragraph{}
+Fonctionnement de l'authentification : l'utilisateur présente un login et un mot de passe au près du serveur. Ce dernier vérifie l'identité de l'utilisateur dans son annuaire d'utilisateurs. S'il réussit à identifier l'utilisateur, il lui donne l'accès à 
+ses ressources. Sinon, il lui refuse l'accès. Cependant, La phase d'authentification ne garantie pas la satisfaction de toutes 
+les requêtes de l'utilisateur. Il faut aussi une autorisation pour utiliser les ressources sollicitées.
+
+\subsubsection{Système d'autorisation :}
+Le serveur même si elle arrive à identifier un utilisateur, il ne lui donne pas tous les droits d'utilisation sur ses ressources.
+Le serveur associe des droits d'utilisation à ses ressources tels que le droit de création, de lecture, de mise à jour et de 
+suppression de ressource et aussi le droit d'administration d'un compte utilisateur ou d'un projet. Une étude a été faite
+sur deux stratégies :
+\begin{itemize}
+\item Droits associés à chaque ressource : chaque ressource a une liste des utilisateurs avec leurs droits d'utilisation associés. Cette stratégie permet alors à un utilisateur de donner des droits à d'autres sur chacune de ses ressources
+de manière individuelle. Dans ce cas, on a pas besoin de la notion de projet pour partager des ressources avec d'autres
+utilisateurs. Cette stratégie n'est pas difficile à mettre en oeuvre mais nécessite beaucoup d'effort de la par 
+des utilisateurs. En effet, du point de vue de l'utilisateur ce système est complexe à utiliser car il faut une gestion
+de droits d'utilisation sur chaque ressource. Cette stratégie est à éviter car la plate-forme CosyVerif a pour vocation 
+d'offrir une utilisation simple de ses ressources à ses utilisateurs.
+\item Droits associés aux comptes utilisateurs et aux projets : dans cette stratégie, les ressources d'un utilisateur sont
+soit toutes (compte avec droit public ) ou soit aucune (compte avec droit privé) mis à la disposition des autres en lecture. Les ressources d'un utilisateur ne sont modifiable que par lui-même. Si un utilisateur décide de partager quelques ressources, il crée un projet, déplace les quelques ressources et invite d'autres à se joindre au projet. Dans ce cas, les utilisateurs peuvent se servir du projet selon leurs droits d'utilisation (droit de lecture, droit d'édition et droit d'administration) sur ce dernier. Cette stratégie est adoptée pour le système d'autorisation car elle nécessite peu
+d'effort de la part des utilisateurs.
+\end{itemize} 
+
+\paragraph{}
+La liste de droits d'utilisation de la solution retenu :
+
+\begin{itemize}
+\item Propriétaire d'un compte : un utilisateur a tous les droits sur son compte et sur ses ressources,
+\item Droit d'administration des comptes utilisateurs : ce droit est donné à un utilisateur pour créer, mettre à jour ou
+supprimer un compte utilisateur quelconque,
+\item Compte utilisateur public : un compte utilisateur publique donne le droit de lecture de ses ressources à tous les
+utilisateurs de la plate-forme,
+\item Compte utilisateur privé : un compte utilisateur privé ne donne aucune droit d'utilisation à d'autres utilisateurs que
+son propriétaire,
+\item Participants d'un projet : tous les utilisateurs qui participent à un projet ont le droit de lecture.
+\item Droit d'administration d'un projet : ce droit est donné à un utilisateur d'un projet pour mettre à jour le projet, 
+supprimer un utilisateur du projet et inviter, accepter ou refuser des utilisateurs au projet.
+\item Droit d'édition d'un projet : ce droit est donné à un utilisateur d'un projet pour créer, lire, modifier et supprimer 
+des ressources du projet.
+\item Projet public : un projet publique donne le droit de lecture de ses ressources à tous les utilisateurs de la 
+plate-forme,
+\item Projet privé : un projet privé ne donne aucune droit d'utilisation à d'autres que les utilisateurs qui y
+participent,
+\end{itemize}
+
+% -- Tableau 1 compte user : URIs,  propriétaire,  autre utilisateur authentifié sans droit admin,  autre utilisateur authentifié avec droit admin, autre utilisateur non authentifié
+
+
+% -- Tableau 2 projet : URIs, Participant sans droit, Participant avec droit admin, Participant avec droit d'édition, Non participant
+
+
+
+\section{Définition de l'architecture et du protocole}
+\paragraph{}
+Le nouveau serveur doit être une application REST (Representational State Transfer) ou RESTful. RESTful est un style
+d’architecture permettant de construire des applications (Web, Intranet, Web Service, surtout pour les systèmes 
+hypermédia distribués). Il s’agit d’un ensemble de conventions et de bonnes pratiques à respecter et non d’une 
+technologie à part entière. L’architecture REST utilise les spécifications originelles du protocole HTTP, plutôt que de
+réinventer une surcouche (comme le font SOAP ou XML-RPC par exemple). Il est créé par Roy Fielding en 2000 dans le
+chapitre 5 de sa thèse de doctorat.
+
+\paragraph{}
+La communication du serveur avec les clients se base sur : 
+
+\begin{itemize}
+\item Des requêtes HTTP,
+\item Des URLs pour les ressources,
+\item Les verbes HTTP pour les méthodes,
+\item Les codes d'état pour les résultats,
+\item Les contenus des requêtes et des résultats 
+\end{itemize}
+
+\paragraph{Les contraintes} 
+d'une architecture REST sont les suivantes :
+
+\begin{enumerate}
+\item Client-serveur : les responsabilités sont séparées entre le client et le serveur. L'interface utilisateur est séparée de
+celle du stockage des données. Cela permet aux deux d'évoluer indépendamment ;
+\item Sans état : chaque requête d'un client vers un serveur doit contenir toute l'information nécessaire pour permettre 
+au serveur de comprendre la requête, sans avoir à dépendre d'un contexte conservé sur le serveur. Cela libère de 
+nombreuses interactions entre le client et le serveur ;
+\item Une interface uniforme : cette contrainte agit selon 4 règles essentielles :
+    \begin{itemize}
+    \item L'identification des ressources : chaque ressource est identifiée uniquement,
+    \item La manipulation des ressources à travers des représentations : les ressources ont des représentations définies,
+    \item Un message auto-descriptif : les messages expliquent leur nature. Par exemple, si une représentation en HTML 
+    est codée en UTF-8, le message contient l'information nécessaire pour dire que c'est le cas,
+    \item Hypermédia comme moteur d'état de l'application : chaque accès aux états suivants de l'application est décrit 
+     dans le message courant
+    \end{itemize}
+\item Mise en cache : le serveur envoie une réponse qui donne l'information sur la propension de cette réponse à être mise en cache, comme la fraîcheur, sa date de création, si elle doit être conservée dans le futur. Cela permet à des
+serveurs mandataires de décharger les contraintes sur le serveur et aux clients de ne pas faire de requêtes inutiles. Cela
+permet également d'améliorer l'extensibilité des serveurs ;
+\item Un système hiérarchisé par couche : les états de l'application sont identifiées par des ressources individuelles. 
+Toute l'information n'est pas envoyée dans une seule ressource unique. Les requêtes/réponses entre le client et le 
+serveur augmentent et donc peuvent faire baisser la performance d'où l'importance de la mise en cache, etc. Le bénéfice
+est que cela rend beaucoup plus flexible l'évolution du système.
+\end{enumerate}
+
+\paragraph{}
+La thèse de Roy Fielding précise les avantages de ce style architectural par rapport à d’autres styles d’architectures 
+d’applications Web. Citons entre autres :
+
+\begin{enumerate}
+\item L’application est plus simple à entretenir, car elle désolidarise la partie client de la partie serveur. La nature 
+hypermédia de l'application permet d'accéder aux états suivants de l'application par inspection de la ressource courante;
+\item L'absence de gestion d’état du client sur le serveur conduit à une plus grande indépendance entre le client et le 
+serveur. Elle permet également de ne pas avoir à maintenir une connexion permanente entre le client et le serveur. 
+Le serveur peut ainsi répondre à d'autres requêtes venant d'autres clients sans saturer l'ensemble de ses ports de 
+communication. Cela devient essentiel dans un système distribué;
+\item L’absence de gestion d’état du client sur le serveur permet également une répartition des requêtes sur plusieurs 
+serveurs : une session client n’est pas à maintenir sur un serveur en particulier (via une sticky session d’un loadbalancer), ou à propager sur tous les serveurs (avec des problématiques de fraîcheur de session). Cela permet aussi une meilleure 
+évolutivitée et tolérance aux pannes (un serveur peut être ajouté facilement pour augmenter la capacité de traitement, ou pour en remplacer un autre);
+\item Dans un contexte Web
+    \begin{itemize}
+    \item l’utilisation du protocole HTTP en tirant parti de son enveloppe et ses en-têtes,
+    \item l’utilisation d’URI comme représentant d’une ressource permet d'avoir un système universel d'identification des 
+     éléments de l'application,
+    \item la nature auto-descriptive du message permet la mise en place de serveurs cache. Les informations nécessaires
+     sur la fraîcheur, la péremption de la ressource sont contenues dans le message lui-même
+    \end{itemize}
+\end{enumerate}
+
+\paragraph{}
+Vu ces avantages de REST, on peut dire qu'il est un atout pour réaliser le serveur. 
+
+\paragraph{}
+Pour répondre aux contraintes de REST, nous avons définit : 
+\begin{itemize}
+\item Les ressources, leurs contenus et leurs représentations,
+\item les méthodes prises en charge, les entrées, les sorties et les codes d'état.
+\end{itemize}
+
+\subsection{URIs}
+\paragraph{}
+Le serveur utilise les ressources suivantes : 
+
+\begin{itemize}
+    \item users,
+    \item formalisms,
+    \item models,
+    \item converters,
+    \item scenarios,
+    \item services,
+    \item executions,
+    \item projects.
+\end{itemize}
+
+\paragraph{}
+Pour identifier les ressources, REST utilise Uniform Ressource Identifiers (URIs). Un client demande une ressource au 
+serveur en lui fournissant l'URI de la ressource. Il existe deux types de ressources dans cette application : \\
+
+\begin{itemize}
+    \item collections de ressources,
+    \item ressources.
+\end{itemize}
+
+\paragraph{}
+Ils se distinguent par l'utilisation de la forme singulière (pour les ressources individuelles) ou au pluriel (pour les
+collections de ressources).
+
+\paragraph{}
+Par exemple : 
+
+\begin{itemize}
+    \item /users/ : représente une collection  d'utilisateurs;
+    \item /users/rokysaroi : représente l'utilisateur rokysaroi dans la collection de l'utilisateur.
+\end{itemize}
+
+\newpage
+
+\paragraph{}
+Les ressources du serveur sont hiérarchisées comme suit :
+
+\begin{figure}[h!]
+     \centering
+     \includegraphics[scale=0.60] {img/resources_hierarchy.pdf}
+     \caption{Hiérarchie des ressources}
+\end{figure}
+
+\paragraph{}
+Un nom de ressource à partir de ":" par exemple ":user", est une variable. La liste suivante montre également les URIs des
+ressources. La notation (a|b) indique qu'une ressource est disponible pour les préfixes a et b.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.60]{img/resources_uri.pdf}
+    \caption{Hiérarchie des ressources}
+\end{figure}
+
+\subsection{Représentation de ressources}
+
+\paragraph{}
+Une ressource peut avoir plusieurs représentations (XML, JSON, image, le format CosyVerif, CAMI, PNML, ...). En interne, 
+le serveur utilise la représentation CosyVerif pour les ressources suivantes : formalisme, modèle, scénario, service, 
+exécution.
+
+\paragraph{}
+Les clients sont autorisés à demander une représentation particulière dans leurs requêtes. Lorsque cela est possible, le 
+serveur effectue une conversion de la ressource à la forme requise : des convertisseurs sont prévus pour ça.
+
+\paragraph{Exemple :}
+représentation d'une liste de ressources et une ressource
+
+\paragraph{La représentation d'un utilisateur en XML :}
+      
+\begin{lstlisting}[style=XML]
+    <?xml version="1.0" encoding="ISO-8859-1" ?>
+    <user xmlns="http://example.org/mon-exemple-ns/" >
+        <first-name>First name</first-name>
+        <last-name>Last name</last-name>
+        <login>User name</login>
+        <phone>Phone number</phone>
+     </user>
+\end{lstlisting}
+
+\paragraph{Le même en JSON :}
+
+\begin{lstlisting}[style=XML]
+ {
+   "user": {
+	      "first-name" : "First name",
+	      "last-name" : "Last name",
+	      "login" : "User name",
+	      "phone" : "Phone number"	
+	    }
+}
+\end{lstlisting}
+
+\paragraph{la représentation d'une liste d'utilisateurs en XML :}
+
+\begin{lstlisting}[style=XML]
+    <users xmlns='http://example.org/mon-exemple-ns/'>
+        <user-ref href="first user URI">complete name first user</user-ref>
+        <user-ref href="second user URI"/>complete name second user</user-ref>
+         ...
+        <user-ref href="last user URI"/>complete name last user</user-ref>
+    </users>
+\end{lstlisting}
+
+\paragraph{Le même en JSON :}
+
+\begin{lstlisting}[style=XML]
+{
+   "users": {
+	       "user-ref" : [
+			       {"href" : "First user URI", "name" : "complete name of first user"},
+			       {"href" : "Second user URI", "name" : "complete name of second user"},
+			         ...
+			       {"href" : "Last user URI", "name" : "complete name of last user"}
+		               ]
+	     }
+}
+\end{lstlisting}
+      
+\subsection{Méthodes et codes de statut}
+
+\paragraph{}
+L'architecture REST est basé sur le protocole HTTP. Par conséquent, les mêmes méthodes sont plus ou moins utilisées. 
+Le protocole est normalisé donc on en profite de ses avantages. Les clients peuvent utiliser un URI pour accéder à une 
+ressource référencée. L'accès peut prendre diverses formes, telles que l'obtention d'une représentation de la ressource 
+(par exemple, en utilisant la méthode GET ou la méthode HEAD), l'ajout ou la modification d'une ressource (par exemple, 
+en utilisant la méthode POST ou la méthode PUT) et la suppression d'une ressource (par exemple, via la méthode DELETE).
+
+\paragraph{}
+Les méthodes suivantes seront intégrées dans le système :
+
+\begin{itemize}
+   \item GET : Récupération d'une représentation d'une ressource,
+   \item PUT : créer/mettre à jour une ressource,
+   \item PATCH : mettre à jour une ressource partiellement,
+    \item DELETE : supprimer une ressource.
+\end{itemize}
+
+\paragraph{}
+La méthode POST du protocole HTTP n'est pas pris en compte car elle permet la création d'une ressource sans en 
+fournir l'URL. Or, c'est une exigence que les clients fournissent un URL pour chaque requête au serveur.
+
+\paragraph{}
+Chaque réponse HTTP contient un code (code de statut). Ce code est utilisé par le serveur pour informer le client de l'état 
+du traitement de sa demande. Le code d'état est un code numérique et une description donnant une réponse 
+humainement compréhensible. 
+
+\paragraph{}
+Codes de retour utilisés :
+
+\begin{tabular}{|p{1cm}|p{4cm}|p{9cm}|}
+\hline \bf Code & \bf Message & \bf Signification \\
+\hline 200 & OK & Requête traitée avec succès \\
+\hline 201 & Created & Requête traitée avec succès avec création d’un document \\
+\hline 204 & No Content & Requête traitée avec succès mais pas d’information à renvoyer \\
+\hline 301 & Moved Permanently & La ressource demandée possède une nouvelle adresse (URI). Toute référence future à cette ressource doit être faite en utilisant l'une des URIs retournées dans la réponse. Le client doit normalement charger 
+automatiquement la ressource demandée à sa nouvelle adresse. \\
+\hline 302 & Moved Temporarily & La ressource demandée réside temporairement à une adresse (URI) différente. Cette 
+redirection étant temporaire, le client doit continuer à utiliser l'URI originale pour les requêtes futures \\
+\hline 400 & Bad Request & La syntaxe de la requête est erronée \\
+\hline 401 & Unauthorized & Une authentification est nécessaire pour accéder à la ressource \\
+\hline 403 & Forbidden & Le serveur a compris la requête, mais refuse de l’exécuter. Contrairement à l’erreur 401, 
+s’authentifier ne fera aucune différence. Sur les serveurs où l’authentification est requise, cela signifie généralement que 
+l’authentification a été acceptée mais que les droits d’accès ne permettent pas au client d’accéder à la ressource \\
+\hline 404 & Not Found & Ressource non trouvée \\
+\hline 405 & Method Not Allowed & Méthode de requête non autorisée \\
+\hline 410 & Gone & La ressource est indisponible et aucune adresse de redirection n’est connue. Ce code sera utilisé 
+pour les ressources supprimées ; on mettra une information à la place d’une ressource supprimée. \\
+\hline 415 & Unsupported Media Type & Format de requête non supporté pour une méthode et une ressource données \\
+\hline 422 & Unprocessable entity & L’entité fournie avec la requête est incompréhensible ou incomplète \\
+\hline 500 & Internal Server Error & Erreur interne du serveur \\
+\hline 501 & Not Implemented & Fonctionnalité réclamée non supportée par le serveur \\
+\hline
+\end{tabular}
+
+\paragraph{}
+Ces codes de statuts sont spécifiés par la norme RFC 2616, avec d'autres codes de statut.
+
+\paragraph{}
+Les URIs et des représentations sont définis, les méthodes et les codes de statuts sont déterminés. Quelques 
+correspondances de différents éléments ont été réalisés : \\
+
+\begin{tabular}{|p{3cm}|p{2cm}|p{3cm}|p{6cm}|}
+\hline \bf Ressource & \bf Méthode & \bf Representation & \bf Codes de statuts \\
+\hline Utilisateur & GET & Format user & 200, 400, 401, 403, 404, 410, 415, 500 \\
+\hline Utilisateur & PUT & Format user & 200, 201, 400, 401, 403, 415, 500 \\
+\hline Utilisateur & PATCH & Format user & 200, 201, 400, 401, 403, 415, 500 \\
+\hline Utilisateur & DELETE & N/A & 200, 204, 401, 403, 404, 500 \\
+\hline Les utilisateurs & GET & Format all-user & 200, 400, 401, 403, 404, 410, 415, 500 \\
+\hline
+\end{tabular}
+
+\section{Etude technique}
+
+\paragraph{}
+L'objectif de cette partie est de recenser les contraintes et les choix techniques dimensionnant la conception du serveur.
+Ainsi, certains APIs, technologies et outils utils sont utilisés pour le bon fonctionnement du serveur. Les techniques 
+choisies dans le cadre de la réalisation de notre serveur sont :
+
+\begin{itemize}
+\item Langage : PHP,
+\item Frameworks et outils d'aide pour le développement : SLIM, Composer, Box, Docco, GIT,
+\item Frameworks et outils d'aide pour le test : PHPUnit, Guzzle, Travis-ci,
+\item Persistance de données : Système de gestion de fichier.
+\end{itemize}
+
+\subsection{Langage PHP}
+
+\paragraph{}
+Pour pallier aux problèmes soulevés sur l'ancien serveur réalisé avec le langage JAVA, PHP 
+a été choisis comme langage de programmation pour développer le serveur de la nouvelle plate-forme CosyVerif.
+
+\paragraph{}
+PHP (Hypertext Preprocessor) est un langage de scripts généraliste et Open Source, spécialement conçu pour le 
+développement d'applications web. Le grand avantage de PHP est qu'il est extrêmement simple pour les néophytes, 
+mais offre des fonctionnalités avancées pour les experts. On peut citer quelques autres avantages de plus : 
+
+\begin{itemize}
+\item Facile à apprendre,
+\item Complet avec un grand nombre de fonctions pré-existantes,
+\item Fortement utilisé et pourvu d'une communauté complète,
+\item Gestion des erreurs de programmation précise,
+\item Rapidité de développement (non compilé),
+\item Développement au choix : Procédural ou Objet,
+\item Performant,
+\item Disponible partout (tous les hébergements proposent le PHP) et surtout à moindre coût,
+\item Outils de développements professionnels (PHAR, PHPUnit, Jenkins, ...),
+\item Énormément d'aide et de documentation
+\end{itemize}
+
+\subsection{Framework Slim}
+
+\paragraph{}
+Pour faciliter la programmation en PHP, plusieurs frameworks existent parmi lesquels on peut citer Symphony et SLIM. 
+
+\paragraph{Symphony :}
+est assez complexe : le développeur doit se plier aux nombreuses contraintes du framework. De plus celui-ci est 
+assez lent. Il est recommandable dans le cas de projet conséquent et dans le cas où les développeurs ont déjà une 
+expérience avec.
+
+\paragraph{Slim :}
+est un micro framework PHP qui vous permet d'écrire rapidement des applications Web et des APIs de façon simple 
+mais puissant. Il est facile à utiliser pour les débutants et les professionnels. Son interface est simple et intuitive, et 
+largement documenté - à la fois en ligne et dans le code lui-même. En plus, c'est un framework léger.
+
+\paragraph{}
+le framework SLim a été retenu car il est plus facile pour les développeurs de CosyVerif de prendre la main sur celui-ci.
+
+\subsection{Composer}
+
+\paragraph{}
+Composer est un outil pour gérer les dépendances en PHP. Les dépendances, dans un projet, ce sont toutes les 
+bibliothèques dont le projet dépend pour fonctionner. Par exemple, le serveur CosyVerif utilise la bibliothèque 
+du framework slim pour le développement, il « dépend » donc de slim. Autrement dit, Slim est une dépendance 
+dans le projet.
+
+\paragraph{}
+Composer a donc pour objectif d'aider à gérer toutes les dépendances du projet. En effet, il y a plusieurs problématiques
+lorsqu'on utilise des bibliothèques externes :
+
+\begin{itemize}
+\item  Ces bibliothèques sont mises à jour. Il nous faut donc les mettre à jour une à une pour nous assurer de corriger les
+ bogues de chacune d'entre elles.
+\item Ces bibliothèques peuvent elles-mêmes dépendre d'autres bibliothèques. En effet, si une de nos bibliothèques 
+dépend d'autres bibliothèques, cela nous oblige à gérer l'ensemble de ces dépendances (installation, mises à jour, etc.).
+\item Ces bibliothèques ont chacune leur paramètres d'autoload, et nous devons gérer leur autoload pour chacune 
+d'entre elles.
+\end{itemize}
+
+\paragraph{}
+Composer va nous aider dans chacune de ces tâches.
+
+\subsection{Box}
+
+\paragraph{}
+Simplifie le processus de construction d'un Phar
+
+\subsection{PHPUnit}
+
+\paragraph{}
+est un framework de test pour les programmes PHP. Il s'agit d'un exemple de l'architecture xUnit pour des frameworks 
+de tests unitaires. On pourrait aussi entendre parler de SimpleTest, mais, depuis des années, n’est plus vraiment un 
+projet vivant Ou de Atoum qui, bien que prometteur, n’est pas encore très répandu.
+
+\subsection{Guzzle}
+
+\paragraph{}
+est un client HTTP de PHP et un framework pour créer des clients web RESTful qui communique avec le serveur. 
+Il rend facile l'utilisation du protocole HTTP de la version 1.1. Il sert ici pour le test du serveur CosyVerif.
+
+\subsection{Travis-CI}
+
+\paragraph{}
+est une plateforme d’intégration continue ouverte et distribuée mise à disposition sous forme de service. Ouverte car 
+tout projet public publié sur Github peut mettre en place son intégration continue sur Travis. Il propose un service qui 
+exécute des tâches au moment où vous le souhaitez. Ces tâches sont très souvent des tests (unitaires).
+
+\subsection{Docco}
+
+\paragraph{}
+est un générateur de documentation. Il produit un document HTML qui affiche vos commentaires entremêlées avec 
+votre code. Il est utiliser pour la documentation et pour commenter le code de CosyVerif.
+
+\subsection{Persistance de données}
+
+\paragraph{}
+Pour la persistance, on avait le choix entre un serveur de gestion de bases de données et le système de gestion de fichiers.
+Mais, on a opté pour le système de gestion de fichiers car on voulait la simplicité et aussi un serveur qui ne dépend pas
+d'un autre serveur comme fait avec une base de données. En plus, PHP a une API simple et complète pour le système de 
+fichiers. Donc, le serveur va utiliser le système de fichier local.
+
+\section{Mise en oeuvre}
+
+\paragraph{}
+Une fois que l'étude est fait,  la phase suivante a pour rôle de réaliser ce qui a été définis, et ensuite le mettant en oeuvre.
+Ainsi, cette étape détaillera la mise en oeuvre de la solution.
+
+\paragraph{}
+Le serveur de la nouvelle plate-forme est réalisé sur une nouvelle base. En effet, tout le code produit est nouveau et ne 
+réutilise pas le code de l'ancienne plate-forme. Le serveur de la nouvelle plate-forme est réalisé de manière à être simple,
+générique, modulaire, portable et maintenable, à moindre coût. 
+
+\paragraph{Simple :}
+le développement avec le framework SLim rend la production du code simple et pratique. En effet, le framework Slim permet
+de produire peu de code pour une fonctionnalité qui en demande beaucoup sans celui-ci. En plus, l'approche de Slim est 
+simple à comprendre.
+
+\paragraph{Générique :}
+Les ressources du dépôt de modèles et de formalismes présentent beaucoup de points communs qui permet d'avoir
+un code générique. En effet, La façon de persister les données est la même pour toutes les ressources ; les ressources 
+ont beaucoup d'informations en commun ; l'architecture REST (Representational State Transfert) permet de les utiliser de 
+la même manière. Et donc, grâce à l'héritage, on en a profiter pour faire un code générique qui sera réutiliser pour l'intégration de futures fonctionnalités.
+
+\paragraph{Modulaire :}
+Le serveur a été réalisé de manière modulaire afin de faciliter la maintenance. Ainsi, les modules peuvent être développés
+et maintenus indépendamment. Par exemple, on peut changer le système d'authentification mis en place par un autre
+système sans affecter le reste du serveur.
+
+\paragraph{Portable :}
+Le code du serveur est du pure PHP qui est un langage de script portable.
+
+\paragraph{Maintenable :}
+La maintenabilité est assuré car on a un code simple, générique et modulaire.
+
+
+\subsection{Description des différents modules du dépôt}
+
+\paragraph{}
+Le serveur de la nouvelle plate-forme est réalisé de manière à être générique, modulaire et maintenable. Ainsi, le serveur 
+est développé sous forme de couches superposées et chaque couche traite une fonction bien précise afin de séparer
+les responsabilités. Pour être satisfaite, une requête arrive et traverse toutes les couches du serveur. Ces couches correspondent aux différents modules du serveur. 
+
+\paragraph{}
+Le schéma suivant situe la position des différentes couches du serveur, les uns par rapport aux autres mais aussi les 
+uns par rapport aux technologies utilisées.
+
+\newpage
+
+\begin{figure}[h!]
+     \centering
+     \includegraphics[scale=0.60]{img/server_couches.pdf}
+     \caption{Couches du serveur}
+\end{figure}
+
+\subsubsection{Module Exception}
+
+\paragraph{} 
+Le module exception gère les exceptions produits pendant le traitement des requêtes. Nous distinguons les 
+exceptions des cas d'erreurs qui sont directement traités au moment où ils sont produits. Les exceptions produits dans
+le serveur proviennent du système de fichiers et sont capturés par cette couche. Nous ne traitons pas ces exceptions car
+ils sont rarement produits et liés au système de fichiers. Néanmoins, un message est envoyé à l'administrateur du serveur
+avec la description de l'exception qui va pourvoir intervenir.
+
+\subsubsection{Module Authenticate}
+
+\paragraph{} 
+Le module Authenticate gère l'authentification des utilisateurs. Ainsi, quand la requête arrive à cette couche, son
+utilisateur est soumis à l'authentication.
+
+\subsubsection{Module Permission}
+
+\paragraph{} 
+Le module Permission gère les droits d'accès aux ressources par des utilisateurs. Ainsi, quand la requête arrive
+à cette couche, les droits d'utilisation de l'utilisateur sur la requête sont vérifiés.
+
+\subsubsection{Module Translator}
+
+\paragraph{} 
+Le module Translator gère les conversions de formats vers d'autres formats. Ainsi, quand la requête arrive
+à cette couche et qu'il y a lieu de traduction, il traite la traduction.
+
+\subsubsection{Module Core}
+
+\paragraph{}
+Le module Core gère l'accès et la mise à jour des ressources.
+
+\subsection{Description de l'environnement de développement}
+
+\paragraph{}
+Un environnement de développement a été mis en place pour réaliser le serveur. Notamment :
+
+\begin{itemize}
+\item  Un serveur web Apache : c'est un serveur d'application web nécessaire pour le développement 
+du serveur.
+\item PHP (version 5.4.24) : c'est un langage serveur qui va permettre au serveur apache d'interpréter le code PHP.
+\item Un éditeur : sublime text 3 est utilisé (par simple goût du développeur).
+\item Outil Git : le code et documents produits sont envoyer vers le dépôt Github de CosyVerif % l'url du dépôt en note de page
+\item Box : pour construire un phar du serveur.
+\item Composer : va gérer toute les dépendances du projet.
+\item PHPUnit : va aider à faire les tests.
+\end{itemize}
+
+\paragraph{}
+
+
+\paragraph{}
+Le processus d'installation des outils et des dépendances, le processus de tests et la production de documents ont été  automatisé à l'aide d'un script Bash.
+
+
+\subsection{Tests}
+
+\paragraph{}
+Les tests du serveur se sont basés sur des tests fonctionnels avec une couverture complete. Ainsi, pour chaque
+fonctionnalité, des scénarios et des test sont écris, validés par mes encadrants puis implémentés. Les outils 
+PHPUnit, Guzzle et Travis sont utilisés pour faire le test. Ces tests vont nous permettre de s'assurer que le serveur 
+fonctionne correctement, fonctionnellement.
+
+\subsection{Bilan}
+\subsection{Perspective}
+\chapter{Etudes et réalisations de l'interface web}
+\section{Présentation}
+\section{Définition de l'architecture}
+\section{Etude technique}
+\section{Mise en oeuvre}
+\subsection{Présentation}
+\subsection{Exemples d'écran de sortie}
+\subsection{Bilan}
+\subsection{Perspective}
+classe étudiant : lauré
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+\paragraph{}
+
+\end{document}
+
+%% Exigences du rapport 
+ %% Le Rapport de conception doit contenir :
+  % - Remerciement (20 mn) 
+  % - Sujet du stage (20 mn) (ok)
+  % - Introduction (20 mn)
+  % - Présentation de CosyVerif (client coloane, server alligator, client clitoris, nouveau server nouveau client) (30 mn)
+  % - Présentation de LSV et LIPN (30 mn)
+  % - Présentation du nouveau serveur et du dépot de modèles (30 mn)
+  % - Développement du serveur et du dépot (Besoins, Architecture-protocole, outils, objectifs-planning (échances)) (30 mn)
+  % - Test
+  % - Conclusion (20 mn)
+  % - Glossaire
+  % - Webographie (20 mn)
+  % - Annexes (20 mn)
+
+
+%% Nota bené :
+ % Le découpage
+
+% - La structure du rapport, 
+% - l'introduction, 
+% - la présentation de l'entreprise, 
+% - la présentation du sujet, 
+% - le découpage de votre travail,
+% - un premier chapitre d'étude et/ou de développement, 
+% - des éléments de bibliographie doivent déjà exister.
+

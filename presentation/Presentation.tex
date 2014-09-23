@@ -1,0 +1,294 @@
+\PassOptionsToPackage{svgnames}{xcolor}
+\documentclass[t, english]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{tikz}
+\usepackage{LobsterTwo}
+\usepackage[default]{comfortaa}
+\usepackage{pgfpages}
+\usepackage{listings}
+\usepackage{appendixnumberbeamer}
+
+\lstset{
+  basicstyle=\ttfamily\scriptsize\color{white},
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue},
+  language=bash,
+  backgroundcolor=\color{black},
+}
+
+%\pgfpagesuselayout{8 on 1}[a4paper, border shrink=5mm]
+%\setbeameroption{show notes on second screen=bottom}
+\setbeameroption{hide notes}
+%\setbeameroption{show notes}
+\setbeamertemplate{note page}[plain]
+\beamertemplatenavigationsymbolsempty
+
+\synctex=1
+
+\hypersetup{pdfpagemode=UseNone} % don't show bookmarks on initial view
+\usetheme{default}
+%\usefonttheme{professionalfonts}
+
+
+\setbeamertemplate{footline}{%
+  \raisebox{5pt}{%
+    \makebox[\paperwidth]{%
+      \hfill\makebox[25pt]{%
+        \scriptsize\insertframenumber/\inserttotalframenumber%
+      }%
+    }%
+  }\hspace*{5pt}%
+}
+
+% http://www.texample.net/tikz/examples/hand-drawn-lines/
+\usetikzlibrary{calc,decorations.pathmorphing,patterns}
+\pgfdeclaredecoration{penciline}{initial}{
+    \state{initial}[width=+\pgfdecoratedinputsegmentremainingdistance,
+    auto corner on length=1mm,]{
+        \pgfpathcurveto%
+        {% From
+            \pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}
+                      {\pgfdecorationsegmentamplitude}
+        }
+        {%  Control 1
+        \pgfmathrand
+        \pgfpointadd{\pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}{0pt}}
+                    {\pgfqpoint{-\pgfdecorationsegmentaspect
+                     \pgfdecoratedinputsegmentremainingdistance}%
+                               {\pgfmathresult\pgfdecorationsegmentamplitude}
+                    }
+        }
+        {%TO 
+        \pgfpointadd{\pgfpointdecoratedinputsegmentlast}{\pgfpoint{1pt}{1pt}}
+        }
+    }
+    \state{final}{}
+}
+\tikzset{
+  photo/.style= {
+    rectangle,
+    line width=8pt,
+    draw=DarkGreen,
+    decorate,
+    decoration={penciline},
+    inner sep=0pt
+  }
+}
+\input Konanur.fd
+\newcommand*\initfamily{\usefont{U}{Konanur}{xl}{n}}
+
+% http://tex.stackexchange.com/questions/16964/block-quote-with-big-quotation-marks
+\newcommand*\quotesize{60}
+\newcommand*{\openquote}
+   {\tikz[remember picture,overlay,xshift=-4ex,yshift=-1ex]
+   \node (OQ) {\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}
+\newcommand*{\closequote}
+  {\tikz[remember picture,overlay,xshift=4ex,yshift=-4ex]
+   \node (CQ) {\fontsize{\quotesize}{\quotesize}\selectfont''};}
+\newenvironment{shadequote}[4]%
+{%
+\begin{minipage}{.25\textwidth}
+  \noindent
+  \includegraphics[width=\textwidth]{#4}\\
+  {\scriptsize\bfseries\itshape #1}
+  \\
+  {\tiny #2 \newline at #3}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{.7\textwidth}
+\LobsterTwo
+%\begin{cursive}
+\begin{quote}\openquote{}
+}%
+{%
+\hfill\closequote{}\end{quote}
+%\end{cursive}
+\end{minipage}
+}
+
+\begin{document}
+
+\title{Etude et réalisation du serveur de la nouvelle plate-forme CosyVerif}
+\author{Idrissa SOKHONA}
+\date{29 Septembre 2014}
+
+\LobsterTwo
+
+\begin{frame}
+\begin{center}
+\par
+\textsf{Soutenance de stage}
+
+\par
+\Huge Etude et réalisation du serveur de la nouvelle plate-forme CosyVerif
+
+\par
+\normalsize
+\textsf{Idrissa SOKHONA}
+
+\par
+\textsf{idrissa.sokhona@etu.upmc.fr}
+
+\par
+\textsf{Université Pierre et Marie Curie,}
+
+\par
+\textsf{Master informatique,}
+
+\par
+\textsf{Spécialité SAR, Parcours SRETR}
+
+\begin{tikzpicture}
+    \node
+      [anchor=north]
+      at (1,3)
+      {\includegraphics[height=2cm]{img/lipn}};
+    \node
+      [anchor=north]
+      at (6.5,3)
+      {\includegraphics[height=2cm]{img/lsv}};
+  \end{tikzpicture}
+\end{center}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Partners}
+  
+  \begin{minipage}{.7\textwidth}
+     \begin{itemize}
+     \item <1->Qu'est ce que c'est ?,
+     \item <2->Pourquoi ?,
+     \item <3->Qui développe ?
+     \item <4->Problèmes !
+     \end{itemize}
+  \end{minipage}
+  
+  \begin{minipage}{.25\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \node
+      [anchor=north]
+      at (0,3)
+      {\includegraphics[height=2cm]{img/lip6}};
+    \node
+      [anchor=north]
+      at (3,3)
+      {\includegraphics[height=2cm]{img/lipn}};
+    \node
+      [anchor=north]
+      at (6.5,3)
+      {\includegraphics[height=2cm]{img/lsv}};
+      {\small Pending};
+  \end{tikzpicture}
+  \end{minipage}
+  
+  \begin{minipage}{.7\textwidth}
+     \begin{itemize}
+     \item Partage d'outils,
+     \item comparer et soutenir des études de cas industriels,
+     \item promouvoir la pratique de vérification formelle.
+     \end{itemize}
+  \end{minipage}
+ \end{frame}
+
+\begin{frame}[plain,c]
+\centering
+{\Huge\LobsterTwo Qu'est ce que c'est ?}
+\end{frame}
+
+\begin{frame}[c]
+  \begin{minipage}{.25\textwidth}
+    \noindent
+    \includegraphics[width=\textwidth]{img/cosyverif}\\
+    \raggedleft\emph{\small\normalfont\url{cosyverif.org}}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[c]{.7\textwidth}
+    \begin{quote}\openquote{}
+    \LobsterTwo
+       CosyVerif est un environnement logiciel dont le but est la spécification
+       et la vérification formelle des systèmes dynamiques.
+    \hfill
+    \closequote{}\end{quote}
+
+    \begin{itemize}
+     \item Différents formalismes,
+     \item interface graphique pour chaque formalisme,
+     \item outils de vérification,
+     \item outils de développeurs.
+     \end{itemize}
+  \end{minipage}
+\end{frame}
+
+\begin{frame}[plain,c]
+\centering
+{\Huge\LobsterTwo Pourquoi ?}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Partners}
+  \begin{minipage}{.25\textwidth}
+  \centering
+  \begin{tikzpicture}
+    \node
+      [anchor=north]
+      at (0,3)
+      {\includegraphics[height=2cm]{img/lip6}};
+    \node
+      [anchor=north]
+      at (3,3)
+      {\includegraphics[height=2cm]{img/lipn}};
+    \node
+      [anchor=north]
+      at (6.5,3)
+      {\includegraphics[height=2cm]{img/lsv}};
+      {\small Pending};
+  \end{tikzpicture}
+  \end{minipage}
+  
+  \begin{minipage}{.7\textwidth}
+     \begin{itemize}
+     \item Partage d'outils,
+     \item comparer et soutenir des études de cas industriels,
+     \item promouvoir la pratique de vérification formelle.
+     \end{itemize}
+  \end{minipage}
+ \end{frame}
+  
+\begin{frame}[plain,c]
+\centering
+{\Huge\LobsterTwo Qui développe ?}
+\begin{center}
+\begin{itemize}
+     \item Ingénieurs,
+     \item Stagiaires,
+\end{itemize}
+\end{center}
+\end{frame}
+
+\begin{frame}[plain,c]
+\centering
+{\Huge\LobsterTwo Des problèmes !}
+\end{frame}
+
+
+ \begin{frame}[c]
+  \frametitle{Objectifs }
+   
+\uncover <1->{fsfsfsfsfsfssfs}
+
+\uncover <2->{fsfsfsfsfsfssfs}
+
+\uncover <3->{fsfsfsfsfsfssfs}
+
+
+ \end{frame}
+
+
+
+
+
+
+\end{document}
