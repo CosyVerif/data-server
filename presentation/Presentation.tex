@@ -10,7 +10,7 @@
 \usepackage{appendixnumberbeamer}
 
 \lstset{
-  basicstyle=\ttfamily\scriptsize\color{white},
+  basicstyle=\ttfamily\scriptsize\color{black},
   showstringspaces=false,
   commentstyle=\color{red},
   keywordstyle=\color{blue},
@@ -43,7 +43,7 @@
 }
 
 % http://www.texample.net/tikz/examples/hand-drawn-lines/
-\usetikzlibrary{calc,decorations.pathmorphing,patterns}
+\usetikzlibrary{calc,decorations.pathmorphing,patterns,trees}
 \pgfdeclaredecoration{penciline}{initial}{
     \state{initial}[width=+\pgfdecoratedinputsegmentremainingdistance,
     auto corner on length=1mm,]{
@@ -286,6 +286,53 @@
 
  \end{frame}
 
+ \begin{frame}[fragile]
+  \begin{columns}[T] % align columns
+    \begin{column}{.48\textwidth}
+      \only<1>{%
+        \lstinline!GET http://rest.cosyverif.org/users! \\
+        \lstinline!200 OK! \\
+        \lstinline!{ ... }!
+      }%
+      \only<2>{%
+        \lstinline!POST .../users/isokhona! \\
+        \lstinline!201 CREATED!
+      }%
+    \end{column}%
+    \hfill%
+    \begin{column}{.48\textwidth}
+      % http://www.texample.net/tikz/examples/filesystem-tree/
+      \tikzstyle{every node}=[draw=black,thick,anchor=west,minimum width=2cm,minimum height=2em]
+      \tikzstyle{selected}=[draw=red,fill=red!30]
+      \tikzstyle{optional}=[dashed,fill=gray!50]
+      \scriptsize
+      \begin{tikzpicture}[
+          every node={draw=black,thick,anchor=west},
+          selected={draw=red,fill=red!30},
+          grow via three points={one child at (-.5,-0.7) and
+          two children at (-.5,-0.7) and (-.5,-1.4)},
+          edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
+        \only<1>{
+        \node {/}
+          child { node {projects} }
+          child { node {users} };
+        }
+        \only<2>{
+        \node {/}
+          child { node {projects} }
+          child { node {users}
+            child { node [selected] {isokhona}
+                child { node {formalisms} }
+                child { node {models} }
+                child { node {services} }
+                child { node {executions} }
+              }
+          };
+        }
+      \end{tikzpicture}
+    \end{column}%
+  \end{columns}
+\end{frame}
 
 
 
