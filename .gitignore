@@ -12,3 +12,14 @@ doc/scenarios
 # Ignore temporary files:
 *.swp
 *~
+
+# Ignore LaTeX generated files:
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+presentation/Presentation.pdf
