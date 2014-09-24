@@ -84,60 +84,59 @@
 \end{frame}
 
 \begin{frame}[c]
-  \frametitle{Context}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-chercheur}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2-7>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-chercheur}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <8>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/3-chercheur}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <9>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/4-chercheur}};
-                 \end{tikzpicture}
-            }%
- 
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <3->Installer
-     	    \item <4->Prise en main
-	    \item <5->Format d'entrée
-     	    \item <6->Format de sortie
-     	    \item <7->Analyse de résultats
-         \end{itemize}
-   \end{minipage}
-
+  \frametitle{Contexte}
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-chercheur}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2-7>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-chercheur}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <8>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/3-chercheur}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <9>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/4-chercheur}};
+%                 \end{tikzpicture}
+%            }%
+% 
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <3->Installer
+%     	    \item <4->Prise en main
+%	    \item <5->Format d'entrée
+%     	    \item <6->Format de sortie
+%     	    \item <7->Analyse de résultats
+%         \end{itemize}
+%   \end{minipage}
+%
    \note{
     \begin{itemize}
      \item CosyVerif est une collection d'outils
@@ -187,6 +186,7 @@
 }\only<8->{
   \frametitle{Évolutions}
 }
+  \centering
 \begin{tikzpicture}
 \node (c1) at (2,3)
   {\includegraphics[width=3cm,height=3cm]{img/screen}};
@@ -308,231 +308,274 @@
         \item Des fonctionnalités simples et nécessaires (utilisateurs,
           dépôt) prennent trop de temps à déveloper
       \end{itemize}
+    \item Évolution \#1: passer à REST
+      \begin{itemize}
+        \item
+      \end{itemize}
+    \item Évolution \#2: passer à un client et éditeur Web
+      \begin{itemize}
+        \item Ce n'est pas le sujet de mon stage
+        \item La partie éditeur est en cours de réalisation par un autre
+          stagiaire
+      \end{itemize}
+    \item Évolution \#3: passer le serveur en PHP
+      \begin{itemize}
+        \item But: maintenance, car plusieurs membres permanents de
+          CosyVerif maitrisent le PHP
+        \item But: ajout plus simple de fonctionalités
+      \end{itemize}
+    \item Évolution \#4: ajouter la notion d'utilisateurs
+    \item Évolution \#5: ajouter la gestion d'un dépôt de formalismes et
+      modèles, de manière similaire à PNMLWeb ou PetriWeb
+    \item Contrainte \#1: écrire un code maintenable
+    \item Contrainte \#2: avoir une très bonne couverture de code par les
+      tests
   \end{itemize}
 }
 \end{frame}
- 
- \begin{frame}[c]
-  \frametitle{Problématique}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-probleme}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-probleme}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <3>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/3-probleme}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <4>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/4-probleme}};
-                 \end{tikzpicture}
-            }%
- 
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <2-> Protocole de communication SOAP (Simple Object Access Protocol)
-     	    \item <3-> Langage 
-     	    \item <4->Maintenance 
-         \end{itemize}
-   \end{minipage}
- \end{frame}
- 
- 
-  \begin{frame}[c]
-  \frametitle{Objectifs}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <3>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/3-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <4>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/4-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <5>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/5-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <6>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/6-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <7>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/7-objectif}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <8>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/8-objectif}};
-                 \end{tikzpicture}
-            }%
- 
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <1-> Serveur maintenable
-     	    \item <2-> Gestion des utilisateurs 
-     	    \item <3-> Dépôt de modèles et de formalisms (comme PNMLWEB)
-	    \item <4-> SOAP => REST (Representation State Transfert)
-     	    \item <6-> JAVA => PHP 
-     	    \item <8-> Test
-         \end{itemize}
-   \end{minipage}
- \end{frame}
- 
-    \begin{frame}[c]
-  \frametitle{Arborescence utilisateurs}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1-9>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-u}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <10->{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-arbre-u}};
-                 \end{tikzpicture}
-            }%
-            
- 
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}[t][15cm][t]{\textheight}
-  
-  \begin{columns}[T] % align columns
-\begin{column}{.48\textwidth}
-\only<2>{%
-\lstinline!GET http://rest.cosyverif.org/users! \\
-\lstinline!200 OK! \\
-\lstinline!{ ... }!
-}%
-\only<3>{%
-\lstinline!POST .../users/isokhona! \\
-\lstinline!201 CREATED!
-}%
-\only<4>{%
-\lstinline!POST .../users/alban! \\
-\lstinline!201 CREATED!
-}%
 
-\only<5>{%
-\lstinline!POST .../users/isokhona/models/model1! \\
-\lstinline!201 CREATED!
-}%
+% \begin{frame}[c]
+%  \frametitle{Problématique}
+%  
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-probleme}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-probleme}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <3>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/3-probleme}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <4>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/4-probleme}};
+%                 \end{tikzpicture}
+%            }%
+% 
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <2-> Protocole de communication SOAP (Simple Object Access Protocol)
+%     	    \item <3-> Langage 
+%     	    \item <4->Maintenance 
+%         \end{itemize}
+%   \end{minipage}
+% \end{frame}
+% 
+% 
+%  \begin{frame}[c]
+%  \frametitle{Objectifs}
+%  
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <3>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/3-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <4>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/4-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <5>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/5-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <6>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/6-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <7>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/7-objectif}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <8>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/8-objectif}};
+%                 \end{tikzpicture}
+%            }%
+% 
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <1-> Serveur maintenable
+%     	    \item <2-> Gestion des utilisateurs 
+%     	    \item <3-> Dépôt de modèles et de formalisms (comme PNMLWEB)
+%	    \item <4-> SOAP => REST (Representation State Transfert)
+%     	    \item <6-> JAVA => PHP 
+%     	    \item <8-> Test
+%         \end{itemize}
+%   \end{minipage}
+% \end{frame}
 
-\only<6>{%
-\lstinline!GET .../users/isokhona/models/model1! \\
-\lstinline!200 OK & data!
-}%
+\begin{frame}[t,fragile]
+\only<1>{
+  \frametitle{Réalisation}
+}\only<2-3>{
+  \frametitle{Création d'utilisateur}
+}\only<4>{
+  \frametitle{Liste des utilisateurs}
+}\only<5-8>{
+  \frametitle{Ajout de modèle}
+}
+%  \begin{minipage}{1\textwidth}
+%  	\only <1-9>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-u}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <10->{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-arbre-u}};
+%                 \end{tikzpicture}
+%            }%
+%            
+% 
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}[t][15cm][t]{\textheight}
+%  
+\begin{columns}[T] % align columns
+\begin{column}{.65\textwidth}
+  \lstset{
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+  }
+\begin{semiverbatim}
+\scriptsize
+\only<2-3>{
+  POST http://rest.cosyverif.org/users/isokhona
+  503 FORBIDDEN
 
-\only<7>{%
-\lstinline!PUT .../users/isokhona/models/model1! \\
-\lstinline!200 OK!
-}%
-
-\only<8>{%
-\lstinline!DELETE .../users/isokhona/models/model1! \\
-\lstinline!204 NO CONTENT!
-}%
-
-\only<9>{%
-\lstinline!GET .../users/isokhona/models/model1! \\
-\lstinline!410 GONE!
-}%
+  POST http://admin:admin@rest.cosyverif.org/users/isokhona
+  201 CREATED
+}
+\end{semiverbatim}
+%\only<2>{%
+%\lstinline!GET http://rest.cosyverif.org/users! \\
+%\lstinline!200 OK! \\
+%\lstinline!{ ... }!
+%}%
+%\only<3>{%
+%\lstinline!POST .../users/isokhona! \\
+%\lstinline!201 CREATED!
+%}%
+%\only<4>{%
+%\lstinline!POST .../users/alban! \\
+%\lstinline!201 CREATED!
+%}%
+%
+%\only<5>{%
+%\lstinline!POST .../users/isokhona/models/model1! \\
+%\lstinline!201 CREATED!
+%}%
+%
+%\only<6>{%
+%\lstinline!GET .../users/isokhona/models/model1! \\
+%\lstinline!200 OK & data!
+%}%
+%
+%\only<7>{%
+%\lstinline!PUT .../users/isokhona/models/model1! \\
+%\lstinline!200 OK!
+%}%
+%
+%\only<8>{%
+%\lstinline!DELETE .../users/isokhona/models/model1! \\
+%\lstinline!204 NO CONTENT!
+%}%
+%
+%\only<9>{%
+%\lstinline!GET .../users/isokhona/models/model1! \\
+%\lstinline!410 GONE!
+%}%
 
 \end{column}%
 \hfill%
-\begin{column}{.48\textwidth}
+\begin{column}{.34\textwidth}
 % http://www.texample.net/tikz/examples/filesystem-tree/
 \tikzstyle{every node}=[draw=black,thick,anchor=west,minimum width=2cm,minimum height=2em]
 \tikzstyle{selected}=[draw=red,fill=red!30]
@@ -544,174 +587,313 @@ selected={draw=red,fill=red!30},
 grow via three points={one child at (-.5,-0.7) and
 two children at (-.5,-0.7) and (-.5,-1.4)},
 edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
-\only<2->{
+\only<1->{
 \node {/}
 child { node {users} };
 }
 \end{tikzpicture}
 \end{column}%
 \end{columns}
-    
-   \end{minipage}
- \end{frame}
- 
-     \begin{frame}[c]
-  \frametitle{Arborescence Projets}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-u}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-p}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <3->{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-arbre-p}};
-                 \end{tikzpicture}
-            }%
-            
- 
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}[t][15cm][t]{\textheight}
-  
-  \begin{columns}[T] % align columns
-\begin{column}{.48\textwidth}
-\only<2->{%
-\lstinline!GET http://rest.cosyverif.org/users! \\
-\lstinline!200 OK! \\
-\lstinline!{ ... }!
-}%
-
-\end{column}%
-\hfill%
-\begin{column}{.48\textwidth}
-% http://www.texample.net/tikz/examples/filesystem-tree/
-\tikzstyle{every node}=[draw=black,thick,anchor=west,minimum width=2cm,minimum height=2em]
-\tikzstyle{selected}=[draw=red,fill=red!30]
-\tikzstyle{optional}=[dashed,fill=gray!50]
-\scriptsize
-\begin{tikzpicture}[
-every node={draw=black,thick,anchor=west},
-selected={draw=red,fill=red!30},
-grow via three points={one child at (-.5,-0.7) and
-two children at (-.5,-0.7) and (-.5,-1.4)},
-edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
-\only<2->{
-\node {/}
-child { node {projects} }
-child { node {users} };
+%\end{minipage}
+\note{
+  \begin{itemize}
+    \item Je vous présente ici au moyen d'exemples les fonctionnalités que
+      j'ai implémenté dans le serveur
+    \item Explication: à droite l'arborescence des ressources disponibles
+      sur le server, à gauche les requêtes et réponses
+    \item Ces requêtes sont des requêtes HTTP, elles peuvent donc être
+      réalisées depuis n'importe quelle application disposant d'une
+      bibliothèque HTTP
+    \item Cas 1: création d'un utilisateur
+      \begin{itemize}
+        \item Sans les droits
+        \item Avec les droits
+        \item Un utilisateur particulier: l'administrateur
+      \end{itemize}
+    \item Cas 2: liste des utilisateurs
+      \begin{itemize}
+        \item Deux types de ressources: les listes et les ressources simples
+        \item Distinguées facilement
+        \item Fonctionnement similaire pour lister n'importe quelle
+          collection de ressources
+      \end{itemize}
+    \item Cas 3: ajout d'un modèle
+      \begin{itemize}
+        \item Chaque utilisateur dispose de ressources: formalismes,
+          modèles, services et exécutions
+        \item Lui seul peut créer ou modifier une ressource
+      \end{itemize}
+    \item Cas 3-1: ajout d'un autre modèle, puis suppression
+    \item Cas 3-2: .... ?
+    \item Cas 4: ajout d'un autre utilisateur
+    \item Cas 4-1:
+      \begin{itemize}
+        \item Passage en compte privé d'un utilisateur
+        \item Tentative d'accéder à un modèle par cet utilisateur,
+          par l'autre utilisateur (échec)
+      \end{itemize}
+    \item Cas 5: les deux utilisateurs veulent travailler ensemble sur un
+      projet industriel
+      \begin{itemize}
+        \item Impossible car les modèles doivent être privés mais partagés
+          entre les deux utilisateurs
+        \item Notion de projet (voir slide suivant)
+      \end{itemize}
+  \end{itemize}
 }
-\end{tikzpicture}
-\end{column}%
-\end{columns}
-    
-   \end{minipage}
- \end{frame}
- 
- 
-\begin{frame}[c]
-  \frametitle{Implémentation}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-implementation}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2->{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/2-implementation}};
-                 \end{tikzpicture}
-            }%
-
-             
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <1-> Technologies
-     	    \item <2-> Test
-         \end{itemize}
-   \end{minipage}
- \end{frame}
- 
- 
-\begin{frame}[c]
-
-\begin{center}
-
-\par
-\Huge Perspectives \& Conclusion
-
-\end{center}
-  
 \end{frame}
 
+%     \begin{frame}[c]
+%  \frametitle{Arborescence Projets}
+%  
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-u}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-arbre-p}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <3->{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-arbre-p}};
+%                 \end{tikzpicture}
+%            }%
+%            
+% 
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}[t][15cm][t]{\textheight}
+%  
+%  \begin{columns}[T] % align columns
+%\begin{column}{.48\textwidth}
+%\only<2->{%
+%\lstinline!GET http://rest.cosyverif.org/users! \\
+%\lstinline!200 OK! \\
+%\lstinline!{ ... }!
+%}%
+%
+%\end{column}%
+%\hfill%
+%\begin{column}{.48\textwidth}
+%% http://www.texample.net/tikz/examples/filesystem-tree/
+%\tikzstyle{every node}=[draw=black,thick,anchor=west,minimum width=2cm,minimum height=2em]
+%\tikzstyle{selected}=[draw=red,fill=red!30]
+%\tikzstyle{optional}=[dashed,fill=gray!50]
+%\scriptsize
+%\begin{tikzpicture}[
+%every node={draw=black,thick,anchor=west},
+%selected={draw=red,fill=red!30},
+%grow via three points={one child at (-.5,-0.7) and
+%two children at (-.5,-0.7) and (-.5,-1.4)},
+%edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
+%\only<2->{
+%\node {/}
+%child { node {projects} }
+%child { node {users} };
+%}
+%\end{tikzpicture}
+%\end{column}%
+%\end{columns}
+%    
+%   \end{minipage}
+% \end{frame}
+ 
+ 
 \begin{frame}[c]
-  \frametitle{Problématique/Objectif}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-probleme}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2->{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-client}};
-                 \end{tikzpicture}
-            }%
+  \frametitle{Technologies}
+\centering
+\begin{tikzpicture}
+  \node at (-3,2) {\includegraphics[height=1.5cm]{img/php.png}};
+  \node at (-1,2) {\includegraphics[height=1.5cm]{img/slim}};
+  \node at ( 1,2) {\includegraphics[height=1.5cm]{img/composer}};
+  \node at ( 3,2) {\includegraphics[height=1.5cm]{img/box}};
+  \node at ( 0,0) {\includegraphics[height=.75cm]{img/docco}};
+  \node at (-3,-2) {\includegraphics[height=1.5cm]{img/phpunit}};
+  \node at (-.5,-2) {\includegraphics[height=1.5cm]{img/guzzle}};
+  \node at ( 3,-2) {\includegraphics[height=1.5cm]{img/travis}};
+\only<2>{
+  \node at (0,0)
+  {\includegraphics[height=6cm]{img/couverture}};
+}
+\end{tikzpicture}
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-implementation}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2->{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/2-implementation}};
+%                 \end{tikzpicture}
+%            }%
+%
+%             
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <1-> Technologies
+%     	    \item <2-> Test
+%         \end{itemize}
+%   \end{minipage}
+\note{
+  \begin{itemize}
+    \item Pour la première ligne : technologies utilisées par le serveur
+      \begin{itemize}
+      \item PHP: langage de script utilisé pour le code du serveur
+      \item Slim: framework permettant d'écrire des applications REST en PHP
+      \item Composer: gestionnaire de dépendances pour PHP
+      \item Box: Outil de packaging d'une application PHP + dépendances +
+        ressources
+    \end{itemize}
+    \item Seconde ligne : technologie utilisée pour la documentation
+      \begin{itemize}
+        \item Docco: écriture de la documentation dans le code (literate
+          programming)
+        \item Génération de documentation HTML
+      \end{itemize}
+    \item Troisième ligne: technologies utilisées pour le test
+      \begin{itemize}
+        \item PHPUnit: outil de lancement des tests
+        \item On réalise les tests en boîte noire, juste en envoyant des
+          requêtes
+        \item Guzzle: client Web en PHP permettant de lancer les tests en
+          boîte noire
+        \item Travis: service en ligne d'intégration continue,
+          qui exécute les tests
+      \end{itemize}
+    \item Couverture de code par les tests: bonne, mais encore quelques
+      points à améliorer
+  \end{itemize}
+}
+\end{frame}
 
-             
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <1-> Maintenance
-     	    \item <1-> Fonctionnalités
-	    \item <1-> Evolution
-	    \item <2-> Nouvelle interface web
-         \end{itemize}
-   \end{minipage}
+%\begin{frame}[c]
+%
+%\begin{center}
+%
+%\par
+%\Huge Perspectives \& Conclusion
+%
+%\end{center}
+%  
+%\end{frame}
+
+\begin{frame}[c]
+\only<1>{
+  \frametitle{État actuel}
+}\only<2>{
+  \frametitle{Développement imprévu...}
+}
+\centering
+\begin{tikzpicture}
+\node (c1) at (2,3)
+  {\includegraphics[width=3cm,height=3cm]{img/screen}};
+\node (c2) at (2,7)
+  {\includegraphics[width=3cm,height=3cm]{img/screen}};
+\node at (2,5)
+  {Clients};
+\node (s) at (7,5)
+  {\includegraphics[width=3cm,height=3cm]{img/screen}};
+\node [anchor=center]
+  at (s.south)
+  {\includegraphics[width=1cm]{img/php.png}};
+\node [anchor=north west] at (s.east)
+  {\includegraphics[width=1cm]{img/depot2}};
+\node [anchor=north west] at (s.north east)
+  {\includegraphics[width=1cm]{img/users}};
+\node at (7,3)
+  {Server};
+\only<1>{
+\node (coloane)
+  at (2, 3.3)
+  {\color{white}?};
+}\only<2->{
+\node (webclient)
+  at (2, 3.3)
+  {\includegraphics[width=2.8cm,height=2.2cm]{img/webclient}};
+\node [anchor=center]
+  at (c1.south)
+  {\includegraphics[width=2cm]{img/html5}};
+}
+\node
+  at (2, 7.3)
+  {\includegraphics[width=2.8cm,height=2.2cm]{img/clitor}};
+\node (t1)
+  at (6.5, 5)
+  {\includegraphics[height=1cm]{img/tools-1}};
+\node (t2)
+  at (7.5, 5.5)
+  {\includegraphics[height=1cm]{img/tools-2}};
+\draw [<->, line width=2pt]
+  (c1) -- (s)
+  node [midway, below, sloped] {REST};
+\draw [<->, line width=2pt]
+  (c2) -- (s)
+  node [midway, above, sloped] {REST};
+\end{tikzpicture}
+
+%  \begin{minipage}{1\textwidth}
+%  	\only <1>{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-probleme}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%            \only <2->{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-client}};
+%                 \end{tikzpicture}
+%            }%
+%
+%             
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <1-> Maintenance
+%     	    \item <1-> Fonctionnalités
+%	    \item <1-> Evolution
+%	    \item <2-> Nouvelle interface web
+%         \end{itemize}
+%   \end{minipage}
  \end{frame}
  
  
@@ -769,66 +951,122 @@ child { node {users} };
 \end{frame}
 
 \begin{frame}[c]
-  \frametitle{Implémentation}
-  
-  \begin{minipage}{1\textwidth}
-  	\only <1->{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=10.5cm, height=4cm]{img/1-implementation-client}};
-                 \end{tikzpicture}
-            }%
-            
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <1-> Technologies
-         \end{itemize}
-   \end{minipage}
- \end{frame}
+\frametitle{Technologies}
+\centering
+\begin{tikzpicture}
+  \node at (0,0) {\includegraphics[height=3cm]{img/html5}};
+  \node at (-3,-3) {\includegraphics[height=1.5cm]{img/bootstrap}};
+  \node at ( 0,-3) {\includegraphics[height=1.5cm]{img/jquery}};
+  \node at ( 3,-3) {\includegraphics[height=1.5cm]{img/handlebars}};
+\end{tikzpicture}
+
+\note{
+  \begin{itemize}
+    \item Client écrit avec des technologies Web standard: HTML, JavaScript,
+      CSS
+    \item Utilisation du framework Bootstrap qui fournit le placement en
+      grille et des composants utiles
+    \item Utilisation de la bibliothèque javascript JQuery, très répandue
+    \item Utilisation de templates de HTML5 avec handlebars pour une
+      meilleure réutilisation du code
+  \end{itemize}
+}
+
+%  \begin{minipage}{1\textwidth}
+%  	\only <1->{%
+%                \begin{tikzpicture}
+%                      \node
+%                          [anchor=north]
+%                          at (0,0)
+%                          {\includegraphics[width=10.5cm, height=4cm]{img/1-implementation-client}};
+%                 \end{tikzpicture}
+%            }%
+%            
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <1-> Technologies
+%         \end{itemize}
+%   \end{minipage}
+\end{frame}
  
 \begin{frame}[c]
-\par
-\Huge Perspectives \& Conclusion
+  \frametitle{Perpectives}
+  \begin{block}{Court terme}
+    \begin{itemize}
+      \item Améliorer la couverture de code
+      \item Intégrer l'éditeur collaboratif de modèles
+      \item Réaliser un script d'installation
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \begin{block}{Moyen terme}
+    \begin{itemize}
+      \item Ajouter la notion de \emph{classe d'étudiants}
+      \item Développer des clients mobiles \& tablette
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Conclusion}
+  \begin{itemize}
+    \item 
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[c]
   \frametitle{Bilan}
-  
-  \begin{minipage}{1\textwidth}
-  	
-\begin {center}
-	\par
-	\Huge Bilan
-\end{center}
-             
-    \end{minipage}
-   
-   \hrule
-  
-  \begin{minipage}{1\textwidth}
-    
-         \begin{itemize}
-     	    \item <1-> Serveur
-     	    \item <2-> Interface web
-	    \item <3-> Personnel
-         \end{itemize}
-   \end{minipage}
+  \note{
+    Bilan personnel :
+    \begin{itemize}
+      \item TODO
+    \end{itemize}
+  }
+\note{
+  \begin{itemize}
+    \item Ce que tu as appris comme technologies
+    \item Ce que tu as appris en méthode de développement
+    \item Ce que tu as appris sur la gestion d'un projet
+    \item Si c'était à refaire, que changerais-tu ?
+    \item Quel avenir professionnel envisages-tu ?
+  \end{itemize}
+}
+%  
+%  \begin{minipage}{1\textwidth}
+%  	
+%\begin {center}
+%	\par
+%	\Huge Bilan
+%\end{center}
+%             
+%    \end{minipage}
+%   
+%   \hrule
+%  
+%  \begin{minipage}{1\textwidth}
+%    
+%         \begin{itemize}
+%     	    \item <1-> Serveur
+%     	    \item <2-> Interface web
+%	    \item <3-> Personnel
+%         \end{itemize}
+%   \end{minipage}
 \end{frame}
 
+\appendix
+
+\setbeamertemplate{footline}{}
+
 \begin{frame}[c]
-
 \begin{center}
-
-\par
-\Huge Question ?
-
+\Huge Questions ?
 \end{center}
 \end{frame}
 
