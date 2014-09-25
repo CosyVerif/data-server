@@ -20,8 +20,8 @@
 }
 
 %\pgfpagesuselayout{8 on 1}[a4paper, border shrink=5mm]
-\setbeameroption{show notes on second screen=bottom}
-%\setbeameroption{hide notes}
+%\setbeameroption{show notes on second screen=bottom}
+\setbeameroption{hide notes}
 %%\setbeameroption{show notes}
 
 \setbeamertemplate{note page}[plain]
@@ -306,7 +306,7 @@
         \item Repose sur des bibliothèques complexes (WebServices)
         \item Pas de permanent disposant de ces compétences dans CosyVerif
         \item Des fonctionnalités simples et nécessaires (utilisateurs,
-          dépôt) prennent trop de temps à déveloper
+          dépôt) prennent trop de temps à développer
       \end{itemize}
     \item Évolution \#1: passer à REST
       \begin{itemize}
@@ -322,7 +322,7 @@
       \begin{itemize}
         \item But: maintenance, car plusieurs membres permanents de
           CosyVerif maitrisent le PHP
-        \item But: ajout plus simple de fonctionalités
+        \item But: ajout plus simple de fonctionnalisés
       \end{itemize}
     \item Évolution \#4: ajouter la notion d'utilisateurs
     \item Évolution \#5: ajouter la gestion d'un dépôt de formalismes et
@@ -589,7 +589,8 @@ two children at (-.5,-0.7) and (-.5,-1.4)},
 edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
 \only<1->{
 \node {/}
-child { node {users} };
+child { node {users}}
+child { node {users} child { node {users}}};
 }
 \end{tikzpicture}
 \end{column}%
@@ -898,56 +899,91 @@ child { node {users} };
  
  
 \begin{frame}[c]
-  \frametitle{Interface web}
- 
- \begin{columns}[T] % align columns
-\begin{column}{.25\textwidth}
-\only<1-2>{%
-\textsf{Create user}
+
+\only<1-6>{%
+\frametitle{Create user}
 }%
 
-\only<3>{%
-\textsf{Create resource}
+\only<7>{%
+\frametitle{Create resource}
 }%
 
-
-\only<4>{%
-\textsf{Create project}
+\only<8>{%
+\frametitle{Create project}
 }%
 
-\only<5>{%
-\textsf{Create invitation}
+\only<9>{%
+\frametitle{Create invitation}
 }%
 
-\only<6>{%
+\only<9>{%
 \textsf{Search}
 }%
 
-\end{column}%
-\hfill%
-\begin{column}{.81\textwidth}
 
-	\only <1>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=8cm, height=10cm]{img/1-ecran-create-user}};
-                 \end{tikzpicture}
-            }%
-            
-            \only <2>{%
-                \begin{tikzpicture}
-                      \node
-                          [anchor=north]
-                          at (0,0)
-                          {\includegraphics[width=8cm, height=10cm]{img/2-ecran-create-user}};
-                 \end{tikzpicture}
-            }%
-\end{column}%
-\end{columns}
- 
-  
+\only <1>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/1-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
+\only <2>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/2-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
+\only <3>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/3-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
+\only <6>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/6-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
+\only <7>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/1-ecran-create-resource}};
+     \end{tikzpicture}
+}%
+
+\only <8>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/6-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
+\only <9>{%
+    \begin{tikzpicture}
+          \node
+              [anchor=north]
+              at (0,0)
+              {\includegraphics[width=10cm, height=8cm]{img/6-ecran-create-user}};
+     \end{tikzpicture}
+}%
+
 \end{frame}
 
 \begin{frame}[c]
@@ -1069,5 +1105,6 @@ child { node {users} };
 \Huge Questions ?
 \end{center}
 \end{frame}
+
 
 \end{document}
