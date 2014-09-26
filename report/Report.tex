@@ -1033,12 +1033,110 @@ classe d'étudiants au dépôt de modèles et de formalismes.
 \chapter{Etudes et réalisations de l'interface web}
 
 \paragraph{}
+Au début de mon stage a été la conception et la réalisation du serveur de la nouvelle plate-forme de CosyVerif mais
+maintenant, il a été étendu par la réalisation d'un client web. Ce client va offrir une interface pour chaque fonctionnalité
+du serveur. 
 
 \section{Présentation}
+
+\paragraph{}
+Le client est une interface web permettant à des utilisateurs d'interagir avec le serveur. Il propose une interface pour chaque 
+fonctionnalités du serveur de la nouvelle plate-forme de CosyVerif. Il permet donc à un utilisateur de :
+
+\begin{itemize}
+\item créer son compte utilisateur et s'authentifier,
+\item créer, lire et modifier ses ressources (modèles, formalismes, services et exécutions),
+\item rechercher ses ressources et/ou autres ressources publiques selon certains critères,
+\item mettre à jour son compte,
+\item rendre publique ou privé son compte pour autoriser l'accès ou non à tous les utilisateurs en lecture seule,
+\item créer un projet pour partager des ressources avec quelques utilisateurs,
+\item inviter un utilisateur à un projet,
+\item faire une requête pour se joindre à un projet,
+\item créer, lire et modifier les ressources (modèles, formalismes, services et exécutions) d'un projet,
+\item changer les droits d'un utilisateur,
+\item supprimer un utilisateur d'un projet,
+\item mettre à jour les informations d'un projet,
+\item supprimer un compte ou un projet.
+\end{itemize}
+
 \section{Définition de l'architecture}
+
+\paragraph{}
+Le client est juste une page web écrit avec des technologies standard HTML, JavaScript et CSS. Il permet d'envoyer des 
+requêtes REST (basé sur la spécification du protocole HTTP) au serveur via le framework JQuery. Il est construit avec une
+utilisation de templates de HTML5 pour une meilleure réutilisation du code. Les données échangés avec le serveur sont
+au format JSON.
+
 \section{Etude technique}
+
+\paragraph{}
+Cette partie récence les technologies utilisées
+
+\subsection*{HTML5}
+
+\paragraph{}
+HTML (Hypertext Markup Language) est le format de données conçu pour représenter les pages web. Il permet de 
+structurer sémantiquement et de mettre en forme le contenu des pages, d’inclure des ressources multimédias dont des 
+images, des formulaires de saisie, et des programmes informatiques. Il permet de créer des documents interopérables 
+avec des équipements très variés de manière conforme aux exigences de l’accessibilité du web. HTML5 est sa version
+évolué qui ajoute des nouvelles fonctionnalités comme description des applications en ligne, d'enrichir les interfaces
+utilisateurs avec des contrôles spécifiques : menus, champs associés à des types de données spécifiques, ... Il est le
+langage qui s'occupe des aspects statiques de l'interface du client web.
+
+
+\subsection*{JavaScript}
+
+\paragraph{}
+Le langage de programmation pour les aspect dynamique d'une page. Dans un document HTML, il est possible de définir 
+des fonctions associé à des événements, et ainsi de modifier l’apparence de l'interface (HTML), d'ajouter de nouveaux 
+éléments à la page, de valider les données de formulaires, de faire des requêtes asynchrone au serveur de la plate-forme
+de CosyVerif.
+
+\subsection*{CSS}
+
+\paragraph{}
+Les styles CSS, pour feuilles de style en cascadent, permettent de définir l’aspect d'une page et de ses éléments par un 
+ensemble de propriétés (position, taille, couleurs, bordures, polices, visibilité…), en fonction de certains paramètres 
+comme la taille ou la nature du support associé, ou de l'état de ces éléments, si la souris est positionnée sur un élément 
+il est par exemple possible de changer son aspect. Par exemple à l'impression d'une page web il est possible de définir 
+un style qui permet de cacher les éléments de navigation inutiles sur papiers. Il a permis au client d'avoir une ergonomie
+moderne.
+
+\subsection*{jQuery}
+
+\paragraph{}
+jQuery est une bibliothèque JavaScript facilitant d'écrire de scripts côté client dans le code HTML des pages web. 
+Combiné avec JavaScript, il nous a permis de réaliser les aspects dynamiques du client.
+
+\subsection*{Bootstrap}
+
+\paragraph{}
+Bootstrap est un framework qui fournit le placement en grille dynamiquement pour bien disposer les composants d'une
+page HTML et  des composants utiles (des composants HTML mise en forme).
+
+\subsection*{Handlebars}
+
+\paragraph{}
+Handlebars est un framework qui permet une utilisation simple de templates de HTML5 pour une meilleure réutilisation 
+du code. Il a permis de factoriser beaucoup de codes qui sont réutilisés après.
+
 \section{Mise en oeuvre}
-\subsection{Présentation}
+
+\paragraph{}
+Le client web a été développé sur une nouvelle base. En effet, tout le code produit est nouveau. Il est réalisé de manière
+à être simple et maintenable en utilisant des bibliothèques standards :
+
+\paragraph{Code réutilisable :} des templates ont été réalisés, utilisés, réutilisés. Des futures fonctionnalités 
+peuvent réutiliser ces templates. Ils sont réalisés grâce au framework "Handlebars". En plus, cinq fonctions JavaScript
+seulement pour tout le code permettant d'échanger avec le serveur (post, get, post et del, patch)
+
+\paragraph{Code réutilisable :} des templates ont été réalisés, utilisés, réutilisés. Des futures fonctionnalités 
+peuvent réutiliser ces templates. Ils sont réalisés grâce au framework "Handlebars".
+
+
+
+
+
 \subsection{Exemples d'écran de sortie}
 \subsection{Bilan}
 \subsection{Perspective}
