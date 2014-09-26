@@ -1,26 +1,28 @@
-\documentclass{book}
+\PassOptionsToPackage{svgnames,table}{xcolor}
+\documentclass{report}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{etoolbox}
+\usepackage{xcolor}
 \renewcommand*\familydefault{\sfdefault}
 \usepackage[francais]{babel}
+\usepackage{tikz}
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{hyperref}
-\usepackage[table]{xcolor}
-\usepackage{listings, color}
+\usepackage{listings}
 \definecolor{forestgreen}{rgb}{0.34,0.139,0.34}
 \definecolor{orangered}{rgb}{0.239,0.134,0.64}
 \definecolor{darkblue}{rgb}{0.0,0.0,0.6}
 \definecolor{gray}{rgb}{0.4,0.4,0.4}
 \usepackage[left=2.5cm, right=2.5cm]{geometry}
 
-\let
-\cleardoublepage
-\clearpage
 
-\title{\textbf{Rapport de stage \\ -- \\ CONCEPTION ET DÉVELOPPEMENT DU 
-               SERVEUR COSYVERIF}}
+\title{\textbf{Rapport de stage \\ -- \\
+    CONCEPTION ET DÉVELOPPEMENT DU 
+    SERVEUR COSYVERIF
+}}
 \author{%
   Idrissa \textsc{Sokhona}
 }%
@@ -118,12 +120,12 @@ qui m'ont été confiées.  Dans un second temps, j'aborderai la description du 
 bilan et les perspectives.
 
 
-\chapter{Description de la problématique}
+\chapter{Contexte et Problématique}
 
 \section{MeFoSyloMa}
 
-\paragraph{}
-MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels) est un groupe de vérification parisien dont
+\href{http://www.mefosyloma.fr/}{MeFoSyLoMa}
+(Méthodes Formelles pour les Systèmes Logiciels et Matériels) est un groupe de vérification francilien dont
 l'objectif est de permettre la confrontation de différentes approches ou points de vue sur l'utilisation des méthodes 
 formelles dans les domaines du génie logiciel, de la conception de circuit, des systèmes répartis, des systèmes 
 temps-réel ou encore des systèmes d'information. Le groupe s'organise autour de réunions bimestrielles où sont 
@@ -133,28 +135,34 @@ Supérieure de Cachan) et LTCI (TELECOM ParisTech).
 
 \section{Organisation de CosyVerif}
 
-\paragraph{}
 \href{http://www.cosyverif.org}{CosyVerif} est un environnement logiciel dont le but est la spécification et la vérification
-formelle des systèmes dynamiques. Le projet a été décidé et soutenu par trois partenaires du groupe de vérification MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels). Ses membres fondateurs sont LIP6 (Laboratoire 
-d'Informatique de Paris 6) , LIPN (Laboratoire d'Informatique de Paris Nord) et LSV (Laboratoire Spécification et 
+formelle des systèmes dynamiques. Le projet a été décidé et soutenu par
+trois partenaires du groupe de vérification MeFoSyLoMa. Ses membres
+fondateurs appartiennent au LIP6 (Laboratoire 
+d'Informatique de Paris 6), au LIPN (Laboratoire d'Informatique de Paris
+Nord) et au LSV (Laboratoire Spécification et 
 Vérification - Laboratoire d'informatique de l'ENS de Cachan).
 
-\paragraph{}
-Tout d'abord, ces membres visent à partager leurs outils, à comparer et à soutenir des études de cas industriels.
+Ce projet vise à partager leurs outils, à les rendre accessibles aussi bien
+pour l'enseignement que pour des études de cas industriels.
+Pour cela, CosyVerif facilite les tâches de modélisation, ainsi que celles
+d'intégration de nouveaux formalismes et d'outils.
 
-\paragraph{}
-Deuxièmement, ils veulent aussi promouvoir la pratique de la vérification formelle dans l'industrie et donc ils ont 
-l'intention de faciliter la tâche de l'intégration de nouveaux formalismes et des outils.
+CosyVerif est géré par un comité de pilotage composé de chercheurs et d'ingénieurs. Il décide des orientations 
+stratégiques ainsi que des choix techniques.
+Le projet est généralement développé par un ingénieur (lorsque le
+financement est disponible), des doctorants (pour l'intégration de leurs
+outils), et des stagiaires de niveau L3 à M2.
 
 \section{Présentation des organismes d'accueil}
 
-\paragraph{}
-Le stage est co-encadré par le LIPN et LSV, et financé par LIPN. Il se déroule dans leur locaux : LIPN (3 jours par semaine)  
-et LSV ( 2 jours par semaine).
+Le stage est co-encadré par Laure Petrucci (Professeur, directrice du LIPN)
+et Alban Linard (Ingénieur, LSV/INRIA), et financé par LIPN. Il se déroule
+dans les locaux des deux organismes : LIPN (3 jours par semaine) et LSV (2 jours par semaine).
 
 \subsection{LIPN}
 
-\paragraph{}
+\begin{quotation}
 Le Laboratoire d'Informatique de Paris-Nord (LIPN) est associé au CNRS depuis janvier 1992 et a le statut d'unité mixte 
 de recherche  (UMR 7030) depuis janvier 2001. Le LIPN poursuit ses recherches autour de ses axes forts en s'appuyant 
 sur les compétences de ses membres, en particulier en combinatoire, en optimisation combinatoire, en algorithmique, 
@@ -167,169 +175,198 @@ en logique, en logiciel, en langage naturel, en apprentissage. Le laboratoire es
      \item RCLN : Représentation des Connaissances et Langage Naturel. 
 \end{itemize}
 
-\paragraph{}
 Plus de 130 membres participent aux activités du laboratoire dont 78 chercheurs ou enseignants-chercheurs permanents, 
 pour la plupart en poste à l'Université Paris 13 (Institut Galilée, IUT de Villetaneuse).
     
-\paragraph{}
 Le LIPN fait partie du pôle MathSTIC, un centre de recherche dans les domaines mathématiques et sciences et 
 technologies de l'information et de la communication.
+\end{quotation}
+\hfill{Source: \url{{http://lipn.univ-paris13.fr/}}}
 
-\paragraph{}
+\medskip
+
 Le stage se déroule au sein de l'équipe LCR avec mon encadrent Laure Petrucci (Directrice du laboratoire).
-    
  % ToDo : l'organigramme et là oû je suis affecté%
 
 \subsection{LSV}
 
-\paragraph{}
+\begin{quotation}
 Fondé en 1997, le Laboratoire Spécification et Vérification (LSV) est le laboratoire d'informatique de l'ENS de Cachan, 
 et est aussi affilié au Centre National de la Recherche Scientifique (CNRS) en tant qu'UMR 8643. La recherche au LSV est
 centrée sur la vérification de logiciels et systèmes critiques, et sur la vérification de la sécurité des systèmes informatiques.
+\end{quotation}
+\hfill{Source: \url{http://www.lsv.ens-cachan.fr/}}
 
-\paragraph{}
-Il y a différents catégories de membre : \\
+Mon stage se déroule au sein de l'axe MEXICO (Modelling and Exploitation of
+Interaction and Concurrency) du LSV.
 
-\begin{itemize}
-    \item Personnel administratif et technique,
-    \item Membres permanents,
-    \item Membres associés ou temporaires,
-    \item Doctorants,
-    \item Membres du LSV en détachement.
-\end{itemize}
-    
-\paragraph{}
-Le stage se déroule avec mon encadrent Alban Linard qui est membre temporaire.
+\begin{quotation}
+In the increasingly networked world, reliablity of applications becomes ever more critical as the number of users of, e.g., communication systems, web services, transportation etc grows steadily. MExICo will work towards a better understanding and an increased reliability of distributed and asynchronous systems, and thus join the existing effort of many other teams that use formal methods; what is particular in the present proposal is that our team focusses its research on the two features of concurrency and interaction.
+\end{quotation}
+\hfill{\url{http://www.lsv.ens-cachan.fr/axes/MEXICO/mexico?l=fr}}
 
 \section{État actuel du projet}
 
-\paragraph{}
-L'environnement de CosyVerif se compose actuellement de deux outils logiciels : Coloane, l'interface graphique, et 
-Alligator, une intégration d'outils basé sur les web services. Il est agrandie par les outils existants de vérification 
-développés dans les laboratoires (membres ou partenaires fondateurs).
-
-\paragraph{}
-Il a été conçu de manière à :
-\begin{itemize}
-\item manipuler des formalismes différents avec la possibilité de créer facilement de nouveaux,
-\item fournir une interface graphique pour chaque formalisme permettant l'édition de modèles,
-\item inclure des outils de vérification appelées via l'interface en tant que Web service,
-\item offrir la possibilité pour un développeur d'intégrer son/sa propre outil, en le/la permettant d'interagir avec les 
-autres outils.
-\end{itemize}
-
-\paragraph{}
-Deux familles de formalismes sont pris en charge: les automates et les réseaux de Petri, à la fois avec des extensions. 
-La plupart des outils sont liés à des réseaux de Petri. Certains d'entre eux procèdent à des analyses structurelles comme 
-des calculs d'invariants. Tandis que d'autres outils effectuent des analyses comportementales : construction de graphe 
-d'accessibilité, etc ...
-
-
-\paragraph{}
-Tous les logiciels développés sont open source et logiciels libres.
-
-\paragraph{}
-CosyVerif est géré par un comité de pilotage composé de chercheurs et d'ingénieurs. Il décide des orientations 
-stratégiques ainsi que des choix techniques. Il est développé par ces ingénieurs quant-il y en a et des stagiaires.
-
-\subsection{Architecture de l'existant}
+La plateforme CosyVerif se compose actuellement de trois outils logiciels :
+Coloane, une interface graphique agissant à la fois comme éditeur de modèles
+et comme client de la plateforme,
+Alligator, un serveur d'intégration d'outils basé sur les web services,
+et un client en ligne de commande.
+Le serveur est étendu par les outils de vérification intégrés à la plateforme,
+développés dans des laboratoires de recherche (membres ou partenaires fondateurs).
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.50]{img/cosyverif_schema.pdf}
+    \\
+    \hfill{Source: Benoît Barbot}
     \caption{Architecture de CosyVerif}
 \end{figure}
 
+La plateforme CosyVerif a été conçue de manière à :
+\begin{itemize}
+\item manipuler des formalismes différents avec la possibilité de créer facilement de nouveaux,
+\item fournir une interface graphique pour chaque formalisme permettant l'édition de modèles,
+\item inclure des outils de vérification appelées via l'interface en tant
+  que services web,
+\item offrir la possibilité pour un développeur d'intégrer son propre outil,
+  en lui permettant d'interagir avec les autres outils.
+\end{itemize}
+
+Deux familles de formalismes sont actuellement pris en charge: les automates
+et les réseaux de Petri. Pour chaque famille, plusieurs formalismes sont
+disponibles (réseaux P/T, colorés, stochastiques, ...).
+La plupart des outils manipulent pour l'instant des réseaux de Petri. Certains d'entre eux procèdent à des analyses structurelles comme 
+des calculs d'invariants, tandis que d'autres effectuent des analyses
+comportementales, comme la construction de graphe 
+d'accessibilité.
+Tous les logiciels développés sont sous licences libres, mais certains
+outils peuvent ne pas l'être, comme par exemple GreatSPN.
+
 \subsection{Problèmes identifiés}
 
-\paragraph{}
-La communication et l'échange de données entre les clients (Coloane) et le serveur Alligator  de l'ancienne plate-forme 
-se sont basées sur l'architecture orienté service, en particulier, le protocole SOAP (Simple Object Access Protocol). 
-Cependant, l'utilisation de SOAP n'est pas pratique et laisse une forte couplage entre le serveur et ses clients. En plus, le 
-surcouche et le moteur de SOAP et Java ajoutent des dizaines de méga-octets supplémentaires. En effet, Java présente 
-beaucoup de dépendances (environ 100 Mo) et des difficultés de maintenance par les membres du projet, mais aussi, il 
-manque des fonctionnalités. Néanmoins, Java apporte une performance et une portabilité à Alligator. C'est alors à cause 
-des problèmes que présente la plate-forme existante que l'équipe a jugé nécessaire de repartir sur une nouvelle base, 
-en restant vigilant pour ne pas retomber sur les mêmes difficultés. Pour ces raisons, l'équipe a émis des exigences pour 
+Les choix techniques pour la réalisation de la plateforme ont jusqu'ici été
+influencés par les composants pré-existants. La première brique fut Coloane,
+écrit en Java sous la forme d'une plug-in Eclipse.
+
+Le serveur a donc été lui aussi développé en Java, afin de conserver un seul
+langage.
+Le protocole SOAP a été choisi comme protocole de communication entre les
+deux,
+car il dispose d'une excellente interface Java, ne nécessitant qu'un minimum
+de développement.
+
+\medskip
+
+Plusieurs problèmes ont mené à la redéfinition technique du projet
+CosyVerif.
+
+Premièrement, le client graphique actuel, Coloane, n'est plus maintenable, car aucun
+membre permanent du projet ne maîtrise le développement de plug-in Eclipse.
+
+Deuxièmement, il est apparu que l'utilisation de SOAP n'est pas
+pratique hors du monde Java, ce qui crée un fort couplage entre le serveur et ses clients.
+De plus, l'environnement Java, ainsi que la surcouche et le moteur de SOAP
+ajoutent de très nombreuses dépendances transitives, qui pèsent plusieurs dizaines de méga-octets.
+Troisièmement, le serveur a posé des problèmes de confinement. En effet, les
+outils étant directement lancés par le serveur, il est arrivé qu'ils fassent
+planter la Java Virtual Machine, et donc le serveur complet.
+Un confinement a été mis en place, mais il est très coûteux en ressources
+(temps et mémoire).
+
+Quatrièmement, l'ajout de nouvelles fonctionnalités simples au serveur,
+telles que l'authentification, s'est avérée plus complexe que prévu. En
+effet, les bibliothèques utilisées nécessitent un apprentissage conséquent
+pour de telles choses.
+
+Ces problèmes de la plate-forme existante ont conduits l'équipe à repartir sur une nouvelle base, 
+tout en restant vigilant pour ne pas retomber sur les mêmes difficultés.
+Pour ces raisons, l'équipe a émis des exigences assez fortes pour 
 la nouvelle plate-forme.
-
-\subsection{Enjeux}
-
-\paragraph{}
-Le développement d'une nouvelle plate-forme CosyVerif qui représente un serveur et un client web.
-Cette plate-forme constitue un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur
-d'édition collaboratif de modèles et formalismes et un gestionnaire de permissions et d'authentification des utilisateurs.
-
-\section{Objectifs}
-
-\paragraph{}
-L'objectif de ce stage est de participer à la conception et au développement du nouveau serveur et du 
-client web de la plate-forme de vérification CosyVerif. Ce serveur aura comme fonctions, un dépôt de modèles et de 
-formalismes, un gestionnaire d'exécution d'outils, un serveur d'éditions collaboratif de modèles et formalismes, et un gestionnaire de permissions et d'authentification des utilisateurs. 
 
 \section{Sujet du stage}
 
-\paragraph{}
-Le stage est de concevoir et de développer tout d'abord le serveur de la nouvelle plate-forme de vérification CosyVerif 
-qui aura comme fonctions, un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur 
-d'éditions et la gestion d'authentification des utilisateurs. Ensuite, un client web qui propose une interface pour chaque 
-fonctionnalités du serveur.
+L'objectif de mon stage est de concevoir et développer le nouveau serveur de
+la plateforme CosyVerif. Cet objectif a été étendu au cours du stage au
+client web de la plate-forme.
+
+Le nouveau serveur dispose de fonctionnalités nouvelles par rapport au
+serveur existant : dépôt de modèles et de formalismes, éditions
+collaborative de modèles, authentification des utilisateurs.
+Il intègre aussi les fonctionnalités déjà existantes : la gestion
+d'exécution d'outils.
 
 \subsection{Que doit offrir la future plate-forme ?}
 
-\paragraph{}
 La plate-forme doit permettre :
 
 \begin{itemize}
-\item La recherche de formalismes et de modèles selon certains critères,
-\item L'insertion des nouveaux formalismes et modèles et leur édition,
-\item L'authentification des utilisateurs,
-\item La gestion de permissions des utilisateurs,
-\item L'exécution d'outils
+\item la recherche de formalismes et de modèles selon certains critères,
+\item l'insertion des nouveaux formalismes et modèles et leur édition,
+\item l'authentification des utilisateurs,
+\item la gestion de permissions des utilisateurs,
+\item l'insertion de nouveaux outils,
+\item l'exécution d'outils.
 \end{itemize}
 
-\subsection{Exigences de la future plate-forme}
+\subsection{Exigences de l'encadrement}
 
-\paragraph{}
-Les exigences à prendre en compte, qui ont été imposées par l'équipe, pour réaliser la nouvelle plate-forme :
+Les exigences à prendre en compte, qui ont été imposées par l'équipe, pour
+réaliser la nouvelle plate-forme, sont :
 
 \begin{itemize}
-\item Les tests doivent être effectuées en boîte noire avec une couvertir complète du code,
-\item Le code doit être maintenable et simple,
-\item Le code source doit être écrit et commenté en anglais,
-\item Des technologies qui présentent une surcouche et un couplage forte seront évitées. Par exemple, SOAP, eclipse, ...
+\item les tests doivent être effectuées en boîte noire avec une couvertir complète du code,
+\item le code doit être maintenable et simple,
+\item le code source doit être écrit et commenté en anglais,
+  les commentaires seront rédigés en programmation lettrée,
+\item seules des technologies simples et légères seront utilisées;
+  des technologies lourdes telles que SOAP ou Eclipse sont interdites.
 \end{itemize}
 
 \subsection{Axes de ma contribution sur la future plate-forme}
 
 \paragraph{}
 La nouvelle plate-forme présente 5 composants distincts qui sont étudiés et réalisés séparément et intégrés par la suite : trois composants côté serveur et deux autres côté client web.
+J'ai réalisé deux de ces composants au cours de mon stage. Un autre a été
+réalisé par un autre stagiaire (Francisco Gimenez), et le reste par
+l'ingénieur du projet.
 
 \subsubsection{Côté serveur}
 
 \begin{itemize}
-\item Serveur dépôt : ce composant est chargé du dépôt de modèles et de formalismes, de la gestion d'authentifications 
-et de droits d'accès des utilisateurs, d'une base qui démarre et interagit avec les autres composants du serveur.
-\item Serveur d'édition : ce composant s'occupe de l'édition collaborative de modèles et de formalismes. Il interagit 
-directement avec le composant édition web du client au moment de l'édition collaborative.
-\item Serveur d'exécution : ce composant s'occupent de l'exécution d'outils .
+\item Dépôt : ce composant est chargé du dépôt de modèles et de formalismes, de la gestion d'authentifications 
+et de droits d'accès des utilisateurs.
+\item Édition : ce composant s'occupe de l'édition collaborative de modèles et de formalismes. Il interagit 
+directement avec le composant édition web du client au moment de l'édition
+collaborative,
+ainsi qu'avec le dépôt.
+\item Exécution : ce composant s'occupe de l'exécution d'outils. Il n'est à ce
+  jour pas complètement défini.
 \end{itemize}
 
 \subsubsection{Côté client}
 
 \begin{itemize}
-\item Interface web : ce composant est l'interface web qu'un utilisateur a pour s'authentifier au près du serveur, pour utiliser le dépôt de modèles et de formalismes, pour participer à des projets avec d'autres utilisateurs, pour lancer des outils et observer leurs résultats. C'est le composant du client qui communique et échange des données avec le serveur dépôt.
+\item Interface web : ce composant est l'interface web qu'un utilisateur a pour s'authentifier auprès du serveur, pour utiliser le dépôt de modèles et de formalismes, pour participer à des projets avec d'autres utilisateurs, pour lancer des outils et observer leurs résultats. C'est le composant du client qui communique et échange des données avec le serveur dépôt.
 \item Editeur web : Ce composant est l'interface web qui permet l'édition de modèles et de formalismes. C'est le composant du client qui interagit directement avec le composant serveur d'édition.
 \end{itemize}
 
-\paragraph{}
-Mon stage consiste donc à concevoir et à réaliser le serveur de dépôt. En plus, il a été étendu pour réaliser l'interface web du client. Les serveurs d'édition et d'exécution sont réalisés par Alban Linard (Notre encadrent) et l'éditeur web par Francisco Gimenez (Un autre stagiaire argentin).  Exemple d'interactions entre les différents composants (Voir figure 1.2)
-
+L'interaction entre ces composants est schématisé dans la
+figure~\ref{fig:interaction}.
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.60]{img/cosyverif_composants.pdf}
     \caption{Exemple d'interactions entre les différents composants (édition collaborative)}
+    \label{fig:interaction}
 \end{figure}
+
+\medskip
+
+Mon stage consiste à concevoir et à réaliser le serveur de dépôt. Il a été
+étendu pour réaliser l'interface web du client. Les serveurs d'édition et
+d'exécution sont réalisés par Alban Linard (encadrent) et l'éditeur web par
+Francisco Gimenez (un autre stagiaire).
+
 
 \chapter{Etudes et réalisations du serveur dépôt}
 \section{Présentation}
