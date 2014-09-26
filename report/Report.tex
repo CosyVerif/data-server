@@ -368,68 +368,113 @@ d'exécution sont réalisés par Alban Linard (encadrent) et l'éditeur web par
 Francisco Gimenez (un autre stagiaire).
 
 
-\chapter{Etudes et réalisations du serveur dépôt}
-\section{Présentation}
 
-\paragraph{}
-Le serveur de dépôt est le composant centrale du serveur de la plate-forme CosyVerif. D'une part, il est chargé de la
-gestion de comptes utilisateurs et du dépôt de modèles et de formalismes de la plate-forme. D'autre part, c'est le composant  qui satisfait toute les requêtes de l'interface des clients (sauf une partie des requêtes de l'édition 
-collaborative et de l'exécution d'outils) et qui est initiateur de l'édition collaborative et de l'exécution d'outils. Il
-fonctionne sous une architecture client/serveur. Les clients attendus sont : Web, téléphone mobile, console et des 
-bibliothèques.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\paragraph{}
-Le dépôt proprement dit de la plate-forme est constitué des ressources telles que des formalismes, 
-des modèles, des converteurs, des services, des exécutions de service et des scénarios :
+\chapter{Conception et réalisations du serveur}
 
-% -- Nota : Donner la définition des ressources 
+Le dépôt est le composant centrale du serveur de la plate-forme CosyVerif. D'une part, il est chargé de la
+gestion de comptes utilisateurs et du dépôt de modèles et de formalismes de
+la plate-forme. D'autre part, c'est le composant  qui satisfait toute les
+requêtes de l'interface des clients (mis à part l'édition 
+collaborative et de l'exécution d'outils) et qui est initiateur de l'édition collaborative et de l'exécution d'outils.
+Les clients attendus sont : web, téléphone mobile, console et des bibliothèques.
+
+Le serveur définit des
+ressources, et des méthodes d'accès (création, lecture, écriture,
+suppression) sur ces ressources. Il est sans état, c'est-à-dire
+qu'il ne maintient aucun état de connexion avec les clients.
+
+\section{Ressources}
+
+Le dépôt de la plate-forme contient des ressources, parmi un ensemble
+prédéfini :
 \begin{itemize}
-\item Formalismes : ,
-\item Modèles : ,
-\item Converter : ,
-\item Service : ,
-\item Exécution : ,
-\item Scénario : .
+  \item utilisateurs,
+  \item projets,
+  \item formalismes,
+  \item modèles,
+  \item convertisseurs,
+  \item services,
+  \item exécutions,
+  \item scénarios.
 \end{itemize}
 
-\paragraph{}
-Les ressources présentent dans le dépôt appartiennent à ses utilisateurs. Ces derniers peuvent avoir leurs propres
-ressources privées mais aussi partager des ressources entre eux. Par conséquent, il faut un système capable d'identifier
+Les ressources présentes dans le dépôt appartiennent aux utilisateurs.
+Les ressources peuvent être publiques ou privées.
+Par conséquent, il faut un système capable d'identifier
 les utilisateurs et de vérifier leurs droits correspondants à l'utilisation d'une ressource. A cet effet, un système 
 d'organisation et de protection des ressources a été réalisé.
 
 \subsection{Organisation de ressources}
 
-\paragraph{}
-Une des objectifs pour la plate-forme CosyVerif est de mettre à disposition de ses utilisateurs un moyen pour permettre
+Un des objectifs pour la plate-forme CosyVerif est de mettre à disposition de ses utilisateurs un moyen pour permettre
 d'avoir des ressources propres et de partager des ressources entre utilisateurs.
 
-\subsubsection{Ressources personnelles :}
-Pour permettre aux utilisateurs d'avoir leurs propres ressources, chaque utilisateur a un compte à sa disposition, lié à ses 
-ressources. A cet effet, un utilisateur peut créer des ressources, les utiliser et les mettre à jour mais aussi permettre à 
-d'autres utilisateurs d'utiliser ses ressources. Cependant, les autres ne peuvent qu'utiliser ses ressources sans le modifier.
-L'octroi de la permission d'utilisation ou pas de ses ressources par d'autres utilisateurs, un utilisateur a la possibilité de 
-rendre son compte publique ou privé. Ainsi, un compte publique donne droit d'utilisation de ses ressources à tout 
+\subsubsection{Ressources propres}
+Pour permettre aux utilisateurs d'avoir ses propres ressources, chaque
+utilisateur a un compte à sa disposition. Un utilisateur peut y créer des ressources, les utiliser et les mettre à jour mais aussi permettre à 
+d'autres utilisateurs d'y accéder.
+Cependant, on ne peut accéder aux ressources d'un autre utilisateur qu'en
+lecture seule, sans les modifier.
+
+La visibilité du compte d'un utilisateur, et donc des ressources contenues,
+est globalement publique ou privée.
+Un compte publique donne droit de lecture de ses ressources à tout 
 utilisateur et un compte privé ne donne ce droit qu'au propriétaire du compte.
 
-\subsubsection{Ressources partagées :}
-Plusieurs moyens existent pour permettre aux utilisateurs de partager des ressources entre-eux. Notamment, un système
-de groupes, un système de projets, ... La solution de projets a été retenu car elle est beaucoup plus simple à mettre en 
-oeuvre et qu'il est largement suffisant pour répondre aux exigences de partage de la plate-forme. Quand, un utilisateur
+Ce système de droits est extrêmement simple, mais il ne permet pas de
+couvrir tous les cas d'utilisation. Par exemple, avec ce système, il est
+impossible à deux utilisateurs de travailler (en écriture) sur le même
+modèle. Il leur est aussi impossible d'accéder tous deux à un modèle privé.
+
+\subsubsection{Ressources partagées}
+Tout utilisateur de la plateforme peut décider de créer un projet. Celui-ci
+est similaire à un compte utilisateur, et contient ses propres ressources.
+Cependant, il est possible d'inviter ou d'ajouter d'autres utilisateurs à
+projet, ce qui permet de travailler à plusieurs sur les même ressources.
+
+Quand, un utilisateur
 désire de partager des ressources avec un ou plusieurs utilisateurs, il crée un projet et invite les autres à y joindre (ou 
-les autres font eux mêmes la demande). Cependant, on peut aussi rendre un projet publique ou privé comme le compte
-utilisateur afin de donner le droit d'utilisation à d'autres utilisateurs.
+les autres font eux mêmes la demande).
+
+Un projet peut être public ou privé, comme un compte utilisateur,
+ce qui permet d'avoir des projets accessibles à tous en lecture, ou bien
+limités à certains utilisateurs.
 
 
 \subsection{Protection des ressources}
 La plate-forme de CosyVerif est une plate-forme publique et peut être accéder par n'importe qui, à partir du moment où
-l'on a l'accès à Internet. Donc, on a une contrainte de protéger les ressources personnelles des utilisateurs. Pour répondre 
-à ce besoin de protection, le serveur met en place une politique de sécurité basée sur un système d'authentification et un système d'autorisation des utilisateurs mais aussi un système de chiffrement des données échangées entre les clients et le serveur.
+l'on a l'accès à Internet.
+Cependant, certaines ressources, celles situées dans des comptes utilisateurs ou
+projets privés, ne doivent pas être lisible de tous. De même, les ressources
+d'un utilisateur ne doivent être modifiables que par lui-même.
 
-\subsubsection{Système d'authentification :}
-La plate-forme disposant des ressources privées, un système d'authentification est mis en place. Ce dernier identifie les utilisateurs à l'aide d'un login et d'un mot de passe. Cependant, il y a des précautions à prendre pour éviter certaines 
+Pour répondre 
+à ce besoin de protection des ressources, le serveur met en place une
+politique de sécurité basée sur un système d'authentification et un système
+d'autorisation des utilisateurs.
+Afin de garantir le caractère privé des données, on utilise aussi un système
+de chiffrement des données échangées entre les clients et le serveur : SSL.
+
+\subsubsection{Système d'authentification}
+Les ressources de la plate-forme sont utilisées par deux catégories d'utilisateurs : 
+\begin{itemize}
+\item Des utilisateurs authentifiés : ce sont des utilisateurs muni d'un login et d'un mot de passe qui font des requêtes au 
+serveur et qui sont identifiés par ce dernier. Cette catégorie
+d'utilisateurs peut créer et utiliser ses propres ressources et
+accéder en lecture à toutes les ressources publiques.
+\item Des utilisateurs non authentifiés : ce sont des utilisateurs qui font des requêtes au serveur sans présenter de login 
+et de mot de passe. Cette catégorie d'utilisateurs ne peut qu'accéder en
+lecture aux ressources publiques.
+\end{itemize}
+
+La plate-forme disposant de la notion de compte utilisateur, un système d'authentification est mis en place. Ce dernier identifie les utilisateurs à l'aide d'un login et d'un mot de passe. Cependant, il y a des précautions à prendre pour éviter certaines 
 failles. Différentes techniques existent pour sécuriser les échanges de la plate-forme :
 
+\begin{quotation}
+  \noindent
 \begin{itemize}
 \item Hachage de mot de passe : d'une part, il permet de ne pas faire circuler le mot de passe clairement sur le réseau et 
 d'autre part, il permet également de ne pas stocker le mot de passe de l’utilisateur en clair. Cependant, le mot de passe ainsi haché peut être retrouvé dans certains cas
@@ -459,50 +504,58 @@ navigateurs web et permet de sécuriser les échanges entre l’utilisateur et l
 être sûr que personne n’interceptera vos requêtes. Ce mécanisme vous assure la sécurité du transport et uniquement de 
 celui-ci (pas de gestion d’authentification, d’unicité des requêtes, …).
 \end{itemize}
+\end{quotation}
+\hfill{Source: \url{http://blog.ineat-conseil.fr/2013/01/restful-authentication/}}
 
-\paragraph{}
-Le choix a été porté sur un système d'authentification basique basé sur la combinaison de la technique de hachage de 
+\medskip
+
+Par soucis de simplicité, à la fois du serveur et des clients, le choix a été porté sur un système d'authentification basique basé sur la combinaison de la technique de hachage de 
 mot de passe et le protocole SSL. Ce choix va permettre de sécuriser les mots de passes présents dans le système de
-stockage du serveur dans le cas où un hacker parviendrait à les récupérer et, aussi de rendre la requête illisible par les 
-éventuels hackers qui récupéreraient cette requête sur internet. On a fait ce choix car CosyVerif n'est pas un système
-critique et ne présente autre danger que la circulation en claire du mot de passe.
+stockage du serveur dans le cas où un pirate parviendrait à les récupérer et, aussi de rendre la requête illisible par les 
+éventuels pirate qui récupéreraient cette requête sur internet. Nous avons fait ce choix car CosyVerif n'est pas un système
+critique et ne présente d'autre danger que la circulation en claire du mot de passe
+(pour l'instant).
 
-\paragraph{}
-Les ressources de la plate-forme sont utilisées par deux catégories d'utilisateurs : 
-
-\begin{itemize}
-\item Des utilisateurs authentifiés : ce sont des utilisateurs muni d'un login et d'un mot de passe qui font des requêtes au 
-serveur et qui sont identifiés par ce dernier. Cette catégorie d'utilisateurs peuvent se servir de leurs propres ressources et
-utiliser les ressources publiques des autres.
-\item Des utilisateurs non authentifiés : ce sont des utilisateurs qui font des requêtes au serveur sans présenter de login 
-et de mot de passe. Cette catégorie d'utilisateurs ne peuvent qu'utiliser les ressources publiques du premier catégorie 
-d'utilisateurs.
-\end{itemize}
-
-\paragraph{}
-Fonctionnement de l'authentification : l'utilisateur présente un login et un mot de passe au près du serveur. Ce dernier vérifie l'identité de l'utilisateur dans son annuaire d'utilisateurs. S'il réussit à identifier l'utilisateur, il lui donne l'accès à 
+L'authentification se déroule de la manière suivante. Puisque le serveur est
+sans état, à chaque requête, l'utilisateur présente un login et un mot de passe auprès du serveur.
+Ce dernier vérifie l'identité de l'utilisateur dans son annuaire d'utilisateurs. S'il réussit à identifier l'utilisateur, il lui donne l'accès à 
 ses ressources. Sinon, il lui refuse l'accès. Cependant, La phase d'authentification ne garantie pas la satisfaction de toutes 
 les requêtes de l'utilisateur. Il faut aussi une autorisation pour utiliser les ressources sollicitées.
 
-\subsubsection{Système d'autorisation :}
-Le serveur même si elle arrive à identifier un utilisateur, il ne lui donne pas tous les droits d'utilisation sur ses ressources.
-Le serveur associe des droits d'utilisation à ses ressources tels que le droit de création, de lecture, de mise à jour et de 
-suppression de ressource et aussi le droit d'administration d'un compte utilisateur ou d'un projet. Une étude a été faite
+\subsubsection{Système d'autorisation}
+Le serveur, même s'il arrive à identifier un utilisateur, ne lui donne pas
+tous les droits d'accès sur les ressources.
+Le serveur associe des droits d'utilisation à ses ressources, tels que le droit de création, de lecture, de mise à jour et de 
+suppression de ressource, mais aussi le droit d'administration d'un compte utilisateur ou d'un projet. Une étude a été faite
 sur deux stratégies :
 \begin{itemize}
-\item Droits associés à chaque ressource : chaque ressource a une liste des utilisateurs avec leurs droits d'utilisation associés. Cette stratégie permet alors à un utilisateur de donner des droits à d'autres sur chacune de ses ressources
-de manière individuelle. Dans ce cas, on a pas besoin de la notion de projet pour partager des ressources avec d'autres
-utilisateurs. Cette stratégie n'est pas difficile à mettre en oeuvre mais nécessite beaucoup d'effort de la par 
-des utilisateurs. En effet, du point de vue de l'utilisateur ce système est complexe à utiliser car il faut une gestion
-de droits d'utilisation sur chaque ressource. Cette stratégie est à éviter car la plate-forme CosyVerif a pour vocation 
-d'offrir une utilisation simple de ses ressources à ses utilisateurs.
+\item Droits associés à chaque ressource : chaque ressource dispose d'une
+  liste d'utilisateurs avec leurs droits associés. Cette stratégie permet
+  alors à un utilisateur de donner finement des droits sur chacune de ses
+  ressources, de manière individuelle.
+  Dans ce cas, la notion de projet est redondante pour partager des ressources avec d'autres
+utilisateurs. Cette stratégie n'est pas difficile à mettre en oeuvre mais
+nécessite beaucoup d'effort de la part 
+des utilisateurs. En effet, ce système est complexe à utiliser car il faut une gestion
+de droits d'utilisation sur chaque ressource. Cette stratégie est à éviter
+car la plate-forme CosyVerif a pour vocation d'être la plus simple possible
+d'utilisation.
 \item Droits associés aux comptes utilisateurs et aux projets : dans cette stratégie, les ressources d'un utilisateur sont
-soit toutes (compte avec droit public ) ou soit aucune (compte avec droit privé) mis à la disposition des autres en lecture. Les ressources d'un utilisateur ne sont modifiable que par lui-même. Si un utilisateur décide de partager quelques ressources, il crée un projet, déplace les quelques ressources et invite d'autres à se joindre au projet. Dans ce cas, les utilisateurs peuvent se servir du projet selon leurs droits d'utilisation (droit de lecture, droit d'édition et droit d'administration) sur ce dernier. Cette stratégie est adoptée pour le système d'autorisation car elle nécessite peu
-d'effort de la part des utilisateurs.
+soit toutes publiques, soit toutes privées.
+Les ressources d'un utilisateur ne sont modifiable que par lui-même, ou dans
+le cadre d'un projet, par les autres membres du projet.
+Si un utilisateur décide de partager des ressources, il crée un projet,
+déplace les ressources dans celui-ci, et invite d'autres utilisateurs à se joindre au projet.
+Les membres d'un projet ont différents droits : lecture, écriture ou
+administration.
 \end{itemize} 
 
-\paragraph{}
-La liste de droits d'utilisation de la solution retenu :
+La seconde stratégie est adoptée pour le système d'autorisation car elle nécessite peu
+d'effort de la part des utilisateurs.
+
+
+La liste de droits d'utilisation de la solution retenue est donnée
+ci-dessous :
 
 \begin{itemize}
 \item Propriétaire d'un compte : un utilisateur a tous les droits sur son compte et sur ses ressources,
@@ -536,23 +589,22 @@ Le nouveau serveur doit être une application REST (Representational State Trans
 d’architecture permettant de construire des applications (Web, Intranet, Web Service, surtout pour les systèmes 
 hypermédia distribués). Il s’agit d’un ensemble de conventions et de bonnes pratiques à respecter et non d’une 
 technologie à part entière. L’architecture REST utilise les spécifications originelles du protocole HTTP, plutôt que de
-réinventer une surcouche (comme le font SOAP ou XML-RPC par exemple). Il est créé par Roy Fielding en 2000 dans le
-chapitre 5 de sa thèse de doctorat.
+réinventer une surcouche (comme le font SOAP ou XML-RPC par exemple).
 
 \paragraph{}
 La communication du serveur avec les clients se base sur : 
-
 \begin{itemize}
 \item Des requêtes HTTP,
 \item Des URLs pour les ressources,
-\item Les verbes HTTP pour les méthodes,
+\item Les verbes HTTP (GET, POST, ...) pour les méthodes,
 \item Les codes d'état pour les résultats,
 \item Les contenus des requêtes et des résultats 
 \end{itemize}
 
-\paragraph{Les contraintes} 
+Les contraintes
 d'une architecture REST sont les suivantes :
-
+\begin{quotation}
+  \noindent
 \begin{enumerate}
 \item Client-serveur : les responsabilités sont séparées entre le client et le serveur. L'interface utilisateur est séparée de
 celle du stockage des données. Cela permet aux deux d'évoluer indépendamment ;
@@ -600,14 +652,14 @@ serveurs : une session client n’est pas à maintenir sur un serveur en particu
      sur la fraîcheur, la péremption de la ressource sont contenues dans le message lui-même
     \end{itemize}
 \end{enumerate}
+\end{quotation}
+\hfill{Source : \url{http://fr.wikipedia.org/wiki/Representational_State_Transfer}}
 
-\paragraph{}
-Vu ces avantages de REST, on peut dire qu'il est un atout pour réaliser le serveur. 
+\medskip
 
-\paragraph{}
 Pour répondre aux contraintes de REST, nous avons définit : 
 \begin{itemize}
-\item Les ressources, leurs contenus et leurs représentations,
+\item les ressources, leurs contenus et leurs représentations,
 \item les méthodes prises en charge, les entrées, les sorties et les codes d'état.
 \end{itemize}
 
@@ -626,46 +678,39 @@ Le serveur utilise les ressources suivantes :
     \item projects.
 \end{itemize}
 
-\paragraph{}
-Pour identifier les ressources, REST utilise Uniform Ressource Identifiers (URIs). Un client demande une ressource au 
+Pour identifier les ressources, REST utilise des Uniform Ressource Identifiers (URIs). Un client demande une ressource au 
 serveur en lui fournissant l'URI de la ressource. Il existe deux types de ressources dans cette application : \\
-
 \begin{itemize}
-    \item collections de ressources,
-    \item ressources.
+  \item des collections de ressources (users, models, ...),
+    \item des ressources simples (model, user, ...).
 \end{itemize}
 
-\paragraph{}
-Ils se distinguent par l'utilisation de la forme singulière (pour les ressources individuelles) ou au pluriel (pour les
+Les deux types se distinguent par l'utilisation de la forme singulière (pour les ressources individuelles) ou au pluriel (pour les
 collections de ressources).
 
-\paragraph{}
 Par exemple : 
-
 \begin{itemize}
-    \item /users/ : représente une collection  d'utilisateurs;
-    \item /users/rokysaroi : représente l'utilisateur rokysaroi dans la collection de l'utilisateur.
+  \item \lstinline!/users/! représente la collection des utilisateurs;
+    \item \lstinline!/users/rokysaroi! représente l'utilisateur rokysaroi dans la collection d'utilisateur.
 \end{itemize}
 
-\newpage
+Les figures \ref{fig:hierarchy} et \ref{fig:uri} montrent la hiérarchie des ressources.
+Un nom de ressource à partir de ":" par exemple ":user", est une variable. La liste suivante montre également les URIs des
+ressources. La notation (a|b) indique qu'une ressource est disponible pour les préfixes a et b.
 
-\paragraph{}
-Les ressources du serveur sont hiérarchisées comme suit :
 
 \begin{figure}[h!]
      \centering
      \includegraphics[scale=0.60] {img/resources_hierarchy.pdf}
      \caption{Hiérarchie des ressources}
+     \label{fig:hierarchy}
 \end{figure}
-
-\paragraph{}
-Un nom de ressource à partir de ":" par exemple ":user", est une variable. La liste suivante montre également les URIs des
-ressources. La notation (a|b) indique qu'une ressource est disponible pour les préfixes a et b.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.60]{img/resources_uri.pdf}
     \caption{Hiérarchie des ressources}
+    \label{fig:uri}
 \end{figure}
 
 \subsection{Représentation de ressources}
@@ -673,71 +718,20 @@ ressources. La notation (a|b) indique qu'une ressource est disponible pour les p
 \paragraph{}
 Une ressource peut avoir plusieurs représentations (XML, JSON, image, le format CosyVerif, CAMI, PNML, ...). En interne, 
 le serveur utilise la représentation CosyVerif pour les ressources suivantes : formalisme, modèle, scénario, service, 
-exécution.
+exécution, et le format JSON pour les autres.
 
-\paragraph{}
 Les clients sont autorisés à demander une représentation particulière dans leurs requêtes. Lorsque cela est possible, le 
 serveur effectue une conversion de la ressource à la forme requise : des convertisseurs sont prévus pour ça.
+La notion de convertisseurs est prévue pour cela, permettant par exemple de
+convertir un modèle en PNML. Cependant, cette notion n'est pour l'instant
+pas étudiée dans le cadre du projet CosyVerif.
 
-\paragraph{Exemple :}
-représentation d'une liste de ressources et une ressource
-
-\paragraph{La représentation d'un utilisateur en XML :}
-      
-\begin{lstlisting}[style=XML]
-    <?xml version="1.0" encoding="ISO-8859-1" ?>
-    <user xmlns="http://example.org/mon-exemple-ns/" >
-        <first-name>First name</first-name>
-        <last-name>Last name</last-name>
-        <login>User name</login>
-        <phone>Phone number</phone>
-     </user>
-\end{lstlisting}
-
-\paragraph{Le même en JSON :}
-
-\begin{lstlisting}[style=XML]
- {
-   "user": {
-	      "first-name" : "First name",
-	      "last-name" : "Last name",
-	      "login" : "User name",
-	      "phone" : "Phone number"	
-	    }
-}
-\end{lstlisting}
-
-\paragraph{la représentation d'une liste d'utilisateurs en XML :}
-
-\begin{lstlisting}[style=XML]
-    <users xmlns='http://example.org/mon-exemple-ns/'>
-        <user-ref href="first user URI">complete name first user</user-ref>
-        <user-ref href="second user URI"/>complete name second user</user-ref>
-         ...
-        <user-ref href="last user URI"/>complete name last user</user-ref>
-    </users>
-\end{lstlisting}
-
-\paragraph{Le même en JSON :}
-
-\begin{lstlisting}[style=XML]
-{
-   "users": {
-	       "user-ref" : [
-			       {"href" : "First user URI", "name" : "complete name of first user"},
-			       {"href" : "Second user URI", "name" : "complete name of second user"},
-			         ...
-			       {"href" : "Last user URI", "name" : "complete name of last user"}
-		               ]
-	     }
-}
-\end{lstlisting}
       
 \subsection{Méthodes et codes de statut}
 
 \paragraph{}
 L'architecture REST est basé sur le protocole HTTP. Par conséquent, les mêmes méthodes sont plus ou moins utilisées. 
-Le protocole est normalisé donc on en profite de ses avantages. Les clients peuvent utiliser un URI pour accéder à une 
+Le protocole est normalisé. Les clients utilisent une URI pour accéder à une 
 ressource référencée. L'accès peut prendre diverses formes, telles que l'obtention d'une représentation de la ressource 
 (par exemple, en utilisant la méthode GET ou la méthode HEAD), l'ajout ou la modification d'une ressource (par exemple, 
 en utilisant la méthode POST ou la méthode PUT) et la suppression d'une ressource (par exemple, via la méthode DELETE).
@@ -746,16 +740,12 @@ en utilisant la méthode POST ou la méthode PUT) et la suppression d'une ressou
 Les méthodes suivantes seront intégrées dans le système :
 
 \begin{itemize}
-   \item PUT : créer une ressource,
-   \item GET : récupération d'une représentation d'une ressource,
-   \item PUT : mettre à jour une ressource,
-   \item PATCH : mettre à jour partiellement une ressource,
-    \item DELETE : supprimer une ressource.
+   \item POST : création une ressource,
+   \item GET : récupération d'une ressource,
+   \item PUT : mise à jour d'une ressource,
+   \item PATCH : mise à jour partielle d'une ressource,
+   \item DELETE : suppression d'une ressource.
 \end{itemize}
-
-\paragraph{}
-La méthode POST du protocole HTTP n'est pas pris en compte car elle permet la création d'une ressource sans en 
-fournir l'URL. Or, c'est une exigence que les clients fournissent un URL pour chaque requête au serveur.
 
 \paragraph{}
 Chaque réponse HTTP contient un code (code de statut). Ce code est utilisé par le serveur pour informer le client de l'état 
@@ -763,8 +753,9 @@ du traitement de sa demande. Le code d'état est un code numérique et une descr
 humainement compréhensible. 
 
 \paragraph{}
-Codes de retour utilisés :
-
+Les codes de retours suivants sont utilisables dans CosyVerif.
+Ces codes de statuts sont une partie de ceux spécifiés par la norme RFC 2616.
+\begin{quotation}
 \begin{tabular}{|p{1cm}|p{4cm}|p{9cm}|}
 \hline \bf Code & \bf Message & \bf Signification \\
 \hline 200 & OK & Requête traitée avec succès \\
@@ -789,13 +780,14 @@ pour les ressources supprimées ; on mettra une information à la place d’une 
 \hline 501 & Not Implemented & Fonctionnalité réclamée non supportée par le serveur \\
 \hline
 \end{tabular}
+\end{quotation}
+\hfill{Source : \url{http://fr.wikipedia.org/wiki/Liste_des_codes_HTTP}}
 
-\paragraph{}
-Ces codes de statuts sont spécifiés par la norme RFC 2616, avec d'autres codes de statut.
+\medskip
 
-\paragraph{}
-Les URIs et des représentations sont définis, les méthodes et les codes de statuts sont déterminés. Quelques 
-correspondances de différents éléments ont été réalisés : \\
+Pour un type de ressource, tous les codes de statuts ne peuvent pas être
+retournés. Le tableau ci-dessous précise quels codes sont utilisés pour les
+différents types de ressources.
 
 \begin{tabular}{|p{3cm}|p{2cm}|p{3cm}|p{6cm}|}
 \hline \bf Ressource & \bf Méthode & \bf Representation & \bf Codes de statuts \\
@@ -807,13 +799,16 @@ correspondances de différents éléments ont été réalisés : \\
 \hline
 \end{tabular}
 
+
+
+
 \section{Etude technique}
 
 \paragraph{}
-L'objectif de cette partie est de recenser les contraintes et les choix techniques dimensionnant la conception du serveur.
-Ainsi, certains APIs, technologies et outils utils sont utilisés pour le bon fonctionnement du serveur. Les techniques 
+L'objectif de cette partie est de recenser les contraintes et les choix
+techniques faits durant la conception du serveur.
+Les techniques 
 choisies dans le cadre de la réalisation de notre serveur sont :
-
 \begin{itemize}
 \item Langage : PHP,
 \item Frameworks et outils d'aide pour le développement : SLIM, Composer, Box, Docco, GIT,
@@ -823,11 +818,12 @@ choisies dans le cadre de la réalisation de notre serveur sont :
 
 \subsection{Langage PHP}
 
-\paragraph{}
-Pour pallier aux problèmes soulevés sur l'ancien serveur réalisé avec le langage JAVA, PHP 
-a été choisis comme langage de programmation pour développer le serveur de la nouvelle plate-forme CosyVerif.
+Le serveur de CosyVerif était jusqu'à présent développé en Java. Cependant,
+aucun membre permanent du projet ne manipule ce langage régulièrement.
+PHP  a été choisi comme langage de programmation pour développer le serveur
+de la nouvelle plate-forme CosyVerif, car plusieurs membres permanents le
+maîtrisent.
 
-\paragraph{}
 PHP (Hypertext Preprocessor) est un langage de scripts généraliste et Open Source, spécialement conçu pour le 
 développement d'applications web. Le grand avantage de PHP est qu'il est extrêmement simple pour les néophytes, 
 mais offre des fonctionnalités avancées pour les experts. On peut citer quelques autres avantages de plus : 
@@ -847,33 +843,31 @@ mais offre des fonctionnalités avancées pour les experts. On peut citer quelqu
 \subsection{Framework Slim}
 
 \paragraph{}
-Pour faciliter la programmation en PHP, plusieurs frameworks existent parmi lesquels on peut citer Symphony et SLIM. 
+Pour faciliter la programmation d'applications en PHP, plusieurs frameworks
+existent parmi lesquels on peut citer Symphony / Silex et Slim. 
 
-\paragraph{Symphony :}
-est assez complexe : le développeur doit se plier aux nombreuses contraintes du framework. De plus celui-ci est 
+\paragraph{Symphony / Silex}
+est assez complexe : le développeur doit se plier aux nombreuses contraintes
+du framework. De plus celui-ci est relativement gros et
 assez lent. Il est recommandable dans le cas de projet conséquent et dans le cas où les développeurs ont déjà une 
 expérience avec.
 
-\paragraph{Slim :}
-Slim est un micro framework PHP qui vous permet d'écrire rapidement des applications Web et des APIs de façon simple 
+\paragraph{Slim}
+Slim est un micro framework PHP qui permet d'écrire rapidement des applications Web et des APIs de façon simple 
 mais puissant. Il est facile à utiliser pour les débutants et les professionnels. Son interface est simple et intuitive, et 
-largement documenté - à la fois en ligne et dans le code lui-même. En plus, c'est un framework léger.
+largement documenté, à la fois en ligne et dans le code lui-même. De plus, c'est un framework léger.
 
-\paragraph{}
-le framework SLim a été retenu car il est plus facile pour les développeurs de CosyVerif de prendre la main sur celui-ci.
+Le framework Slim a été retenu car il est plus facile à prendre en main par les développeurs de CosyVerif.
 
 \subsection{Composer}
 
-\paragraph{}
-Composer est un outil pour gérer les dépendances en PHP. Les dépendances, dans un projet, ce sont toutes les 
+Composer est un outil de gestiondes dépendances en PHP. Les dépendances, sont toutes les 
 bibliothèques dont le projet dépend pour fonctionner. Par exemple, le serveur CosyVerif utilise la bibliothèque 
-du framework slim pour le développement, il « dépend » donc de slim. Autrement dit, Slim est une dépendance 
+du framework Slim pour le développement, il « dépend » donc de slim. Autrement dit, Slim est une dépendance 
 dans le projet.
 
-\paragraph{}
 Composer a donc pour objectif d'aider à gérer toutes les dépendances du projet. En effet, il y a plusieurs problématiques
 lorsqu'on utilise des bibliothèques externes :
-
 \begin{itemize}
 \item  Ces bibliothèques sont mises à jour. Il nous faut donc les mettre à jour une à une pour nous assurer de corriger les
  bogues de chacune d'entre elles.
@@ -883,96 +877,93 @@ dépend d'autres bibliothèques, cela nous oblige à gérer l'ensemble de ces d�
 d'entre elles.
 \end{itemize}
 
-\paragraph{}
-Composer va nous aider dans chacune de ces tâches.
-
 \subsection{Box}
 
-\paragraph{}
 Box est un outil de packaging d'une application PHP avec ses dépendances et ses ressources.
+Il permet de créer une archive contenant le serveur, ses dépendances ainsi
+que des ressources.
 
 \subsection{PHPUnit}
 
-\paragraph{}
-est un framework de test pour les programmes PHP. Il s'agit d'un exemple de l'architecture xUnit pour des frameworks 
+PHPUnit est un framework de test pour les programmes PHP. Il s'agit d'un exemple de l'architecture xUnit pour des frameworks 
 de tests unitaires. On pourrait aussi entendre parler de SimpleTest, mais, depuis des années, n’est plus vraiment un 
-projet vivant Ou de Atoum qui, bien que prometteur, n’est pas encore très répandu.
+projet vivant, ou de Atoum qui, bien que prometteur, n’est pas encore très répandu.
 
 \subsection{Guzzle}
 
-\paragraph{}
-est un client HTTP de PHP et un framework pour créer des clients web RESTful qui communique avec le serveur. 
+Guzzle est un client HTTP de PHP et un framework pour créer des clients web RESTful qui communique avec le serveur. 
 Il rend facile l'utilisation du protocole HTTP de la version 1.1. Il sert ici pour le test du serveur CosyVerif.
 
 \subsection{Travis-CI}
 
-\paragraph{}
-est une plateforme d’intégration continue ouverte et distribuée mise à disposition sous forme de service. Ouverte car 
+Travis-CI est une plateforme d’intégration continue ouverte et distribuée mise à disposition sous forme de service. Ouverte car 
 tout projet public publié sur Github peut mettre en place son intégration continue sur Travis. Il propose un service qui 
 exécute des tâches au moment où vous le souhaitez. Ces tâches sont très souvent des tests (unitaires).
 
 \subsection{Docco}
 
-\paragraph{}
-est un générateur de documentation. Il produit un document HTML qui affiche vos commentaires entremêlées avec 
+Docco est un générateur de documentation. Il produit un document HTML qui affiche vos commentaires entremêlées avec 
 votre code. Il est utiliser pour la documentation et pour commenter le code de CosyVerif.
 
 \subsection{Persistance de données}
 
-\paragraph{}
-Pour la persistance, on avait le choix entre un serveur de gestion de bases de données et le système de gestion de fichiers.
-Mais, on a opté pour le système de gestion de fichiers car on voulait la simplicité et aussi un serveur qui ne dépend pas
-d'un autre serveur comme fait avec une base de données. En plus, PHP a une API simple et complète pour le système de 
-fichiers. Donc, le serveur va utiliser le système de fichier. Par conséquent, dans le cadre d'un système distribué, tous
+Pour la persistance, j'avais le choix entre un serveur de gestion de bases de données et le système de gestion de fichiers.
+J'ai opté pour le système de gestion de fichiers car une exigence de
+CosyVerif est la simplicité.
+Ainsi, le serveur ne dépend pas
+d'un autre serveur gérant la base de données. En plus, PHP a une API simple et complète pour le système de 
+fichiers.
+
+Le serveur CosyVerif utilisant le système de fichier, dans le cadre d'un système distribué, tous
 les noeuds doivent accéder au même système de fichier.
 
 \section{Mise en oeuvre}
 
-\paragraph{}
-Une fois que l'étude est fait,  la phase suivante a pour rôle de réaliser ce qui a été définis, et ensuite le mettant en oeuvre.
-Ainsi, cette étape détaillera la mise en oeuvre de la solution.
+J'ai réalisé le serveur défini pendant la phase de conception.
+Cette section détaillera la mise en oeuvre de la solution.
 
-\paragraph{}
-Le serveur de la nouvelle plate-forme est réalisé sur une nouvelle base. En effet, tout le code produit est nouveau et ne 
+J'ai eu à réaliser le serveur de la nouvelle plate-forme à partir de rien. En effet, tout le code produit est nouveau et ne 
 réutilise pas le code de l'ancienne plate-forme. Le serveur de la nouvelle plate-forme est réalisé de manière à être simple,
 générique, modulaire, portable et maintenable, à moindre coût. 
 
-\paragraph{Simple :}
-le développement avec le framework SLim rend la production du code simple et pratique. En effet, le framework Slim permet
-de produire peu de code pour une fonctionnalité qui en demande beaucoup sans celui-ci. En plus, l'approche de Slim est 
+\paragraph{Simple}
+Le développement avec le framework Slim rend la production du code simple et pratique. En effet, le framework Slim permet
+de produire peu de code pour une fonctionnalité qui peut en demander beaucoup sans celui-ci. En plus, l'approche de Slim est 
 simple à comprendre.
 
-\paragraph{Générique :}
+\paragraph{Générique}
 Les ressources du dépôt de modèles et de formalismes présentent beaucoup de points communs qui permet d'avoir
-un code générique. En effet, La façon de persister les données est la même pour toutes les ressources ; les ressources 
-ont beaucoup d'informations en commun ; l'architecture REST (Representational State Transfert) permet de les utiliser de 
-la même manière. Et donc, grâce à l'héritage, on en a profiter pour faire un code générique qui sera réutiliser pour l'intégration de futures fonctionnalités.
+un code générique. En effet, La façon de persister les données est la même
+pour toutes les ressources.
+De plus, les ressources 
+ont beaucoup d'informations en commun.
+L'architecture REST (Representational State Transfert) permet de les utiliser de 
+la même manière. J'ai pu, grâce à la notion d'héritage, faire un code
+générique qui sera réutilisable pour l'intégration de futures fonctionnalités.
 
-\paragraph{Modulaire :}
+\paragraph{Modulaire}
 Le serveur a été réalisé de manière modulaire afin de faciliter la maintenance. Ainsi, les modules peuvent être développés
 et maintenus indépendamment. Par exemple, on peut changer le système d'authentification mis en place par un autre
 système sans affecter le reste du serveur.
 
-\paragraph{Portable :}
-Le code du serveur est du pure PHP qui est un langage de script portable.
+Ce système modulaire repose sur la notion de "middlewares" de Slim.
 
-\paragraph{Maintenable :}
+\paragraph{Portable}
+Le code du serveur est du pur PHP qui est un langage de script portable.
+
+\paragraph{Maintenable}
 La maintenabilité est assuré car on a un code simple, générique et modulaire.
+De plus, le code est commenté et testé.
 
 
 \subsection{Description des différents modules du dépôt}
 
-\paragraph{}
 Le serveur de la nouvelle plate-forme est réalisé de manière à être générique, modulaire et maintenable. Ainsi, le serveur 
 est développé sous forme de couches superposées et chaque couche traite une fonction bien précise afin de séparer
 les responsabilités. Pour être satisfaite, une requête arrive et traverse toutes les couches du serveur. Ces couches correspondent aux différents modules du serveur. 
 
-\paragraph{}
 Le schéma suivant situe la position des différentes couches du serveur, les uns par rapport aux autres mais aussi les 
 uns par rapport aux technologies utilisées.
-
-\newpage
-
 \begin{figure}[h!]
      \centering
      \includegraphics[scale=0.60]{img/server_couches.pdf}
@@ -981,31 +972,28 @@ uns par rapport aux technologies utilisées.
 
 \subsubsection{Module Exception}
 
-\paragraph{} 
-Le module exception gère les exceptions produits pendant le traitement des requêtes. Nous distinguons les 
-exceptions des cas d'erreurs qui sont directement traités au moment où ils sont produits. Les exceptions produits dans
-le serveur proviennent du système de fichiers et sont capturés par cette couche. Nous ne traitons pas ces exceptions car
-ils sont rarement produits et liés au système de fichiers. Néanmoins, un message est envoyé à l'administrateur du serveur
+Le module exception gère les exceptions produites pendant le traitement des requêtes. Nous distinguons les 
+exceptions des cas d'erreurs qui sont directement traités au moment où ils
+sont produits. Les exceptions produites dans
+le serveur sont causées par des problèmes graves. La plupart du temps, elles proviennent du système de fichiers et sont capturées par cette couche. Nous ne traitons pas ces exceptions car
+elles nécessitent une intervention humaine. Pour cela, un message est envoyé à l'administrateur du serveur
 avec la description de l'exception qui va pourvoir intervenir. Ce module est réalisé.
 
-\subsubsection{Module Authenticate}
+\subsubsection{Module Authentication}
 
-\paragraph{} 
-Le module Authenticate gère l'authentification des utilisateurs. Ainsi, quand la requête arrive à cette couche, son
-utilisateur est soumis à l'authentication. Il a été réalisé avec la méthode d'authentification basique de la spécification
-du protocole HTTP car les échanges entre les clients et le serveur utilise le protocole HTTPS qui assure la sécurité
+Le module Authentication gère l'authentification des utilisateurs. Ainsi, quand la requête arrive à cette couche, son
+utilisateur est soumis à l'authentification. Il a été réalisé avec la méthode d'authentification basique de la spécification
+du protocole HTTP car les échanges entre les clients et le serveur utilisent le protocole HTTPS qui assure la sécurité
 du transport. Ce module est réalisé.
 
 \subsubsection{Module Permission}
 
-\paragraph{} 
 Le module Permission gère les droits d'accès aux ressources par des utilisateurs. Ainsi, quand la requête arrive
 à cette couche, les droits d'utilisation de l'utilisateur sur la requête sont vérifiés. 
 
-\subsubsection{Module Translator}
+\subsubsection{Module Translation}
 
-\paragraph{} 
-Le module Translator gère les conversions de formats vers d'autres formats. Ainsi, quand la requête arrive
+Le module Translation gère les conversions de formats vers d'autres formats. Ainsi, quand la requête arrive
 à cette couche et qu'il y a lieu de traduction, il traite la traduction. Cette couche ne concerne pas
 mon stage et est liée au serveur d'exécution d'outils qui sera réalisé plus tard. Donc, ce module n'est pas réalisé.
 
@@ -1017,7 +1005,6 @@ fonctions réutilisables par l'ensemble de parties du serveur.
 
 \subsection{Description de l'environnement de développement}
 
-\paragraph{}
 Un environnement de développement a été mis en place pour réaliser le serveur. Notamment :
 
 \begin{itemize}
@@ -1031,17 +1018,13 @@ du serveur.
 \item PHPUnit : va aider à faire les tests.
 \end{itemize}
 
-\paragraph{}
-
-
-\paragraph{}
 Le processus d'installation des outils et des dépendances, le processus de tests et la production de documents ont été  automatisé à l'aide d'un script Bash.
 
 
 \subsection{Tests}
 
-\paragraph{}
-Les tests du serveur se sont basés sur des tests fonctionnels avec une couverture complete. Ainsi, pour chaque
+Les tests du serveur se sont basés sur des tests fonctionnels en boîte noire avec comme
+intention une couverture complète du code. Ainsi, pour chaque
 fonctionnalité, des scénarios et des test sont écris, validés par mes encadrants puis implémentés. Les outils 
 PHPUnit, Guzzle et Travis sont utilisés pour faire le test. Ces tests permettent de s'assurer que le serveur 
 fonctionne correctement, fonctionnellement. Pour le moment, on a une bonne couverture mais il reste quelques
@@ -1049,18 +1032,15 @@ points à améliorer qui seront faits avant la fin du stage.
 
 \subsection{Bilan}
 
-\paragraph{}
 J'ai réalisé complètement un serveur REST écris en PHP disposant d'un gestionnaire de comptes utilisateurs et d'un 
 dépôt de modèles et de formalismes. En plus, le serveur dispose d'une bibliothèque de fonctions permettant 
 d'intégrer facilement la partie édition collaborative et la partie exécution d'outils. 
 
-\paragraph{}
 La couverture de code par les tests est bonne mais il reste quelques améliorations à faire et seront réalisées avant la
 fin du stage.
 
 \subsection{Perspective}
 
-\paragraph{}
 Il y a des perspectives à court terme qui sont l'amélioration de la couverture de code, l'intégration des parties
 serveur d'édition collaboratif de modèles (en cours de réalisation par Alban Linard) et serveur d'exécution d'outils 
 et la réalisation d'un script d'installation. Mais aussi des perspectives à moyen terme qui sont l'ajout de la notion de 
