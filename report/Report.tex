@@ -120,6 +120,32 @@ bilan et les perspectives.
 
 \chapter{Description de la problématique}
 
+\section{MeFoSyloMa}
+
+\paragraph{}
+MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels) est un groupe de vérification parisien dont
+l'objectif est de permettre la confrontation de différentes approches ou points de vue sur l'utilisation des méthodes 
+formelles dans les domaines du génie logiciel, de la conception de circuit, des systèmes répartis, des systèmes 
+temps-réel ou encore des systèmes d'information. Le groupe s'organise autour de réunions bimestrielles où sont 
+exposés des travaux de recherche récents sur ce thème. Les partenaires du groupe sont les laboratoires Cedric (Cnam), 
+IBISC (Univ. Evry), LACL (Univ. Paris 12), LIP6 (UPMC), LIPN (Univ. Paris 13), LRDE (Epita), LSV (École Normale 
+Supérieure de Cachan) et LTCI (TELECOM ParisTech).
+
+\section{Organisation de CosyVerif}
+
+\paragraph{}
+\href{http://www.cosyverif.org}{CosyVerif} est un environnement logiciel dont le but est la spécification et la vérification
+formelle des systèmes dynamiques. Le projet a été décidé et soutenu par trois partenaires du groupe de vérification MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels). Ses membres fondateurs sont LIP6 (Laboratoire 
+d'Informatique de Paris 6) , LIPN (Laboratoire d'Informatique de Paris Nord) et LSV (Laboratoire Spécification et 
+Vérification - Laboratoire d'informatique de l'ENS de Cachan).
+
+\paragraph{}
+Tout d'abord, ces membres visent à partager leurs outils, à comparer et à soutenir des études de cas industriels.
+
+\paragraph{}
+Deuxièmement, ils veulent aussi promouvoir la pratique de la vérification formelle dans l'industrie et donc ils ont 
+l'intention de faciliter la tâche de l'intégration de nouveaux formalismes et des outils.
+
 \section{Présentation des organismes d'accueil}
 
 \paragraph{}
@@ -175,11 +201,12 @@ Il y a différents catégories de membre : \\
 \paragraph{}
 Le stage se déroule avec mon encadrent Alban Linard qui est membre temporaire.
 
-\section{Présentation du projet CosyVerif}
+\section{État actuel du projet}
 
 \paragraph{}
-\href{http://www.cosyverif.org}{CosyVerif} est un environnement logiciel dont le but est la spécification et la vérification
-formelle des systèmes dynamiques.
+L'environnement de CosyVerif se compose actuellement de deux outils logiciels : Coloane, l'interface graphique, et 
+Alligator, une intégration d'outils basé sur les web services. Il est agrandie par les outils existants de vérification 
+développés dans les laboratoires (membres ou partenaires fondateurs).
 
 \paragraph{}
 Il a été conçu de manière à :
@@ -192,14 +219,11 @@ autres outils.
 \end{itemize}
 
 \paragraph{}
-Deux formalismes sont pris en charge: les automates et les réseaux de Petri, à la fois avec des extensions. La plupart 
-des outils sont liés à des réseaux de Petri. Certains d'entre eux procèdent à des analyses structurelles comme des calculs
-d'invariants. Tandis que d'autres outils effectuent des analyses comportementales : construction de graphe d'accessibilité, 
-etc ...
+Deux familles de formalismes sont pris en charge: les automates et les réseaux de Petri, à la fois avec des extensions. 
+La plupart des outils sont liés à des réseaux de Petri. Certains d'entre eux procèdent à des analyses structurelles comme 
+des calculs d'invariants. Tandis que d'autres outils effectuent des analyses comportementales : construction de graphe 
+d'accessibilité, etc ...
 
-\paragraph{}
-Cet environnement se compose actuellement de deux outils logiciels : Coloane, l'interface graphique, et Alligator, une 
-intégration d'outils basé sur les web services. Il est agrandie par les outils existants de vérification développés dans les laboratoires (membres ou partenaires fondateurs).
 
 \paragraph{}
 Tous les logiciels développés sont open source et logiciels libres.
@@ -208,27 +232,7 @@ Tous les logiciels développés sont open source et logiciels libres.
 CosyVerif est géré par un comité de pilotage composé de chercheurs et d'ingénieurs. Il décide des orientations 
 stratégiques ainsi que des choix techniques. Il est développé par ces ingénieurs quant-il y en a et des stagiaires.
 
-\subsection{Pourquoi ce projet ?}
-
-\paragraph{}
-Le développement de CosyVerif a été décidé et soutenu par trois partenaires  du groupe de vérification parisien,
-MeFoSyLoMa (Méthodes formelles pour les systèmes logiciels et matériels).
-
-\paragraph{}
-Ce groupe est composé de sept équipes, et les membres fondateurs de CosyVerif sont LIP6 (Laboratoire d'Informatique de
-Paris 6) , LIPN (Laboratoire d'Informatique de Paris Nord) et LSV (Laboratoire Spécification et Vérification - Laboratoire 
-d'informatique de l'ENS de Cachan).
-
-\paragraph{}
-Tout d'abord, ces membres visent à partager leurs outils, à comparer et à soutenir des études de cas industriels.
-
-\paragraph{}
-Deuxièmement, ils veulent aussi promouvoir la pratique de la vérification formelle dans l'industrie et donc ils ont 
-l'intention de faciliter la tâche de l'intégration de nouveaux formalismes et des outils.
-    
 \subsection{Architecture de l'existant}
-
-\newpage
 
 \begin{figure}[h!]
     \centering
@@ -236,16 +240,7 @@ l'intention de faciliter la tâche de l'intégration de nouveaux formalismes et 
     \caption{Architecture de CosyVerif}
 \end{figure}
 
-\section{Sujet du stage}
-
-\subsection{Enjeux}
-
-\paragraph{}
-Le développement de la nouvelle plate-forme CosyVerif qui représente actuellement du serveur et d'un client web.
-Cette plate-forme constitue un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur
-d'édition collaboratif de modèles et formalismes et un gestionnaire de permissions et d'authentification des utilisateurs.
-
-\subsection{Critiques}
+\subsection{Problèmes identifiés}
 
 \paragraph{}
 La communication et l'échange de données entre les clients (Coloane) et le serveur Alligator  de l'ancienne plate-forme 
@@ -258,15 +253,31 @@ des problèmes que présente la plate-forme existante que l'équipe a jugé néc
 en restant vigilant pour ne pas retomber sur les mêmes difficultés. Pour ces raisons, l'équipe a émis des exigences pour 
 la nouvelle plate-forme.
 
-\subsection{Objectifs}
+\subsection{Enjeux}
 
 \paragraph{}
-L'objectif de ce stage pour ma part est donc de participer à la conception et au développement du nouveau serveur et du 
+Le développement d'une nouvelle plate-forme CosyVerif qui représente un serveur et un client web.
+Cette plate-forme constitue un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur
+d'édition collaboratif de modèles et formalismes et un gestionnaire de permissions et d'authentification des utilisateurs.
+
+\section{Objectifs}
+
+\paragraph{}
+L'objectif de ce stage est de participer à la conception et au développement du nouveau serveur et du 
 client web de la plate-forme de vérification CosyVerif. Ce serveur aura comme fonctions, un dépôt de modèles et de 
 formalismes, un gestionnaire d'exécution d'outils, un serveur d'éditions collaboratif de modèles et formalismes, et un gestionnaire de permissions et d'authentification des utilisateurs. 
 
+\section{Sujet du stage}
+
+\paragraph{}
+Le stage est de concevoir et de développer tout d'abord le serveur de la nouvelle plate-forme de vérification CosyVerif 
+qui aura comme fonctions, un dépôt de modèles et de formalismes, un gestionnaire d'exécution d'outils, un serveur 
+d'éditions et la gestion d'authentification des utilisateurs. Ensuite, un client web qui propose une interface pour chaque 
+fonctionnalités du serveur.
+
 \subsection{Que doit offrir la future plate-forme ?}
 
+\paragraph{}
 La plate-forme doit permettre :
 
 \begin{itemize}
@@ -283,16 +294,16 @@ La plate-forme doit permettre :
 Les exigences à prendre en compte, qui ont été imposées par l'équipe, pour réaliser la nouvelle plate-forme :
 
 \begin{itemize}
-\item Les tests doivent être effectuées en boîte noire avec une convertir complète du code,
+\item Les tests doivent être effectuées en boîte noire avec une couvertir complète du code,
 \item Le code doit être maintenable et simple,
-\item Le code source doit être commenté en anglais,
-\item Des technologies qui présentent une surcouche et un couplage forte seront évitées,
+\item Le code source doit être écrit et commenté en anglais,
+\item Des technologies qui présentent une surcouche et un couplage forte seront évitées. Par exemple, SOAP, eclipse, ...
 \end{itemize}
 
 \subsection{Axes de ma contribution sur la future plate-forme}
 
 \paragraph{}
-La nouvelle plate-forme présente  5 composants distincts qui sont étudiés et réalisés séparément et intégrés par la suite : trois composants côté serveur et deux autres côté client web.
+La nouvelle plate-forme présente 5 composants distincts qui sont étudiés et réalisés séparément et intégrés par la suite : trois composants côté serveur et deux autres côté client web.
 
 \subsubsection{Côté serveur}
 
@@ -312,7 +323,7 @@ directement avec le composant édition web du client au moment de l'édition col
 \end{itemize}
 
 \paragraph{}
-Mon stage consiste donc à concevoir et à réaliser le serveur de dépôt et l'interface web du client. Les serveurs d'édition et d'exécution sont réalisés par Alban Linard (Notre encadrent) et l'éditeur web par Francisco Gimenez (Un autre stagiaire argentin).
+Mon stage consiste donc à concevoir et à réaliser le serveur de dépôt. En plus, il a été étendu pour réaliser l'interface web du client. Les serveurs d'édition et d'exécution sont réalisés par Alban Linard (Notre encadrent) et l'éditeur web par Francisco Gimenez (Un autre stagiaire argentin).  Exemple d'interactions entre les différents composants (Voir figure 1.2)
 
 \begin{figure}[h!]
     \centering
@@ -320,10 +331,6 @@ Mon stage consiste donc à concevoir et à réaliser le serveur de dépôt et l'
     \caption{Exemple d'interactions entre les différents composants (édition collaborative)}
 \end{figure}
 
-
-\section{Conduite du projet}
-\subsection{Processus de développement}
-\subsection{Planification du projet}
 \chapter{Etudes et réalisations du serveur dépôt}
 \section{Présentation}
 
@@ -380,7 +387,7 @@ utilisateur afin de donner le droit d'utilisation à d'autres utilisateurs.
 \subsection{Protection des ressources}
 La plate-forme de CosyVerif est une plate-forme publique et peut être accéder par n'importe qui, à partir du moment où
 l'on a l'accès à Internet. Donc, on a une contrainte de protéger les ressources personnelles des utilisateurs. Pour répondre 
-à ce besoin de protection, le serveur met en place une politique de sécurité basée sur un système d'authentification et un système d'authorisation des utilisateurs mais aussi un système de chiffrement des données échangées entre les clients et le serveur.
+à ce besoin de protection, le serveur met en place une politique de sécurité basée sur un système d'authentification et un système d'autorisation des utilisateurs mais aussi un système de chiffrement des données échangées entre les clients et le serveur.
 
 \subsubsection{Système d'authentification :}
 La plate-forme disposant des ressources privées, un système d'authentification est mis en place. Ce dernier identifie les utilisateurs à l'aide d'un login et d'un mot de passe. Cependant, il y a des précautions à prendre pour éviter certaines 
@@ -420,7 +427,8 @@ celui-ci (pas de gestion d’authentification, d’unicité des requêtes, …).
 Le choix a été porté sur un système d'authentification basique basé sur la combinaison de la technique de hachage de 
 mot de passe et le protocole SSL. Ce choix va permettre de sécuriser les mots de passes présents dans le système de
 stockage du serveur dans le cas où un hacker parviendrait à les récupérer et, aussi de rendre la requête illisible par les 
-éventuels hackers qui récupéreraient cette requête sur internet.
+éventuels hackers qui récupéreraient cette requête sur internet. On a fait ce choix car CosyVerif n'est pas un système
+critique et ne présente autre danger que la circulation en claire du mot de passe.
 
 \paragraph{}
 Les ressources de la plate-forme sont utilisées par deux catégories d'utilisateurs : 
@@ -701,9 +709,10 @@ en utilisant la méthode POST ou la méthode PUT) et la suppression d'une ressou
 Les méthodes suivantes seront intégrées dans le système :
 
 \begin{itemize}
-   \item GET : Récupération d'une représentation d'une ressource,
-   \item PUT : créer/mettre à jour une ressource,
-   \item PATCH : mettre à jour une ressource partiellement,
+   \item PUT : créer une ressource,
+   \item GET : récupération d'une représentation d'une ressource,
+   \item PUT : mettre à jour une ressource,
+   \item PATCH : mettre à jour partiellement une ressource,
     \item DELETE : supprimer une ressource.
 \end{itemize}
 
@@ -793,7 +802,6 @@ mais offre des fonctionnalités avancées pour les experts. On peut citer quelqu
 \item Gestion des erreurs de programmation précise,
 \item Rapidité de développement (non compilé),
 \item Développement au choix : Procédural ou Objet,
-\item Performant,
 \item Disponible partout (tous les hébergements proposent le PHP) et surtout à moindre coût,
 \item Outils de développements professionnels (PHAR, PHPUnit, Jenkins, ...),
 \item Énormément d'aide et de documentation
@@ -810,7 +818,7 @@ assez lent. Il est recommandable dans le cas de projet conséquent et dans le ca
 expérience avec.
 
 \paragraph{Slim :}
-est un micro framework PHP qui vous permet d'écrire rapidement des applications Web et des APIs de façon simple 
+Slim est un micro framework PHP qui vous permet d'écrire rapidement des applications Web et des APIs de façon simple 
 mais puissant. Il est facile à utiliser pour les débutants et les professionnels. Son interface est simple et intuitive, et 
 largement documenté - à la fois en ligne et dans le code lui-même. En plus, c'est un framework léger.
 
@@ -844,7 +852,7 @@ Composer va nous aider dans chacune de ces tâches.
 \subsection{Box}
 
 \paragraph{}
-Simplifie le processus de construction d'un Phar
+Box est un outil de packaging d'une application PHP avec ses dépendances et ses ressources.
 
 \subsection{PHPUnit}
 
@@ -878,7 +886,8 @@ votre code. Il est utiliser pour la documentation et pour commenter le code de C
 Pour la persistance, on avait le choix entre un serveur de gestion de bases de données et le système de gestion de fichiers.
 Mais, on a opté pour le système de gestion de fichiers car on voulait la simplicité et aussi un serveur qui ne dépend pas
 d'un autre serveur comme fait avec une base de données. En plus, PHP a une API simple et complète pour le système de 
-fichiers. Donc, le serveur va utiliser le système de fichier local.
+fichiers. Donc, le serveur va utiliser le système de fichier. Par conséquent, dans le cadre d'un système distribué, tous
+les noeuds doivent accéder au même système de fichier.
 
 \section{Mise en oeuvre}
 
@@ -940,30 +949,34 @@ Le module exception gère les exceptions produits pendant le traitement des requ
 exceptions des cas d'erreurs qui sont directement traités au moment où ils sont produits. Les exceptions produits dans
 le serveur proviennent du système de fichiers et sont capturés par cette couche. Nous ne traitons pas ces exceptions car
 ils sont rarement produits et liés au système de fichiers. Néanmoins, un message est envoyé à l'administrateur du serveur
-avec la description de l'exception qui va pourvoir intervenir.
+avec la description de l'exception qui va pourvoir intervenir. Ce module est réalisé.
 
 \subsubsection{Module Authenticate}
 
 \paragraph{} 
 Le module Authenticate gère l'authentification des utilisateurs. Ainsi, quand la requête arrive à cette couche, son
-utilisateur est soumis à l'authentication.
+utilisateur est soumis à l'authentication. Il a été réalisé avec la méthode d'authentification basique de la spécification
+du protocole HTTP car les échanges entre les clients et le serveur utilise le protocole HTTPS qui assure la sécurité
+du transport. Ce module est réalisé.
 
 \subsubsection{Module Permission}
 
 \paragraph{} 
 Le module Permission gère les droits d'accès aux ressources par des utilisateurs. Ainsi, quand la requête arrive
-à cette couche, les droits d'utilisation de l'utilisateur sur la requête sont vérifiés.
+à cette couche, les droits d'utilisation de l'utilisateur sur la requête sont vérifiés. 
 
 \subsubsection{Module Translator}
 
 \paragraph{} 
 Le module Translator gère les conversions de formats vers d'autres formats. Ainsi, quand la requête arrive
-à cette couche et qu'il y a lieu de traduction, il traite la traduction.
+à cette couche et qu'il y a lieu de traduction, il traite la traduction. Cette couche ne concerne pas
+mon stage et est liée au serveur d'exécution d'outils qui sera réalisé plus tard. Donc, ce module n'est pas réalisé.
 
 \subsubsection{Module Core}
 
 \paragraph{}
-Le module Core gère l'accès et la mise à jour des ressources.
+Le module Core gère l'accès et la mise à jour des ressources sur le système de fichiers. C'est une bibliothèque de 
+fonctions réutilisables par l'ensemble de parties du serveur.
 
 \subsection{Description de l'environnement de développement}
 
@@ -993,12 +1006,34 @@ Le processus d'installation des outils et des dépendances, le processus de test
 \paragraph{}
 Les tests du serveur se sont basés sur des tests fonctionnels avec une couverture complete. Ainsi, pour chaque
 fonctionnalité, des scénarios et des test sont écris, validés par mes encadrants puis implémentés. Les outils 
-PHPUnit, Guzzle et Travis sont utilisés pour faire le test. Ces tests vont nous permettre de s'assurer que le serveur 
-fonctionne correctement, fonctionnellement.
+PHPUnit, Guzzle et Travis sont utilisés pour faire le test. Ces tests permettent de s'assurer que le serveur 
+fonctionne correctement, fonctionnellement. Pour le moment, on a une bonne couverture mais il reste quelques
+points à améliorer qui seront faits avant la fin du stage.
 
 \subsection{Bilan}
+
+\paragraph{}
+J'ai réalisé complètement un serveur REST écris en PHP disposant d'un gestionnaire de comptes utilisateurs et d'un 
+dépôt de modèles et de formalismes. En plus, le serveur dispose d'une bibliothèque de fonctions permettant 
+d'intégrer facilement la partie édition collaborative et la partie exécution d'outils. 
+
+\paragraph{}
+La couverture de code par les tests est bonne mais il reste quelques améliorations à faire et seront réalisées avant la
+fin du stage.
+
 \subsection{Perspective}
+
+\paragraph{}
+Il y a des perspectives à court terme qui sont l'amélioration de la couverture de code, l'intégration des parties
+serveur d'édition collaboratif de modèles (en cours de réalisation par Alban Linard) et serveur d'exécution d'outils 
+et la réalisation d'un script d'installation. Mais aussi des perspectives à moyen terme qui sont l'ajout de la notion de 
+classe d'étudiants au dépôt de modèles et de formalismes.
+
+
 \chapter{Etudes et réalisations de l'interface web}
+
+\paragraph{}
+
 \section{Présentation}
 \section{Définition de l'architecture}
 \section{Etude technique}
