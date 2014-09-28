@@ -288,6 +288,7 @@ Spécialité SAR, Parcours SRETR
 }
   \centering
 \begin{tikzpicture}
+  \useasboundingbox [] (.5,1) rectangle (10,8.5);
 \node (c1) at (2,3)
   {\includegraphics[width=3cm,height=3cm]{img/screen}};
 \node (c2) at (2,7)
@@ -1303,6 +1304,7 @@ edge from parent path={(\tikzparentnode.south west) |- (\tikzchildnode.west)}]
 }
 \centering
 \begin{tikzpicture}
+  \useasboundingbox [] (.5,1) rectangle (10,8.5);
 \node (c1) at (2,3)
   {\includegraphics[width=3cm,height=3cm]{img/screen}};
 \node (c2) at (2,7)
