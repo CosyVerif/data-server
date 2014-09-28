@@ -75,11 +75,6 @@
  
 \setcounter{page}{1}
   
-\chapter*{Résumé}
-\addcontentsline{toc}{chapter}{Résumé}
-
-\paragraph{}
-
   
 \chapter*{Remerciements}
 \addcontentsline{toc}{chapter}{Remerciements}
@@ -376,7 +371,7 @@ Francisco Gimenez (un autre stagiaire).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Conception et réalisations du serveur}
+\chapter{Conception et réalisation du serveur}
 
 Le dépôt est le composant centrale du serveur de la plate-forme CosyVerif. D'une part, il est chargé de la
 gestion de comptes utilisateurs et du dépôt de modèles et de formalismes de
@@ -744,7 +739,7 @@ en utilisant la méthode POST ou la méthode PUT) et la suppression d'une ressou
 Les méthodes suivantes seront intégrées dans le système :
 
 \begin{itemize}
-   \item POST : création une ressource,
+   \item POST : création d'une ressource,
    \item GET : récupération d'une ressource,
    \item PUT : mise à jour d'une ressource,
    \item PATCH : mise à jour partielle d'une ressource,
@@ -820,7 +815,7 @@ choisies dans le cadre de la réalisation de notre serveur sont :
 \item Persistance de données : Système de gestion de fichier.
 \end{itemize}
 
-\subsection{Langage PHP}
+\subsection*{Langage PHP}
 
 Le serveur de CosyVerif était jusqu'à présent développé en Java. Cependant,
 aucun membre permanent du projet ne manipule ce langage régulièrement.
@@ -844,7 +839,7 @@ mais offre des fonctionnalités avancées pour les experts. On peut citer quelqu
 \item Énormément d'aide et de documentation
 \end{itemize}
 
-\subsection{Framework Slim}
+\subsection*{Framework Slim}
 
 \paragraph{}
 Pour faciliter la programmation d'applications en PHP, plusieurs frameworks
@@ -863,9 +858,9 @@ largement documenté, à la fois en ligne et dans le code lui-même. De plus, c'
 
 Le framework Slim a été retenu car il est plus facile à prendre en main par les développeurs de CosyVerif.
 
-\subsection{Composer}
+\subsection*{Composer}
 
-Composer est un outil de gestiondes dépendances en PHP. Les dépendances, sont toutes les 
+Composer est un outil de gestion des dépendances en PHP. Les dépendances, sont toutes les 
 bibliothèques dont le projet dépend pour fonctionner. Par exemple, le serveur CosyVerif utilise la bibliothèque 
 du framework Slim pour le développement, il « dépend » donc de slim. Autrement dit, Slim est une dépendance 
 dans le projet.
@@ -881,35 +876,35 @@ dépend d'autres bibliothèques, cela nous oblige à gérer l'ensemble de ces d�
 d'entre elles.
 \end{itemize}
 
-\subsection{Box}
+\subsection*{Box}
 
 Box est un outil de packaging d'une application PHP avec ses dépendances et ses ressources.
 Il permet de créer une archive contenant le serveur, ses dépendances ainsi
 que des ressources.
 
-\subsection{PHPUnit}
+\subsection*{PHPUnit}
 
 PHPUnit est un framework de test pour les programmes PHP. Il s'agit d'un exemple de l'architecture xUnit pour des frameworks 
 de tests unitaires. On pourrait aussi entendre parler de SimpleTest, mais, depuis des années, n’est plus vraiment un 
 projet vivant, ou de Atoum qui, bien que prometteur, n’est pas encore très répandu.
 
-\subsection{Guzzle}
+\subsection*{Guzzle}
 
 Guzzle est un client HTTP de PHP et un framework pour créer des clients web RESTful qui communique avec le serveur. 
 Il rend facile l'utilisation du protocole HTTP de la version 1.1. Il sert ici pour le test du serveur CosyVerif.
 
-\subsection{Travis-CI}
+\subsection*{Travis-CI}
 
 Travis-CI est une plateforme d’intégration continue ouverte et distribuée mise à disposition sous forme de service. Ouverte car 
 tout projet public publié sur Github peut mettre en place son intégration continue sur Travis. Il propose un service qui 
 exécute des tâches au moment où vous le souhaitez. Ces tâches sont très souvent des tests (unitaires).
 
-\subsection{Docco}
+\subsection*{Docco}
 
 Docco est un générateur de documentation. Il produit un document HTML qui affiche vos commentaires entremêlées avec 
 votre code. Il est utiliser pour la documentation et pour commenter le code de CosyVerif.
 
-\subsection{Persistance de données}
+\subsection*{Persistance de données}
 
 Pour la persistance, j'avais le choix entre un serveur de gestion de bases de données et le système de gestion de fichiers.
 J'ai opté pour le système de gestion de fichiers car une exigence de
@@ -1022,7 +1017,8 @@ du serveur.
 \item PHPUnit : va aider à faire les tests.
 \end{itemize}
 
-Le processus d'installation des outils et des dépendances, le processus de tests et la production de documents ont été  automatisé à l'aide d'un script Bash.
+Le processus d'installation des outils et des dépendances, le processus de tests et la production de documents ont été 
+automatisé à l'aide d'un script Bash.
 
 
 \subsection{Tests}
@@ -1047,14 +1043,14 @@ fin du stage.
 
 Il y a des perspectives à court terme qui sont l'amélioration de la couverture de code, l'intégration des parties
 serveur d'édition collaboratif de modèles (en cours de réalisation par Alban Linard) et serveur d'exécution d'outils 
-et la réalisation d'un script d'installation. Mais aussi des perspectives à moyen terme qui sont l'ajout de la notion de 
+et la réalisation d'un script d'installation. Mais aussi d'une perspective à moyen terme qui est l'ajout de la notion de 
 classe d'étudiants au dépôt de modèles et de formalismes.
 
 
-\chapter{Etudes et réalisations de l'interface web}
+\chapter{Conception et réalisation de l'interface web}
 
 \paragraph{}
-Au début de mon stage a été la conception et la réalisation du serveur de la nouvelle plate-forme de CosyVerif mais
+Au début mon stage a été de concevoir et de réaliser le serveur de la nouvelle plate-forme de CosyVerif mais
 maintenant, il a été étendu par la réalisation d'un client web. Ce client va offrir une interface pour chaque fonctionnalité
 du serveur. 
 
@@ -1084,7 +1080,7 @@ fonctionnalités du serveur de la nouvelle plate-forme de CosyVerif. Il permet d
 
 \paragraph{}
 Le client est juste une page web écrit avec des technologies standard HTML, JavaScript et CSS. Il permet d'envoyer des 
-requêtes REST (basé sur la spécification du protocole HTTP) au serveur via le framework JQuery. Il est construit avec une
+requêtes REST (basé sur la spécification du protocole HTTP) au serveur via le framework JQuery. Il est construit par une
 utilisation de templates de HTML5 pour une meilleure réutilisation du code. Les données échangés avec le serveur sont
 au format JSON.
 
@@ -1127,7 +1123,7 @@ moderne.
 
 \paragraph{}
 jQuery est une bibliothèque JavaScript facilitant d'écrire de scripts côté client dans le code HTML des pages web. 
-Combiné avec JavaScript, il nous a permis de réaliser les aspects dynamiques du client.
+Combiné avec JavaScript, il nous a permis de réaliser les aspects dynamiques du client et d'envoyer des requêtes au serveur.
 
 \subsection*{Bootstrap}
 
@@ -1173,30 +1169,83 @@ des ressources dont il est autorisé à lire et filtrer le résultat de la reche
 \subsubsection{Interface de recherche}
 
 \paragraph{}
-La figure suivante (Figure 3.2) représente la page de recherche. Il permet à un utilisateur de faire des recherches.
-Il permet à l'utilisateur de choisir de rechercher dans son compte ou dans tout le dépôt, de rechercher par un ou
-plusieurs types, par un ou plusieurs projets.
- par
-un ou plusieurs types de resources, 
+L'interface suivante (Figure 3.2) représente la page de recherche. Il permet à l'utilisateur de choisir de rechercher dans 
+son compte ou dans tout le dépôt. De rechercher des ressources par un ou plusieurs types et/ou par un ou plusieurs projets. En plus,
+elle permet de rechercher par nom ou par description. Enfin, elle permet de trier par date, par ordre croissant ou par ordre 
+décroissant.
 
 \newpage
 
 \begin{figure}[h!]
      \centering
-     \includegraphics[width=0.8\textwidth] {img/1-ecran-recherche}
+     \includegraphics[width=1\textwidth] {img/1-ecran-recherche}
      \caption{écran de recherche}
 \end{figure}
 
+\subsubsection{Interface d'un compte utilisateur}
+
+\paragraph{}
+L'interface suivante (Figure 3.3) représente l'interface d'un compte utilisateur. On y voit le profile de l'utilisateur,
+la liste de ses projets et la liste de ses ressources par type. Elle lui permet de créer ou de lire des ressources. 
+Elle lui permet de rendre son compte publique ou privé afin de permettre aux autres de lire ou pas ses ressources. 
+Elle lui permet de créer ou de lire ses projets. Elle lui permet aussi de faire des requêtes pour se joindre à des projets
+ou pour inviter d'autres à se joindre à ses projets.
 
 
+\newpage
+
+\begin{figure}[h!]
+     \centering
+     \includegraphics[width=1\textwidth] {img/4-ecran-create-project}
+     \caption{interface d'un compte}
+\end{figure}
+
+\subsubsection{Interface d'une ressource}
+
+\paragraph{}
+L'interface suivante (Figure 3.4) représente l'interface d'une ressource. Cependant, c'est une interface générique pour
+tous les ressources et attende l'intégration de l'édition collaborative. On y voit des informations de la ressource et
+une zone d'édition de la ressource.
+
+\newpage
+
+\begin{figure}[h!]
+     \centering
+     \includegraphics[width=1\textwidth] {img/3-ecran-create-resource}
+     \caption{interface d'une ressource}
+\end{figure}
+
+\subsubsection{Interface d'un projet}
+
+\paragraph{}
+L'interface suivante (Figure 3.5) représente l'interface d'un projet. On y voit les informations du projet, la liste des 
+utilisateurs du projet et la liste des ressources par type du projet. 
+Elle permet aux utilisateurs ayant le droit décrire de créer des ressources. Elle permet aux utilisateurs qui participent ou
+dans le cas d'un projet publique de  lire les ressources du projet. Elle permet aux utilisateurs ayant le droit d'administrer 
+le projet de rendre ce dernier publique ou privé afin de permettre aux autres de lire ou pas ses ressources. 
+Elle permet aux utilisateurs ayant le droit d'administrer le projet d'inviter d'autres à y participer, de répondre aux requêtes des
+autres ou de changer les droits des utilisateurs qui participent au projet.
 
 
+\newpage
 
+\begin{figure}[h!]
+     \centering
+     \includegraphics[width=1\textwidth] {img/10-ecran-create-project}
+     \caption{interface d'un projet}
+\end{figure}
 
 \subsection{Bilan}
-\subsection{Perspective}
-classe étudiant : lauré
 
+J'ai réalisé complètement un client web moderne qui communique avec le serveur REST écris en PHP. Le client propose une 
+interface pour chaque fonctionnalité disponible du serveur. En plus, le client met en place une bibliothèque de fonctions et
+de templates pour facilité l'intégration de la partie édition collaborative.
+
+\subsection{Perspective}
+
+Il y a une perspective à court terme qui est l'intégration de l'éditeur collaboratif de modèles (en cours de réalisation par un 
+autre stagiaire). Mais aussi une perspective à moyen terme qui est de développer des clients mobiles et des tablettes 
+permettant d'interagir avec le serveur.
 
 
 \chapter*{Conclusion}
@@ -1241,6 +1290,129 @@ différentes facettes pour la réalisation d'un système client / serveur.
 
 Ce stage m'a de plus permis d'affiner ma méthodologie de travail et de 
 développer l'esprit de responsabilité, autonomie et rigueur.
+
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+
+\listoffigures
+
+
+\section{Webographie}
+	\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{6cm}|l|}
+    \hline
+    	\bf - &
+    	\bf - &
+      \bf Site web &
+      \bf Description et URL &
+      \bf Date \\
+    \hline
+      &
+      REST &
+      Page de l'auteur &
+      \cellcolor{gray} 
+      Etude de l'architecture REST &
+      05/05/2014 \\
+    	\cline{4-4}
+    		& & & 
+    		http://opikanoba.org/tr/fielding/rest/ & \\
+    	\cline{3-5}
+    		&  &  &
+    		\cellcolor{gray}
+    		Etude de l'architecture REST &\\
+    	\cline{4-4}
+    		Eléments  &  & Wikipedia &
+    		http://fr.wikipedia.org/wiki/Represent- 
+    		ational\_State\_Transfer & 05/05/2014 \\
+    	\cline{2-5}
+    	  pour la & PHP & Site officiel  &
+    		\cellcolor{gray}
+    		Utilisation des APIs de PHP & 10/05/2014 \\
+    	\cline{4-4}
+    		réalisation du &  & &
+    		http://www.php.net/manual/fr/index.php & \\
+    	\cline{2-5}
+    	  serveur & SLIM & Site officiel  &
+    		\cellcolor{gray}
+    		Utilisation du framework SLIM & 10/05/2014 \\
+    	\cline{4-4}
+    		&  & &
+    		http://slimframework.com &  \\
+    	\cline{2-5}
+    	  &  & Codes HTTP  &
+    		\cellcolor{gray}
+    		Codes de statut du protocole HTTP & 
+    		05/05/2014 \\
+    	\cline{4-4}
+    		& HTTP & &
+    		http://www.codeshttp.com &  \\
+    	\cline{3-5}
+    	  &  & Wikipedia  &
+    		\cellcolor{gray}
+    		Définition du protocole & 05/05/2014 \\
+    	\cline{4-4}
+    		&  & &
+    		http://fr.wikipedia.org/wiki/
+    		Hypertext\_Transfer\_Protocol &  \\
+    \hline
+      Outils &
+      Composer &
+      Evoluation &
+      \cellcolor{gray} utilisation de composer &
+      10/05/2014 \\
+    	\cline{4-4}
+    		pour & & & 
+    		http://www.evoluation.com/blog/2012
+    		/06/installer-et-utiliser-composer-en-php/ & \\
+    	\cline{2-5}
+    		faciliter & Box & 
+    		GitHub &
+    		\cellcolor{gray} 
+    		utilisation de box & 10/05/2014 \\
+    	\cline{4-4}
+    		l'intégration &  & &
+    		https://github.com/kherge/php-box &\\
+    \hline
+      &
+      PHPUnit &
+      Site officiel &
+      \cellcolor{gray}
+      Utilisation de l'api de PHPUnit &
+      25/05/2014 \\
+    	\cline{4-4}
+    		& & & http://phpunit.de & \\
+    	\cline{2-5}
+    		& Guzzle & 
+    		Site officiel &
+    		\cellcolor{gray}
+    		Utilisation du framework Guzzle &
+    		25/05/2014 \\
+    	\cline{4-4}
+    		Tests &  & &
+    		http://guzzle.readthedocs.org/en/latest &\\
+    	\cline{2-5}
+    		& Travis-ci & Site officiel &
+    		\cellcolor{gray}
+    		Intégration continue du serveur dans 
+    		Travis-ci & 10/05/2014 \\
+    	\cline{4-4}
+    		&  & &
+    		https://travis-ci.org &\\
+    \hline
+      Outils pour &
+       &
+      Site officiel &
+      \cellcolor{gray}
+      installation et utilisation de Docco &
+      10/05/2014 \\
+    	\cline{4-4}
+    		la documentation & Docco & & 
+    		http://jashkenas.github.io/docco/ & \\
+    \hline
+    \end{tabular}
+
+\newpage
+
+
 
 \end{document}
 
