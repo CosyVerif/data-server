@@ -27,7 +27,12 @@ if (array_key_exists("coverage", $config) && $config["coverage"]) {
 $app = new \Slim\Slim();
 $app->config = $config;
 
-\CosyVerif\Server\Routing\WebSiteMiddleware::register();
+$app->get("/", function () use ($app) {
+  echo "Welcome to CosyVerif";
+});
+
+//\CosyVerif\Server\Routing\WebSiteMiddleware::register();
+\CosyVerif\Server\CrossOrigin::register();
 \CosyVerif\Server\Routing\UserMiddleware::register();
 \CosyVerif\Server\Routing\ProjectMiddleware::register();
 \CosyVerif\Server\Routing\ModelMiddleware::register();
