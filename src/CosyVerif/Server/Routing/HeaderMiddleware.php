@@ -223,7 +223,7 @@ class HeaderResource extends BaseResource
   public function patch_create($data)
   {
     global $app;
-    if (!isset($data["name"])
+    if (!isset($data["name"]))
       $app->response->setStatus(STATUS_BAD_REQUEST);
     $name = microtime();
     file_put_contents($app->config["base_dir"].$this->getURL()."/".$name."cosy", $data);
