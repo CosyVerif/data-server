@@ -2,10 +2,13 @@
 
 require 'vendor/autoload.php';
 
-$server_config_file = json_decode(file_get_contents('box.json'), TRUE);
-$user_config_file = parse_ini_file("config/server-config.ini");
-$user_config_file = array_map('strtolower', $user_config_file);
-$config = array_merge($server_config_file, $user_config_file);
+$app = new \Slim\Slim();
+$app->base_directory = getcwd();
+
+$default_config = parse_ini_file(__DIR__              . "/config/server-config.ini");
+$user_config    = parse_ini_file($app->base_directory . "/config/server-config.ini");
+$user_config    = array_map('strtolower', $user_config);
+$config = array_merge($default_config, $user_config);
 
 //$config["activate_message"] = file_get_contents("config/activate-message.txt");
 
@@ -26,8 +29,11 @@ if (array_key_exists("coverage", $config) && $config["coverage"]) {
   register_shutdown_function('shutdown');
 }
 
-$app = new \Slim\Slim();
+if (substr($config['base_dir'], 0, 1) != '/') {
+  $config['base_dir'] = $app->base_directory . '/' . $app->config["base_dir"];
+}
 $app->config = $config;
+
 \CosyVerif\Server\Routing\Routing::register();
 \CosyVerif\Server\HttpBasicAuthentification::register();
 \CosyVerif\Server\Constants::register();
