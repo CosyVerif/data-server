@@ -45,7 +45,7 @@ class HttpBasicAuthentification extends \Slim\Middleware
     } 
     $auth = json_decode(file_get_contents($app->config["base_dir"]."/users/".$user."/auth.json"), TRUE);
     $password = $user.$password;
-    if ($auth["login"] == $user && password_verify($password, $auth["password"]))
+    if ($auth["login"] == $user && password_verify($password, $auth["password"]) && $auth["activate"] == true)
     {
       $app->user = $auth;
       return true;

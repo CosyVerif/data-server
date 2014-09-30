@@ -16,6 +16,7 @@ class Constants
 		define('STATUS_NO_CONTENT', 204);
 		define('STATUS_MOVED_PERMANENTLY', 301);
 		define('STATUS_MOVED_TEMPORARILY', 302);
+		define('STATUS_PERMANENT_REDIRECT', 308);
 		define('STATUS_BAD_REQUEST', 400);
 		define('STATUS_UNAUTHORIZED', 401);
 		define('STATUS_FORBIDDEN', 403);
@@ -36,6 +37,14 @@ class Constants
 		define('EDIT_PROJECT', 'edit_project');
 
 		define('IS_PUBLIC', true);
+
+		define('STATUS_SEND', 'send');
+		define('STATUS_RECEIVED', 'received');
+		define('STATUS_ACK', 'ack');
+		define('STATUS_COMMENT', 'comment');
+		define('STATUS_DENIED', 'denied');
+		define('STATUS_CANCELED', 'canceled');
+		define('STATUS_VIEW', 'view');
 	}
 }
 
