@@ -12,7 +12,9 @@
         }
     ],
     "files": [
-      "README.md"
+      "README.md",
+      "config/activate-message.txt",
+      "config/server-config.ini"
     ],
     "algorithm": "SHA1",
     "compression": "GZ"
