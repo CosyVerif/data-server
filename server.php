@@ -31,15 +31,11 @@ $app->get("/", function () use ($app) {
   echo "Welcome to CosyVerif";
 });
 
-//\CosyVerif\Server\Routing\WebSiteMiddleware::register();
 \CosyVerif\Server\CrossOrigin::register();
 \CosyVerif\Server\Routing\UserMiddleware::register();
 \CosyVerif\Server\Routing\ProjectMiddleware::register();
 \CosyVerif\Server\Routing\ModelMiddleware::register();
 \CosyVerif\Server\HttpBasicAuthentification::register();
 \CosyVerif\Server\Constants::register();
-//$app->add(new \CosyVerif\Server\Core());
-//$app->add(new \CosyVerif\Server\Permission());
-
 
 $app->run();
