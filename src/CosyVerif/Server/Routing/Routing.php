@@ -11,14 +11,7 @@ class Routing
     \CosyVerif\Server\CrossOrigin::register();
     UserMiddleware::register();
     ProjectMiddleware::register();
-    ModelMiddleware::register();
-    FormalismMiddleware::register();
-    ServiceMiddleware::register();
-    ExecutionMiddleware::register();
-    ScenarioMiddleware::register();
-    IdeaMiddleware::register();
-    DiscussionMiddleware::register();
-    WebSiteMiddleware::register();
+    HeaderMiddleware::register();
     SearchMiddleware::register();
     ExceptionMiddleware::register();
   }
