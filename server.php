@@ -41,11 +41,4 @@ $app->get('/initializes(/)', function() use($app)
   \CosyVerif\Server\Routing\BaseResource::newResource("")->initializes_server();
 });
 
-\CosyVerif\Server\CrossOrigin::register();
-\CosyVerif\Server\Routing\UserMiddleware::register();
-\CosyVerif\Server\Routing\ProjectMiddleware::register();
-\CosyVerif\Server\Routing\ModelMiddleware::register();
-\CosyVerif\Server\HttpBasicAuthentification::register();
-\CosyVerif\Server\Constants::register();
-
 $app->run();
