@@ -243,39 +243,39 @@ class UserResource extends BaseResource
     $json_info = json_encode($data);
     if(!$this->file_exists())
     {
-      mkdir($app->config["base_dir"].$this->getURL());
+      mkdir($app->config("base_dir").$this->getURL());
     }
-    file_put_contents($app->config["base_dir"].$this->getURL()."/auth.json", $json_auth);
-    file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", $json_info);
-    mkdir($app->config["base_dir"].$this->getURL()."/formalisms");
+    file_put_contents($app->config("base_dir").$this->getURL()."/auth.json", $json_auth);
+    file_put_contents($app->config("base_dir").$this->getURL()."/info.json", $json_info);
+    mkdir($app->config("base_dir").$this->getURL()."/formalisms");
     $tmp = array();
     $tmp["name"] = "Formalism list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/formalisms/info.json", json_encode($tmp));
-    mkdir($app->config["base_dir"].$this->getURL()."/models");
+    file_put_contents($app->config("base_dir").$this->getURL()."/formalisms/info.json", json_encode($tmp));
+    mkdir($app->config("base_dir").$this->getURL()."/models");
     $tmp = array();
     $tmp["name"] = "Model list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/models/info.json", json_encode($tmp));
-    mkdir($app->config["base_dir"].$this->getURL()."/scenarios");
+    file_put_contents($app->config("base_dir").$this->getURL()."/models/info.json", json_encode($tmp));
+    mkdir($app->config("base_dir").$this->getURL()."/scenarios");
     $tmp = array();
     $tmp["name"] = "scenarios list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/scenarios/info.json", json_encode($tmp));
-    mkdir($app->config["base_dir"].$this->getURL()."/services");
+    file_put_contents($app->config("base_dir").$this->getURL()."/scenarios/info.json", json_encode($tmp));
+    mkdir($app->config("base_dir").$this->getURL()."/services");
     $tmp = array();
     $tmp["name"] = "Service list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/services/info.json", json_encode($tmp));
-    mkdir($app->config["base_dir"].$this->getURL()."/executions");
+    file_put_contents($app->config("base_dir").$this->getURL()."/services/info.json", json_encode($tmp));
+    mkdir($app->config("base_dir").$this->getURL()."/executions");
     $tmp = array();
     $tmp["name"] = "Execution list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/executions/info.json", json_encode($tmp)); 
-    mkdir($app->config["base_dir"].$this->getURL()."/projects");
+    file_put_contents($app->config("base_dir").$this->getURL()."/executions/info.json", json_encode($tmp)); 
+    mkdir($app->config("base_dir").$this->getURL()."/projects");
     $tmp = array();
     $tmp["name"] = "Project list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/projects/info.json", json_encode($tmp));
-    mkdir($app->config["base_dir"].$this->getURL()."/invitations");
+    file_put_contents($app->config("base_dir").$this->getURL()."/projects/info.json", json_encode($tmp));
+    mkdir($app->config("base_dir").$this->getURL()."/invitations");
     $tmp = array();
     $tmp["name"] = "Invitation list";
     $tmp["invitations"] = array();
-    file_put_contents($app->config["base_dir"].$this->getURL()."/invitations/info.json", json_encode($tmp));
+    file_put_contents($app->config("base_dir").$this->getURL()."/invitations/info.json", json_encode($tmp));
     if ($app->config["activate_email_mode"])
     {
       $to = $data['email'];
@@ -289,7 +289,7 @@ class UserResource extends BaseResource
   public function user_activate($data)
   {
     global $app;
-    $auth = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/auth.json"), TRUE);
     if ($auth["activate"] == true)
     {
       $app->response->setStatus(STATUS_OK);
@@ -299,7 +299,7 @@ class UserResource extends BaseResource
     {
       $auth["activate"] = true;
       unset($auth["validation_key"]);
-      file_put_contents($app->config["base_dir"].$this->getURL()."/auth.json", json_encode($auth));
+      file_put_contents($app->config("base_dir").$this->getURL()."/auth.json", json_encode($auth));
     }
     $app->response->setStatus(STATUS_OK);
   }
@@ -307,8 +307,8 @@ class UserResource extends BaseResource
   public function user_write($data)
   {
     global $app;
-    $info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
-    $auth = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/auth.json"), TRUE);
+    $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/auth.json"), TRUE);
     $auth["is_public"] = (array_key_exists("is_public", $data)) ? $data["is_public"] : $auth["is_public"];
     $auth["is_admin_user"] =  (array_key_exists("is_admin_user", $data)) ? $data["is_admin_user"] : $auth["is_admin_user"];
     $auth["password"] = (array_key_exists("password", $data)) ? password_hash($auth["login"].$data["password"], PASSWORD_DEFAULT) : $auth["password"];
@@ -321,20 +321,20 @@ class UserResource extends BaseResource
       $info[$field] = $value;
     }
     $info["name"] = $info["first_name"] . " " . $info["last_name"];
-    file_put_contents($app->config["base_dir"].$this->getURL()."/info.json",json_encode($info));
-    file_put_contents($app->config["base_dir"].$this->getURL()."/auth.json", json_encode($auth));
+    file_put_contents($app->config("base_dir").$this->getURL()."/info.json",json_encode($info));
+    file_put_contents($app->config("base_dir").$this->getURL()."/auth.json", json_encode($auth));
     $app->response->setStatus(STATUS_OK);
   }
 
   public function user_read()
   {
     global $app;
-    $info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     if (!is_array($info))
     {
       throw new \Exception("JSON format does not corrects !"); 
     } 
-    $auth = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/auth.json"), TRUE);
     if (!is_array($auth))
     {
       throw new \Exception("JSON format does not corrects !"); 
@@ -355,9 +355,9 @@ class UserResource extends BaseResource
   public function readList()
   {
     global $app;
-    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $resourceList = array();
-    foreach (glob($app->config["base_dir"].$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
+    foreach (glob($app->config("base_dir").$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
     {
       if (!is_dir($file))
         continue;
@@ -387,13 +387,13 @@ class UserResource extends BaseResource
     global $app;
     $idea_list = array();
     $parts = explode('/', $this->getURL());
-    foreach(glob($app->config["base_dir"].$this->getURL(). '/projects/*') as $file) 
+    foreach(glob($app->config("base_dir").$this->getURL(). '/projects/*') as $file) 
     {
       if (!is_link($file))
         continue;
       try
       {
-        $project_auth = json_decode(file_get_contents($app->config["base_dir"].readlink($file)."/auth.json"), TRUE);
+        $project_auth = json_decode(file_get_contents($app->config("base_dir").readlink($file)."/auth.json"), TRUE);
         $permissions = $project_auth["users"];
         unset($permissions[$parts[2]]);
         $project_auth["users"] = $permissions;
@@ -402,18 +402,18 @@ class UserResource extends BaseResource
           ProjectResource::newResource(readlink($file))->project_delete();
           continue;
         }
-        unlink($app->config["base_dir"].readlink($file)."/users/" . $parts[2]);
-        file_put_contents($app->config["base_dir"].readlink($file)."/auth.json",json_encode($project_auth));
+        unlink($app->config("base_dir").readlink($file)."/users/" . $parts[2]);
+        file_put_contents($app->config("base_dir").readlink($file)."/auth.json",json_encode($project_auth));
       }
       catch(\Exception $e){ continue; }
     }
-    $user_invitation_info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/invitations/info.json"), TRUE);
+    $user_invitation_info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/invitations/info.json"), TRUE);
     $user_invitations = $user_invitation_info["invitations"];
     foreach ($user_invitations as $key => $value) 
     {
       if ($value["status"] == STATUS_SEND || $value["status"] == STATUS_RECEIVED) 
       {
-        $project_invitation_info = json_decode(file_get_contents($app->config["base_dir"].$value["project_url"]."/invitations/info.json"), TRUE);
+        $project_invitation_info = json_decode(file_get_contents($app->config("base_dir").$value["project_url"]."/invitations/info.json"), TRUE);
         $project_invitations = $project_invitation_info["invitations"];
         $invitation_data = $project_invitations[$key];
         $invitation_data["status"] = STATUS_DENIED;
@@ -421,7 +421,7 @@ class UserResource extends BaseResource
         $invitation_data["requesting_user"] = $app->user["login"];
         $project_invitations[$key] = $invitation_data;
         $project_invitation_info["invitations"] = $project_invitations;
-        file_put_contents($app->config["base_dir"].$value["project_url"]."/invitations/info.json", json_encode($project_invitation_info));
+        file_put_contents($app->config("base_dir").$value["project_url"]."/invitations/info.json", json_encode($project_invitation_info));
       }
     }
     $this->delete_dir();
@@ -431,9 +431,9 @@ class UserResource extends BaseResource
   public function project_readList()
   {
     global $app;
-    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $resourceList = array();
-    foreach (glob($app->config["base_dir"].$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
+    foreach (glob($app->config("base_dir").$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
     {
       if (!is_link($file))
         continue;
@@ -469,11 +469,11 @@ class UserResource extends BaseResource
     $project = ProjectResource::newResource("/projects/" . $project_name);
     if ($project->project_create($data) == FALSE)
       return; 
-    symlink("/projects/" . $project_name, $app->config["base_dir"].$this->getURL());
-    symlink("/users/" . $user, $app->config["base_dir"]."/projects/" . $project_name ."/users/". $user);
-    $auth = json_decode(file_get_contents($app->config["base_dir"]."/projects/".$project_name."/auth.json"), TRUE);
+    symlink("/projects/" . $project_name, $app->config("base_dir").$this->getURL());
+    symlink("/users/" . $user, $app->config("base_dir")."/projects/" . $project_name ."/users/". $user);
+    $auth = json_decode(file_get_contents($app->config("base_dir")."/projects/".$project_name."/auth.json"), TRUE);
     $auth["users"] = array($user => array('is_admin_project' => true, 'is_edit_project' => true));
-    file_put_contents($app->config["base_dir"]."/projects/".$project_name."/auth.json", json_encode($auth));
+    file_put_contents($app->config("base_dir")."/projects/".$project_name."/auth.json", json_encode($auth));
     $app->response->setStatus(STATUS_CREATED);
   }
 
@@ -483,22 +483,22 @@ class UserResource extends BaseResource
     $parts = explode('/', $this->getURL());
     $user = $parts[2];
     $project = $parts[count($parts) - 1];
-    unlink($app->config["base_dir"]."/users/".$user."/projects/".$project);
-    unlink($app->config["base_dir"]."/projects/".$project."/users/".$user);
-    $auth = json_decode(file_get_contents($app->config["base_dir"]."/projects/".$project."/auth.json"), TRUE);
+    unlink($app->config("base_dir")."/users/".$user."/projects/".$project);
+    unlink($app->config("base_dir")."/projects/".$project."/users/".$user);
+    $auth = json_decode(file_get_contents($app->config("base_dir")."/projects/".$project."/auth.json"), TRUE);
     $users = $auth["users"];
     unset($users[$user]);
     $auth["users"] = $users;
-    file_put_contents($app->config["base_dir"]."/projects/".$project."/auth.json", json_encode($auth));
+    file_put_contents($app->config("base_dir")."/projects/".$project."/auth.json", json_encode($auth));
     $app->response->setStatus(STATUS_NO_CONTENT);
   }
 
   public function project_redirectURL()
   {
     global $app;
-    if (!is_link($app->config["base_dir"].$app->resource->getURL()))
+    if (!is_link($app->config("base_dir").$app->resource->getURL()))
       return NULL;
     else
-      return readlink($app->config["base_dir"].$this->getURL());
+      return readlink($app->config("base_dir").$this->getURL());
   }
 }

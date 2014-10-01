@@ -30,33 +30,33 @@ class BaseResource
   public function initializes_server()
   {
     global $app;
-    $files = array_diff(scandir($app->config["base_dir"]), array('.','..'));
+    $files = array_diff(scandir($app->config("base_dir")), array('.','..'));
     foreach ($files as $file) 
     {
-      (is_dir($app->config["base_dir"]."/$file")) ? $this->rrmdir($app->config["base_dir"]."/$file") : unlink($app->config["base_dir"]."/$file");
+      (is_dir($app->config("base_dir")."/$file")) ? $this->rrmdir($app->config("base_dir")."/$file") : unlink($app->config("base_dir")."/$file");
     }
     $info = array('name' => 'Root base');
     $auth = array('login' => $app->config["user_root"],
                   'password' => password_hash($app->config["user_root"].'toto', PASSWORD_DEFAULT));
-    file_put_contents($app->config["base_dir"]."/info.json", json_encode($info));
-    mkdir($app->config["base_dir"]."/users");
+    file_put_contents($app->config("base_dir")."/info.json", json_encode($info));
+    mkdir($app->config("base_dir")."/users");
     $info['name'] = "User list";
-    file_put_contents($app->config["base_dir"]."/users/info.json", json_encode($info));
-    mkdir($app->config["base_dir"]."/projects");
+    file_put_contents($app->config("base_dir")."/users/info.json", json_encode($info));
+    mkdir($app->config("base_dir")."/projects");
     $info['name'] = "Project list";
-    file_put_contents($app->config["base_dir"]."/projects/info.json", json_encode($info));
-    mkdir($app->config["base_dir"]."/users/".$app->config["user_root"]);
+    file_put_contents($app->config("base_dir")."/projects/info.json", json_encode($info));
+    mkdir($app->config("base_dir")."/users/".$app->config["user_root"]);
     $info['name'] = "Root base";
-    file_put_contents($app->config["base_dir"]."/users/".$app->config["user_root"]."/info.json", json_encode($info));
-    file_put_contents($app->config["base_dir"]."/users/".$app->config["user_root"]."/auth.json", json_encode($auth));
+    file_put_contents($app->config("base_dir")."/users/".$app->config["user_root"]."/info.json", json_encode($info));
+    file_put_contents($app->config("base_dir")."/users/".$app->config["user_root"]."/auth.json", json_encode($auth));
   }
 
   public function readList()
   {
     global $app;
-    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $resourceList = array();
-    foreach (glob($app->config["base_dir"].$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
+    foreach (glob($app->config("base_dir").$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
     {
       if (!is_dir($file))
         continue; 
@@ -80,7 +80,7 @@ class BaseResource
   public function read_invitations()
   {
     global $app;
-    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     if (!is_array($data))
     {
       throw new \Exception("JSON format does not corrects !"); 
@@ -116,14 +116,14 @@ class BaseResource
   public function delete_dir()
   {
     global $app;   
-    $this->rrmdir($app->config["base_dir"].$this->url);
+    $this->rrmdir($app->config("base_dir").$this->url);
     $app->response->setStatus(STATUS_NO_CONTENT);
   }
 
   public function delete_file()
   {
     global $app;  
-    unlink($app->config["base_dir"].$this->url);
+    unlink($app->config("base_dir").$this->url);
     $app->response->setStatus(STATUS_NO_CONTENT);
   }
 
@@ -164,7 +164,7 @@ class BaseResource
       else
       {
         if (!$this->canParticipate($user)){ return false; }
-        $auth = json_decode(file_get_contents($app->config["base_dir"]."/projects/".$parts[2]."/auth.json"), TRUE);
+        $auth = json_decode(file_get_contents($app->config("base_dir")."/projects/".$parts[2]."/auth.json"), TRUE);
         $users = $auth["users"];
         $permissions = $users[$user["login"]];
         return ($permissions["is_edit_project"]);
@@ -219,7 +219,7 @@ class BaseResource
       else
       {
         if (!$this->canParticipate($user)){ return false; }
-        $auth = json_decode(file_get_contents($app->config["base_dir"]."/projects/".$parts[2]."/auth.json"), TRUE);
+        $auth = json_decode(file_get_contents($app->config("base_dir")."/projects/".$parts[2]."/auth.json"), TRUE);
         $users = $auth["users"];
         $permissions = $users[$user["login"]];
         return ($permissions["is_edit_project"]);
@@ -268,7 +268,7 @@ class BaseResource
   {
     global $app;
     $parts = explode('/', $this->url);
-    $auth = json_decode(file_get_contents($app->config["base_dir"].'/'.$this->getURLBase().'/'.$parts[2]."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").'/'.$this->getURLBase().'/'.$parts[2]."/auth.json"), TRUE);
     return ($auth["is_public"] ==  IS_PUBLIC);
   }
 
@@ -276,7 +276,7 @@ class BaseResource
   {
     global $app;
     $parts = explode('/', $this->url);
-    $auth = json_decode(file_get_contents($app->config["base_dir"].'/users/'.$parts[2]."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").'/users/'.$parts[2]."/auth.json"), TRUE);
     return $auth["activate"];
   }
 
@@ -285,7 +285,7 @@ class BaseResource
     global $app;
     if ($this->getURLBase() == "users")
     {
-      $auth = json_decode(file_get_contents($app->config["base_dir"]."/users/".$user["login"]."/auth.json"), TRUE);
+      $auth = json_decode(file_get_contents($app->config("base_dir")."/users/".$user["login"]."/auth.json"), TRUE);
       return ($auth["is_admin_user"]);
     }
     else  if ($this->getURLBase() == "projects")
@@ -293,7 +293,7 @@ class BaseResource
       if (!$this->canParticipate($user))
         return false;
       $parts = explode('/', $this->url);
-      $auth = json_decode(file_get_contents($app->config["base_dir"]."/projects/".$parts[2]."/auth.json"), TRUE);
+      $auth = json_decode(file_get_contents($app->config("base_dir")."/projects/".$parts[2]."/auth.json"), TRUE);
       $users = $auth["users"];
       $permissions = $users[$user["login"]];
       return ($permissions["is_admin_project"]);
@@ -334,7 +334,7 @@ class BaseResource
   {
     global $app;
     $parts = explode('/', $this->url);
-    $auth = json_decode(file_get_contents($app->config["base_dir"].'/projects/'.$parts[2]."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir").'/projects/'.$parts[2]."/auth.json"), TRUE);
     $users = $auth["users"];
     return (array_key_exists($user["login"], $users));
   }
@@ -342,13 +342,13 @@ class BaseResource
   public function file_exists()
   {
     global $app;
-    return (file_exists($app->config["base_dir"].$this->url));
+    return (file_exists($app->config("base_dir").$this->url));
   }
 
   public function file_deleted()
   {
     global $app;
-    $files = array_diff(scandir($app->config["base_dir"].$this->url), array('.','..'));
+    $files = array_diff(scandir($app->config("base_dir").$this->url), array('.','..'));
     foreach ($files as $file) 
     {
      return false;
@@ -359,7 +359,7 @@ class BaseResource
   public function link_exists()
   {
     global $app;
-    return (is_link($app->config["base_dir"].$this->url));
+    return (is_link($app->config("base_dir").$this->url));
   }
 
   public function send_message($from, $to, $subject, $link_header, $message)

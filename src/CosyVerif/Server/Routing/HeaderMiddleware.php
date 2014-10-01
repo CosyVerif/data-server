@@ -137,35 +137,35 @@ class HeaderResource extends BaseResource
     $info = json_encode(array('name' => $data["name"], 'description' => $data["description"]));
     if(!$this->file_exists())
     {
-      mkdir($app->config["base_dir"].$this->getURL());
+      mkdir($app->config("base_dir").$this->getURL());
     }
-    file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", $info);
-    file_put_contents($app->config["base_dir"].$this->getURL()."/data.cosy", (isset($data["data"])) ? $data["data"] : "");
+    file_put_contents($app->config("base_dir").$this->getURL()."/info.json", $info);
+    file_put_contents($app->config("base_dir").$this->getURL()."/data.cosy", (isset($data["data"])) ? $data["data"] : "");
     $tmp = array();
-    mkdir($app->config["base_dir"].$this->getURL()."/patches");
+    mkdir($app->config("base_dir").$this->getURL()."/patches");
     $tmp["name"] = "Patch list";
-    file_put_contents($app->config["base_dir"].$this->getURL()."/patches/info.json", json_encode($tmp));
+    file_put_contents($app->config("base_dir").$this->getURL()."/patches/info.json", json_encode($tmp));
     $app->response->setStatus(STATUS_CREATED);
   }
 
   public function write($data)
   {
     global $app;
-    $info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $info["name"] = (array_key_exists("name", $data))? $data["name"] : $info["name"];
     $info["description"] = (array_key_exists("description", $data))? $data["description"] : $info["description"];
-    file_put_contents($app->config["base_dir"].$this->getURL()."/info.json", json_encode($info));
+    file_put_contents($app->config("base_dir").$this->getURL()."/info.json", json_encode($info));
     if (array_key_exists("data", $data))
-      file_put_contents($app->config["base_dir"].$this->getURL()."/data.cosy", $data["data"]);
+      file_put_contents($app->config("base_dir").$this->getURL()."/data.cosy", $data["data"]);
     $app->response->setStatus(STATUS_OK); 
   }
 
   public function read($name)
   {
     global $app;
-    $info = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     if($app->request->params("summary") == true){
-      $cosy = file_get_contents($app->config["base_dir"].$this->getURL()."/data.cosy");
+      $cosy = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
       $data["data"] = $cosy;
     }
     $data = array('name' => $info["name"], 'description' => $info["description"]);
@@ -196,9 +196,9 @@ class HeaderResource extends BaseResource
   public function readList()
   {
     global $app;
-    $data = json_decode(file_get_contents($app->config["base_dir"].$this->getURL()."/info.json"), TRUE);
+    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $resourceList = array();
-    foreach (glob($app->config["base_dir"].$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
+    foreach (glob($app->config("base_dir").$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
     {
       if (!is_dir($file))
         continue; 
@@ -226,19 +226,19 @@ class HeaderResource extends BaseResource
     if (!isset($data["name"]))
       $app->response->setStatus(STATUS_BAD_REQUEST);
     $name = microtime();
-    file_put_contents($app->config["base_dir"].$this->getURL()."/".$name."cosy", $data);
+    file_put_contents($app->config("base_dir").$this->getURL()."/".$name."cosy", $data);
     $app->response->setStatus(STATUS_CREATED);
   }
 
   public function patch_read()
   {
     global $app;
-    $path = file_get_contents($app->config["base_dir"].$this->getURL());
+    $path = file_get_contents($app->config("base_dir").$this->getURL());
     if ($path == FALSE)
     {
       return null;
     } 
-    $pathInfo = pathinfo($app->config["base_dir"].$this->getURL(), PATHINFO_FILENAME);
+    $pathInfo = pathinfo($app->config("base_dir").$this->getURL(), PATHINFO_FILENAME);
     $data = array ('name' => $pathInfo["filename"], 'data' => $path);
     $app->response->headers->set('Content-Type','application/json');
     $app->response->setStatus(STATUS_OK);
@@ -249,7 +249,7 @@ class HeaderResource extends BaseResource
   {
     global $app;
     $data = array();
-    foreach(glob($app->config["base_dir"].$this->getURL(). '/*') as $file) 
+    foreach(glob($app->config("base_dir").$this->getURL(). '/*') as $file) 
     {
       if(is_dir($file) || basename($file) == "info.json")
         continue;
