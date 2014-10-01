@@ -13,9 +13,9 @@ class CrossOrigin extends \Slim\Middleware
   public function call()
   {
     global $app;
+    $this->next->call();
     $response = $this->app->response();
     $response->header('Access-Control-Allow-Origin', '*');
-    $this->next->call();
   }
 }
 
