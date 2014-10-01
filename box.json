@@ -2,9 +2,9 @@
     "main": "server.php",
     "output": "server.phar",
     "chmod": "0755",
-    "shebang": "#!/usr/bin/env php",
     "stub": true,
     "directories": ["src"],
+    "shebang": "#! /usr/bin/env php",
     "finder": [
         {
             "name": "*.php",
@@ -14,7 +14,12 @@
     "files": [
       "README.md",
       "config/activate-message.txt",
-      "config/server-config.ini"
+      "config/server-config.ini",
+      "resources/info.json",
+      "resources/projects/info.json",
+      "resources/users/info.json",
+      "resources/users/root/auth.json",
+      "resources/users/root/info.json"
     ],
     "algorithm": "SHA1",
     "compression": "GZ"
