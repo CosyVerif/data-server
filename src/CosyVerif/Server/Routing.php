@@ -1,6 +1,6 @@
 <?php
 
-namespace CosyVerif\Server\Routing;
+namespace CosyVerif\Server;
 
 class Routing
 {
@@ -8,12 +8,11 @@ class Routing
   {
     global $app;
 
-    \CosyVerif\Server\CrossOrigin::register();
-    UserMiddleware::register();
-    ProjectMiddleware::register();
-    HeaderMiddleware::register();
-    SearchMiddleware::register();
-    ExceptionMiddleware::register();
+    Routing\UserMiddleware      ::register();
+    Routing\ProjectMiddleware   ::register();
+    Routing\HeaderMiddleware    ::register();
+    Routing\SearchMiddleware    ::register();
+    Routing\ExceptionMiddleware ::register();
   }
   public function call()
   {
