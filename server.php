@@ -31,12 +31,16 @@ if (array_key_exists("coverage", $config) && $config["coverage"]) {
   register_shutdown_function('shutdown');
 }
 
-$app = new \Slim\Slim($config);
+$app = new \Slim\Slim();
+foreach ($config as $k => $v)
+{
+  $app->config($k, $v);
+}
 
-//\CosyVerif\Server\Routing::register();
+
 \CosyVerif\Server\Routing::register ();
-//\CosyVerif\Server\HttpBasicAuthentification::register();
-//\CosyVerif\Server\CrossOrigin::register();
+\CosyVerif\Server\HttpBasicAuthentification::register();
+\CosyVerif\Server\CrossOrigin::register();
 
 $app->get("/", function () use ($app) {
   echo "Welcome to CosyVerif";
