@@ -50,9 +50,13 @@ $app->options("/:x+", function () use ($app) {
   global $app;
   $request  = $app->request ();
   $response = $app->response();
-  $accept   = $request->headers->get('Access-Control-Request-Headers');
+  $accept_headers = $request->headers->get('Access-Control-Request-Headers');
+  $accept_methods = $request->headers->get('Access-Control-Request-Method');
+  $accept_origin  = $request->headers->get('Origin');
   $response->header('Accept', 'HEAD,GET,PUT,POST,PATCH,DELETE,OPTIONS');
-  $response->header('Access-Control-Allow-Headers', $accept);
+  $response->header('Access-Control-Allow-Headers', $accept_headers);
+  $response->header('Access-Control-Allow-Methods', $accept_methods);
+  $response->header('Access-Control-Allow-Origin' , $accept_origin);
 });
 
 $app->run();
