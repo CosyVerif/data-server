@@ -48,9 +48,11 @@ $app->get("/", function () use ($app) {
 
 $app->options("/:x+", function () use ($app) {
   global $app;
+  $request  = $app->request ();
   $response = $app->response();
+  $accept   = $request->headers->get('Access-Control-Request-Headers');
   $response->header('Accept', 'HEAD,GET,PUT,POST,PATCH,DELETE,OPTIONS');
-  $response->header('Access-Control-Allow-Headers', 'Content-Type');
+  $response->header('Access-Control-Allow-Headers', $accept);
 });
 
 $app->run();
