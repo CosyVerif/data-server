@@ -54,4 +54,3 @@ class HttpBasicAuthentification extends \Slim\Middleware
       return false;
   } 
 }
-?>

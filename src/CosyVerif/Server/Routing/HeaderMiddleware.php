@@ -266,4 +266,3 @@ class HeaderResource extends BaseResource
     return $data;    
   }
 }
-?>
