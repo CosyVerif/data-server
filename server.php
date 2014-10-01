@@ -46,4 +46,11 @@ $app->get("/", function () use ($app) {
   echo "Welcome to CosyVerif";
 });
 
+$app->options("/:x+", function () use ($app) {
+  global $app;
+  $response = $app->response();
+  $response->header('Accept', 'HEAD,GET,PUT,POST,PATCH,DELETE,OPTIONS');
+  $response->header('Access-Control-Allow-Headers', 'Content-Type');
+});
+
 $app->run();
