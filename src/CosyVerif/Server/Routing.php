@@ -7,10 +7,10 @@ class Routing
   public static function register()
   {
     global $app;
-
+    
+    Routing\HeaderMiddleware    ::register();
     Routing\UserMiddleware      ::register();
     Routing\ProjectMiddleware   ::register();
-    Routing\HeaderMiddleware    ::register();
     Routing\SearchMiddleware    ::register();
     Routing\ExceptionMiddleware ::register();
   }

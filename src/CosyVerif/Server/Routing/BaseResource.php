@@ -51,32 +51,6 @@ class BaseResource
     file_put_contents($app->config("base_dir")."/users/".$app->config["user_root"]."/auth.json", json_encode($auth));
   }
 
-  public function readList()
-  {
-    global $app;
-    $data = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
-    $resourceList = array();
-    foreach (glob($app->config("base_dir").$this->getURL().'/*', GLOB_NOESCAPE) as $file) 
-    {
-      if (!is_dir($file))
-        continue; 
-      try
-      {
-        $tmp = json_decode(file_get_contents($file."/info.json"), TRUE);
-        $resourceList[] = array('href' => $this->getURL()."/".basename($file), 'name' => $tmp["name"], 'description' => $tmp["description"]);
-      }
-      catch (\Exception $e){ continue; }
-    }
-    $data["resource_list"] = $resourceList;
-    $data["is_create"] = $this->canCreate($app->user);
-    $data["is_edit"] = $this->canWrite($app->user);
-    $data["is_delete"] = $this->canDelete($app->user);
-    $data["is_read"] = $this->canRead($app->user);
-    $app->response->headers->set('Content-Type','application/json');
-    $app->response->setStatus(STATUS_OK);
-    return $data;
-  }
-
   public function read_invitations()
   {
     global $app;
@@ -302,7 +276,7 @@ class BaseResource
       return false;
   }
 
-  private function isOwner($user)
+  public function isOwner($user)
   {
     global $app;
     if ($this->getURLBase() == "users")

@@ -95,17 +95,6 @@ class ProjectMiddleware  extends \Slim\Middleware
       if (is_array($data))
         $app->response->setBody(json_encode($data));
     })->setName("project");
-
-    $app->get('/projects/:project/:others(/)', function() use($app)
-    {
-      if (!$app->resource->file_exists())
-        $app->halt(STATUS_NOT_FOUND);
-      else if (!$app->resource->canRead($app->user))
-        $app->halt(STATUS_FORBIDDEN);
-      $data = $app->resource->readList(); 
-      if (is_array($data))
-        $app->response->setBody(json_encode($data));
-    })->setName("project");
     
     $app->post('/projects/:project/invitations/:user(/)', function($project, $user) use($app){
       if (!file_exists($app->config("base_dir").'/projects/'.$project) || 
@@ -345,6 +334,8 @@ class ProjectResource extends BaseResource
     $data["is_edit"] = $this->canWrite($app->user);
     $data["is_delete"] = $this->canDelete($app->user);
     $data["is_read"] = $this->canRead($app->user);
+    $data["is_copy"] = false;
+    $data["is_move"] = false;
     $app->response->headers->set('Content-Type','application/json');
     $app->response->setStatus(STATUS_OK);
     return $data;
@@ -363,9 +354,9 @@ class ProjectResource extends BaseResource
       {
         if (!BaseResource::newResource($this->getURL()."/".basename($file))->canRead($app->user))
           continue;
-        $parts = explode('/', $this->getURL());
-        $tmp = json_decode(file_get_contents($file."/info.json"), TRUE);
-        $resourceList[] = array('href' => $this->getURL()."/".basename($file), 'name' => $tmp["name"], 'description' => $tmp["description"]);
+        $tmp = ProjectResource::newResource($this->getURL()."/".basename($file))->project_read();
+        $tmp['href'] = $this->getURL()."/".basename($file);
+        $resourceList[] = $this->addInformations($tmp); 
       }
       catch (\Exception $e){ continue; }
     }
@@ -428,8 +419,6 @@ class ProjectResource extends BaseResource
       try
       {
         $user_url = readlink($file);
-        if (!BaseResource::newResource($user_url)->canRead($app->user))
-          continue;
         $tmp = UserResource::newResource($user_url)->user_read();
         if (!is_null($tmp))
         {

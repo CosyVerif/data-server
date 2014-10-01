@@ -164,7 +164,8 @@ class HeaderResource extends BaseResource
   {
     global $app;
     $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
-    if($app->request->params("summary") == true){
+    if($app->request->params("summary") == true)
+    {
       $cosy = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
       $data["data"] = $cosy;
     }
@@ -173,6 +174,8 @@ class HeaderResource extends BaseResource
     $data["is_edit"] = $this->canWrite($app->user);
     $data["is_delete"] = $this->canDelete($app->user);
     $data["is_read"] = $this->canRead($app->user);
+    $data["is_copy"] = (is_null($app->user))? false : true;
+    $data["is_move"] = $data["is_edit"];
     $parts = explode('/', $this->getURL());
     $project_name = "";
     if ($parts[1] == "users")
@@ -204,9 +207,9 @@ class HeaderResource extends BaseResource
         continue; 
       try
       {
-        $tmp = json_decode(file_get_contents($file."/info.json"), TRUE);
-        $tmpData = array('href' => $this->getURL()."/".basename($file), 'name' => $tmp["name"], 'description' => $tmp["description"]);
-        $resourceList[] = $this->addInformations($tmpData); 
+        $tmp = HeaderResource::newResource($this->getURL()."/".basename($file))->read();
+        $tmp['href'] = $this->getURL()."/".basename($file);
+        $resourceList[] = $this->addInformations($tmp); 
       }
       catch (\Exception $e){ continue; }
     }
