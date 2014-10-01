@@ -160,7 +160,7 @@ class HeaderResource extends BaseResource
     $app->response->setStatus(STATUS_OK); 
   }
 
-  public function read($name)
+  public function read()
   {
     global $app;
     $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
