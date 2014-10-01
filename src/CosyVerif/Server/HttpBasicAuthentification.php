@@ -39,11 +39,11 @@ class HttpBasicAuthentification extends \Slim\Middleware
   public function authenticate($user, $password)
   {
     global $app;
-    if (!file_exists($app->config["base_dir"]."/users/".$user))
+    if (!file_exists($app->config("base_dir")."/users/".$user))
     {
       return false;
     } 
-    $auth = json_decode(file_get_contents($app->config["base_dir"]."/users/".$user."/auth.json"), TRUE);
+    $auth = json_decode(file_get_contents($app->config("base_dir")."/users/".$user."/auth.json"), TRUE);
     $password = $user.$password;
     if ($auth["login"] == $user && password_verify($password, $auth["password"]) && $auth["activate"] == true)
     {
