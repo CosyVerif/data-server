@@ -76,6 +76,22 @@ class HeaderMiddleware  extends \Slim\Middleware
       $app->resource->write($data);
       $app->response->setBody("{}");
     })->setName("header");   
+    $app->patch('/(users|projects)/:id/:resources/:resource(/)', function() use($app)
+    {
+      if (!$app->resource->file_exists())
+        $app->halt(STATUS_NOT_FOUND);
+      else if ($app->resource->file_deleted())
+        $app->halt(STATUS_GONE);
+      if (!$app->resource->canWrite($app->user))
+        $app->halt(STATUS_FORBIDDEN);
+      $data = json_decode($app->request->getBody(), TRUE);
+      if (!is_array($data))
+      {
+        $app->halt(STATUS_UNPROCESSABLE_ENTITY);
+      }
+      $app->resource->patch_create($data);
+      $app->response->setBody("{}");
+    })->setName("header");
     $app->delete('/(users|projects)/:id/:resources/:resource(/)', function() use($app)
     {
       if (!$app->resource->file_exists())
@@ -105,7 +121,7 @@ class HeaderMiddleware  extends \Slim\Middleware
       $data = $app->resource->patch_readList($from, $to);
       if (is_array($data))
         $app->response->setBody(json_encode($data));
-    })->setName("header");     
+    })->setName("header");      
     $app->delete('/(users|projects)/:id/:resources/:resource/:path(/)', function() use($app)
     {
       if (!$app->resource->file_exists())
@@ -164,11 +180,8 @@ class HeaderResource extends BaseResource
   {
     global $app;
     $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
-    if($app->request->params("summary") == true)
-    {
-      $cosy = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
-      $data["data"] = $cosy;
-    }
+    $cosy = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
+    $data["data"] = $cosy;
     $data = array('name' => $info["name"], 'description' => $info["description"]);
     $data["is_create"] = $this->canCreate($app->user);
     $data["is_edit"] = $this->canWrite($app->user);
@@ -226,11 +239,10 @@ class HeaderResource extends BaseResource
   public function patch_create($data)
   {
     global $app;
-    if (!isset($data["name"]))
-      $app->response->setStatus(STATUS_BAD_REQUEST);
-    $name = microtime();
-    file_put_contents($app->config("base_dir").$this->getURL()."/".$name."cosy", $data);
-    $app->response->setStatus(STATUS_CREATED);
+    $cosy_data = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
+    $cosy_data = $cosy_data."\n\n".$data["data"];
+    file_put_contents($app->config("base_dir").$this->getURL()."/data.cosy", $cosy_data);
+    $app->response->setStatus(STATUS_OK); 
   }
 
   public function patch_read()
