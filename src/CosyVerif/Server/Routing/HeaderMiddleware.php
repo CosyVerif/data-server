@@ -181,8 +181,8 @@ class HeaderResource extends BaseResource
     global $app;
     $info = json_decode(file_get_contents($app->config("base_dir").$this->getURL()."/info.json"), TRUE);
     $cosy = file_get_contents($app->config("base_dir").$this->getURL()."/data.cosy");
-    $data["data"] = $cosy;
     $data = array('name' => $info["name"], 'description' => $info["description"]);
+    $data["data"] = $cosy;
     $data["is_create"] = $this->canCreate($app->user);
     $data["is_edit"] = $this->canWrite($app->user);
     $data["is_delete"] = $this->canDelete($app->user);
