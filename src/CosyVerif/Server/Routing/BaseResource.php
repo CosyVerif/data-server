@@ -74,6 +74,10 @@ class BaseResource
         $parts = explode('/', $value["project_url"]);
         $value["href"] = ($value["added_user"] == $value["requesting_user"]) ? $value["project_url"]."/invitations/".$value["added_user"] : "/users/".$value["added_user"]."/invitations/".$parts[2];
         $value["timestamp"] = $key;
+        $value["is_ack"] = ($value["status"] == "received" && $this->canWrite($app->user));
+        $value["is_cancel"] = ($value["status"] == "received" && $this->canWrite($app->user));
+        $value["is_comment"] = ($value["status"] == "received" && $this->canWrite($app->user));
+        $value["is_eye"] = ($value["status"] != "received" && $this->canWrite($app->user));
         $tmp[$key] = $value; 
       }
     } 

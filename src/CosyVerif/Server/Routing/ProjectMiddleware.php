@@ -352,8 +352,6 @@ class ProjectResource extends BaseResource
         continue; 
       try
       {
-        if (!BaseResource::newResource($this->getURL()."/".basename($file))->canRead($app->user))
-          continue;
         $tmp = ProjectResource::newResource($this->getURL()."/".basename($file))->project_read();
         $tmp['href'] = $this->getURL()."/".basename($file);
         $resourceList[] = $this->addInformations($tmp); 

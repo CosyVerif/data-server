@@ -354,9 +354,8 @@ class UserResource extends BaseResource
         continue;
       try 
       {
-        $parts = explode('/', $this->getURL());
         $tmp = json_decode(file_get_contents($file."/auth.json"), TRUE);
-        if (!BaseResource::newResource($this->getURL()."/".basename($file))->canRead($app->user) || $tmp["activate"] == false)
+        if ($tmp["activate"] == false)
           continue;
         $tmp = UserResource::newResource($this->getURL()."/".basename($file))->user_read();
         $tmp['href'] = $this->getURL()."/".basename($file);
@@ -436,6 +435,10 @@ class UserResource extends BaseResource
         if (!is_null($tmp))
         {
           $tmp["href"] = $project_url;
+          $tmp["is_create"] = BaseResource::newResource($this->getURL()."/".basename($file))->canCreate($app->user);
+          $tmp["is_edit"] = BaseResource::newResource($this->getURL()."/".basename($file))->canWrite($app->user);
+          $tmp["is_delete"] = BaseResource::newResource($this->getURL()."/".basename($file))->canDelete($app->user);
+          $tmp["is_read"] = BaseResource::newResource($this->getURL()."/".basename($file))->canRead($app->user);
           $resourceList[] = $this->addInformations($tmp); 
         }
       }
