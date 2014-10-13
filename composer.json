@@ -1,10 +1,9 @@
 {
   "require": {
-    "slim/slim": "*",
-    "ircmaxell/password-compat": "*"
+    "predis/predis": "*",
+    "minime/annotations": "*"
    },
   "require-dev": {
-    "guzzlehttp/guzzle": "*",
     "phpunit/phpunit": "*",
     "phpunit/php-code-coverage": "*"
   },
