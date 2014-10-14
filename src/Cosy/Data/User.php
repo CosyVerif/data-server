@@ -1,25 +1,47 @@
 <?php
 namespace Cosy\Data;
 
-final class User extends Hash
+final class User extends Base
 {
-  /** @var identifier */
-  protected $username;
-  /** @var string */
-  protected $password;
+  private $resource;
+  private $username;
 
-  /** @var bool */
-  protected $is_admin;
-  /** @var bool */
-  protected $is_active;
+  public $firstname;
+  public $lastname;
+  public $email;
+  public $password;
 
-  /** @var string */
-  protected $validation_key;
+  public $is_admin  = false;
+  public $is_active = false;
+  public $is_public = true;
 
-  /** @var bool */
-  protected $is_public;
-  /** @var set */
-  protected $share_read;
-  /** @var set */
-  protected $share_write;
+  private $validation_key;
+  private $share_read;
+  private $share_write;
+
+  protected function validation ()
+  {
+    // Check that current user has permission:
+    $session = $this->getDI () ['cosy-core'];
+    return $session->has ('username')
+        && $session->get ('username') == $this->username
+         ;
+  }
+
+  public static function instantiate ($parameters)
+  {
+    // Create instance:
+    $result = new User;
+    // Get required components:
+    $filter   = $result->getDI () ['filter'];
+    $security = $result->getDI () ['security'];
+    $email    = $result->getDI () ['email'];
+    // Extract and sanitize parameters:
+    $result->resource = $filter->sanitize ($parameters ['resource'], 'url');
+    $result->username = $filter->sanitize ($parameters ['username'], 'alphanum');
+    $result->password = $security->hash ($parameters ['password']);
+    $result->validation_key = uniqid ();
+    return $result;
+  }
+
 }

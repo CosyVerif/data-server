@@ -1,8 +1,8 @@
 {
   "require": {
-    "predis/predis": "*",
-    "minime/annotations": "*"
-   },
+    "ircmaxell/password-compat": "*",
+    "swiftmailer/swiftmailer": "*"
+  },
   "require-dev": {
     "phpunit/phpunit": "*",
     "phpunit/php-code-coverage": "*"
