@@ -4,13 +4,23 @@ namespace Cosy\Data;
 
 final class Redirect extends Base
 {
-  public $resource    = "http://cosy.io/";
-  public $redirection;
+  private $target;
 
   protected function validation ()
   {
-    return filter_var ($this->resource    , FILTER_VALIDATE_URL)
-        && filter_var ($this->redirection , FILTER_VALIDATE_URL)
-         ;
+  }
+
+  public static function instantiate ($parent, $parameters)
+  {
+    // Create instance:
+    $result = new Redirect;
+    // Get required components:
+    $filter = $result->getDI () ['filter'];
+    // Extract and sanitize parameters:
+    $result->resource = $filter->sanitize ($parameters ['resource'], 'url');
+    $result->target   = $filter->sanitize ($parameters ['target'  ], 'url');
+    // Save resource:
+    $result->save ();
+    return $result;
   }
 }
