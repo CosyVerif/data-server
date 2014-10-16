@@ -1,6 +1,5 @@
 {
   "require": {
-    "ircmaxell/password-compat": "*",
     "swiftmailer/swiftmailer": "*"
   },
   "require-dev": {
@@ -8,6 +7,9 @@
     "phpunit/php-code-coverage": "*"
   },
   "autoload": {
-    "psr-0": {"": "src/"}
+    "psr-0": {
+      "": "src/",
+      "": "cosy/"
+    }
   }
 }
