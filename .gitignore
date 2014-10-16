@@ -6,8 +6,10 @@ composer.lock
 vendor/
 
 # Ignore generated documentation:
-doc/src
-doc/scenarios
+doc/
+
+# Ignore config files:
+cosy.ini
 
 # Ignore temporary files:
 *.swp
