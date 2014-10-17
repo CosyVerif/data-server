@@ -1,26 +1,33 @@
 {
-    "main": "server.php",
-    "output": "server.phar",
-    "chmod": "0755",
-    "stub": true,
-    "directories": ["src"],
-    "shebang": "#! /usr/bin/env php",
-    "finder": [
-        {
-            "name": "*.php",
-            "in": "vendor"
-        }
-    ],
-    "files": [
-      "README.md",
-      "config/activate-message.txt",
-      "config/server-config.ini",
-      "resources/info.json",
-      "resources/projects/info.json",
-      "resources/users/info.json",
-      "resources/users/root/auth.json",
-      "resources/users/root/info.json"
-    ],
-    "algorithm": "SHA1",
-    "compression": "GZ"
+  "main": "cosy/public/index.php",
+  "output": "dist/cosy.phar",
+  "chmod": "0755",
+  "stub": true,
+  "git-version": "package_version",  
+  "shebang": "#! /usr/bin/env php",
+  "finder": [
+    {
+      "name": "*",
+      "in": "cosy"
+    },
+    {
+      "name": "*.php",
+      "in": "vendor",
+      "exclude": [
+        "herrera-io",
+        "kherge",
+        "phpseclib",
+        "yaml"
+      ]
+    }
+  ],
+  "directories": [
+    "cosy"
+  ],
+  "files": [
+    "README.md",
+    "LICENSE"
+  ],
+  "algorithm": "SHA1",
+  "compression": "GZ"
 }

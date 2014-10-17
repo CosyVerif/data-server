@@ -2,6 +2,7 @@
 
 set -e
 ulimit -Sn 2048
+mkdir -p dist/
 
 ./bin/composer.phar update --no-dev
 php -dphar.readonly=0 bin/box.phar build
