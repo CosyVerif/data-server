@@ -1,15 +1,20 @@
 {
   "require": {
-    "swiftmailer/swiftmailer": "*"
+    "phpmailer/phpmailer": "*",
+    "symfony/console": "*",
+    "phpunit/php-code-coverage": "*"
   },
   "require-dev": {
+    "kherge/box": "*",
     "phpunit/phpunit": "*",
     "phpunit/php-code-coverage": "*"
   },
   "autoload": {
-    "psr-0": {
-      "": "src/",
-      "": "cosy/"
+    "psr-4": {
+      "Cosy\\Command\\": "cosy/commands",
+      "Cosy\\Task\\": "cosy/tasks",
+      "Cosy\\View\\": "cosy/views",
+      "": "cosy/models"
     }
   }
 }

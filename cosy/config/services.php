@@ -6,12 +6,11 @@ else
   $di = new \Phalcon\DI\FactoryDefault ();
 
 $di ['configuration'] = function () {
-  $home = getenv ('HOME');
   $paths = [
-    __DIR__ . "/config.ini",
+    APP_PATH . "/config/config.ini",
     "/etc/cosy.ini",
-    "{$home}/.cosy/cosy.ini",
-    "cosy.ini"
+    getenv ('HOME') . '/.cosy.ini',
+    getcwd () . '/cosy.ini'
   ];
   foreach ($paths as $path)
   {

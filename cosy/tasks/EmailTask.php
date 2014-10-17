@@ -1,33 +1,13 @@
 <?php
+namespace Cosy\Task;
 
-class MailTask extends \Phalcon\CLI\Task
+class EmailTask extends \Phalcon\CLI\Task
 {
-  private $transport;
-  private $mailer;
-
-  public function __construct ()
-  {
-    $configuration = $this->getDi () ['configuration']->email;
-    $server        = $configuration->server;
-    $port          = $configuration->port;
-    $security      = $configuration->security;
-    $username      = $configuration->username;
-    $password      = $configuration->password;
-    $this->transport = \Swift_SmtpTransport::newInstance ($server, $port, $security)
-      ->setUsername($username)
-      ->setPassword($password);
-    $this->mailer = \Swift_Mailer::newInstance ($this->transport);
-  }
-
   public function mainAction ()
   {
     $di            = $this->getDI ();
     $queue         = $di ['queue'];
     $configuration = $di ['configuration'];
-    $site_name     = $configuration->site->name;
-    $site_url      = $configuration->site->url;
-    $from_name     = $configuration->email->from_name;
-    $from_email    = $configuration->email->from_email;
     while (true)
     {
       $job     = $queue->reserve();
@@ -39,12 +19,22 @@ class MailTask extends \Phalcon\CLI\Task
       $user_name  = $resource->fullname;
       $user_email = $resource->email;
       echo "Sending email to {$user_name} <{$user_email}>...\n";
-      $message = \Swift_Message::newInstance()
-        ->setSubject ("[{$site_name}] Account validation")
-        ->setTo   ([$resource->email  => $resource->fullname])
-        ->setFrom ([$from_email       => $from_name         ])
-        ->setBody ("{$site_url}/check/{$resource->validation_key}");
-      $this->mailer->send ($message);
+      // Create and send email:
+      $mail             = new \PHPMailer;
+      $mail->isSMTP ();
+      $mail->Host       = $configuration->email->host;
+      $mail->Port       = $configuration->email->port;
+      $mail->SMTPAuth   = true;
+      $mail->Username   = $configuration->email->username;
+      $mail->Password   = $configuration->email->password;
+      $mail->SMTPSecure = $configuration->email->security;
+      $mail->From       = $configuration->email->from_email;
+      $mail->FromName   = $configuration->email->from_name;
+      $mail->WordWrap   = 76;
+      $mail->Subject    = "[{$configuration->site->name}] Account validation";
+      $mail->Body       = "{$configuration->site->url}/check/{$resource->validation_key}";
+      $mail->addAddress($user_email, $user_name);
+      $mail->send ();
     }
   }
 }

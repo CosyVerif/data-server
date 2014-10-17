@@ -1,4 +1,5 @@
 <?php
+namespace Cosy\Task;
 
 class TestTask extends \Phalcon\CLI\Task
 {
