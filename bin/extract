@@ -1,0 +1,5 @@
+#! /usr/bin/env php
+<?php
+
+$phar = new Phar ('dist/cosy.phar');
+$phar->extractTo ('extracted/');
