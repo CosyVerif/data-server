@@ -1,22 +1,20 @@
 local configuration = require "cosy.server.configuration"
-local Resource      = require "cosy.server.resource"
+local resources     = require "cosy.server.resources"
 local bcrypt        = require "bcrypt"
+local copas = require "copas.timer"
 
-local trim      = configuration.turbo.escape.trim
-local redis     = configuration.redis.client
-local resources = configuration.resources
-local loop      = configuration.loop
+local rounds = configuration.server.password_rounds
 
 local function generate_key ()
   local run = io.popen ("uuidgen", "r")
   local result = run:read ("*all")
   run:close ()
-  return trim (result)
+  return result
 end
 
-local User = Resource.create ()
+local User = resources ()
 
-function User:check (t)
+function User:__check (t)
   local errors = {}
   -- TODO
   if #errors ~= 0 then
@@ -26,47 +24,42 @@ function User:check (t)
 end
 
 function User:new (t)
-  -- Check if user exists
   local resource = "${root}/users/${user}" % {
     root = configuration.server.root,
     user = t.username,
   }
-  -- Create user:
-  local digest = bcrypt.digest (t.password, configuration.server.password_rounds)
-  return User:create {
-    resource       = resource,
+  User [resource] = {
     username       = t.username,
-    password       = t.password,
+--    password       = bcrypt.digest (t.password, rounds),
     fullname       = t.fullname,
     email          = t.email,
     validation_key = generate_key (),
     is_active      = false,
     is_public      = true,
   }
+--local haricot = require "haricot"
+--local bs = haricot.new("localhost", 11300)
+  return User [resource]
 end
 
 -- Test:
-configuration.loop:add_callback (function ()
+copas.addthread (function ()
+  local redis = configuration.redis.client
   redis:flushall ()
-  print "Before:"
-  for _, k in ipairs (redis:keys "*") do
-    print (k)
+  print "Before add."
+  for i = 1, 1000 do
+    print (i)
+    User:new {
+      username = "user-${n}" % { n = i },
+      password = "toto",
+      fullname = "User ${n}" % { n = i },
+      email    = "user.${n}@gmail.com" % { n = i },
+    }
+    if i % 10 == 0 then
+      print (i)
+    end
   end
-  print "Adding user:"
-  User:new {
-    username = "alinard",
-    password = "toto",
-    fullname = "Alban Linard",
-    email    = "alban@linard.fr",
-  }
-  print "After:"
-  for _, k in ipairs (redis:keys "*") do
-    print (k)
-  end
-  print "Load:"
---  collectgarbage ()
-  local u = User:load "cosyverif.io/users/alinard"
-  print (u.validation_key)
+  print "After add."
 end)
 
 return User
