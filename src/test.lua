@@ -29,7 +29,19 @@ end
 -- Encode/Decoder
 -- ==============
 
-local proxy
+local Reference = {}
+
+function Reference.new (resource)
+  return setmetatable ({
+    resource = resource
+  }, Reference)
+end
+
+function Reference:__tostring ()
+  return "=> ${resource}" % {
+    resource = self.resource
+  }
+end
 
 local Format = {}
 
@@ -49,7 +61,7 @@ function Format.decode (x)
   elseif type == "s" then
     return value
   elseif type == "t" then
-    return proxy (value)
+    return Reference.new (value)
   end
 end
 
@@ -70,7 +82,7 @@ end
 -- =====
 
 local Store_mt = {
-  __mode = "v",
+  __mode = "kv",
 }
 
 function Store_mt:__index (resource)
@@ -93,24 +105,22 @@ local store = setmetatable ({}, Store_mt)
 local channel = "updates"
 local Resource_mt = {}
 
-function proxy (resource)
+function Resource_mt.new (resource)
   return setmetatable ({
     resource = resource,
+    data     = store [resource]
   }, Resource_mt)
 end
 
 function Resource_mt:__index (key)
-  if not rawget (self, "data") then
-    rawset (self, "data", store [self.resource])
+  local result = self.data [key]
+  if type (result) == "table" and getmetatable (result) == Reference then
+    result = Resource_mt.new (result.resource)
   end
-  print (key)
-  return self.data [key]
+  return result
 end
 
 function Resource_mt:__newindex (key, value)
-  if not rawget (self, "data") then
-    rawset (self, "data", store [self.resource])
-  end
   local client   = my_client ()
   local resource = self.resource
   local encode   = Format.encode
@@ -119,7 +129,6 @@ function Resource_mt:__newindex (key, value)
       resource = resource,
       key      = encode (key),
     }
-    value.resource = subresource
     local t = {}
     local s = {}
     for k, v in pairs (value) do
@@ -133,10 +142,11 @@ function Resource_mt:__newindex (key, value)
     if #t ~= 0 then
       client:hmset (subresource, table.unpack (t))
     end
-    local sub = proxy (subresource)
+    local sub = Resource_mt.new (subresource)
     for k, v in pairs (s) do
       sub [k] = v
     end
+    value = Reference.new (subresource)
   end
   client:hset    (resource, encode (key), encode (value))
   client:publish (channel, json.encode {
@@ -147,9 +157,16 @@ function Resource_mt:__newindex (key, value)
   self.data [key] = value
 end
 
+function Resource_mt:__tostring ()
+  return "[ ${resource} ]" % {
+    resource = self.resource
+  }
+end
+
 -- Updater
 -- =======
 
+--[[
 copas.addthread (function ()
   local c     = my_client ()
   local client = redis.connect {
@@ -169,15 +186,14 @@ copas.addthread (function ()
         print ("Received a lot of messages!")
       end
       local body = json.decode (message.payload)
-      if body.origin ~= origin then
-        local resource = body.resource
-        local data     = store [resource]
-        local key      = body.key
-        data [key] = decode (c:hget (resource, encode (key)))
-      end
+      local resource = body.resource
+      local data     = store [resource]
+      local key      = body.key
+      data [key] = decode (c:hget (resource, encode (key)))
     end
   end
 end)
+--]]
 
 -- Test
 -- ====
@@ -211,16 +227,16 @@ end
 
 local function do_read (i)
   local name = "user-${i}" % { i = i }
-  local p = proxy (cosy) [i]
-  for k = 1, nb_read do
+  local p = Resource_mt.new (cosy) [i]
+  for _ = 1, nb_read do
     assert (p.username == name)
   end
   finish ()
 end
 
 local function do_write (i)
-  local p = proxy (cosy) [i]
-  for k = 1, nb_write do
+  local p = Resource_mt.new (cosy) [i]
+  for _ = 1, nb_write do
     p.is_private = not p.is_private
   end
   finish ()
@@ -229,7 +245,7 @@ end
 --[[
 local function check_type ()
   do
-    local p = proxy ("aaaa")
+    local p = Resource_mt.new ("aaaa")
     p.a = "a"
     p.b = 1
     p.c = true
@@ -238,7 +254,7 @@ local function check_type ()
   end
   collectgarbage ()
   do
-    local p = proxy ("aaaa")
+    local p = Resource_mt.new ("aaaa")
     assert (type (p.a) == "string")
     assert (type (p.b) == "number")
     assert (type (p.c) == "boolean")
@@ -251,7 +267,7 @@ copas.addthread (check_type)
 --]]
 
 local function do_create (i)
-  local root = proxy (cosy)
+  local root = Resource_mt.new (cosy)
   root [i] = {
     username = "user-${i}" % { i = i },
     password = "toto",
@@ -259,13 +275,9 @@ local function do_create (i)
     email    = "user.${i}@gmail.com" % { i = i },
   }
   total = total + 1
-  copas.addthread (function ()
-    do_read (i)
-  end)
+  copas.addthread (function () do_read  (i) end)
   total = total + 1
-  copas.addthread (function ()
-    do_write (i)
-  end)
+  copas.addthread (function () do_write (i) end)
   finish ()
 end
 
