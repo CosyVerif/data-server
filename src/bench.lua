@@ -9,7 +9,7 @@ local port      = configuration.redis.port
 local db        = configuration.redis.database
 local cosy      = configuration.server.root
 
-local nb_create = 200
+local nb_create = 100
 local nb_read   = 1000
 local nb_write  = 500
 local nb_update = 200
@@ -61,7 +61,9 @@ local function do_read (i)
 end
 
 local function do_write (i)
-  local p = resource {} [i]
+  local p = resource {
+    username = "user-${i}" % { i = i }
+  } [i]
   for _ = 1, nb_write do
     p.is_private = not p.is_private
     copas.sleep (0)
@@ -70,7 +72,9 @@ local function do_write (i)
 end
 
 local function do_update (i)
-  local p = resource {} [i]
+  local p = resource {
+    username = "user-${i}" % { i = i }
+  } [i]
   for _ = 1, nb_update do
     p {
       password  = "pass",
@@ -85,7 +89,9 @@ local function do_update (i)
 end
 
 local function do_create (i)
-  local root = resource {}
+  local root = resource {
+    username = "username",
+  }
   root [i] = User.create {
     username = "user-${i}" % { i = i },
     password = "toto",
@@ -101,30 +107,10 @@ local function do_create (i)
   finish ()
 end
 
-do
-  local client = redis.connect {
-    host      = "127.0.0.1",
-    port      = 6379,
-    use_copas = false,
-  }
-  client:select (db)
-  client:flushdb ()
-end
-
 copas.addthread (function ()
-  local client = redis.connect ({
-    host      = host,
-    port      = port,
-    use_copas = false,
-    timeout   = 0.1
-  })
-  client:select (db)
-  client:flushdb ()
   total = total + nb_create
   for i = 1, nb_create do
-    copas.addthread (function ()
-      do_create (i)
-    end)
+    copas.addthread (function () do_create (i) end)
   end
 end)
 

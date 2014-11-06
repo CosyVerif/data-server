@@ -118,26 +118,51 @@ local store = setmetatable ({}, Store)
 local Resource = {}
 
 function Resource.new (context, resource)
+  local data        = store [resource]
+  local new_context = {}
+  for k, v in pairs (context) do
+    new_context [k] = v
+  end
+  new_context.is_owner  = data.is_owner  and data:is_owner  (context) or context.is_owner
+  new_context.can_read  = data.can_read  and data:can_read  (context) or context.can_read
+  new_context.can_write = data.can_write and data:can_write (context) or context.can_write
   return setmetatable ({
-    context  = context,
-    resource = resource,
-    data     = store [resource]
+    context   = new_context,
+    resource  = resource,
+    data      = data,
   }, Resource)
 end
 
 function Resource:__index (key)
-  local result = self.data [key]
+  local context  = self.context
+  local resource = self.resource
+  local data     = self.data
+  if not context.can_read then
+    error {
+      code     = 403,
+      message  = "Forbidden",
+      resource = resource,
+    }
+  end
+  local result = data [key]
   if type (result) == "table" and getmetatable (result) == Reference then
-    result = Resource.new (self.context, result.resource)
+    result = Resource.new (context, result.resource)
   end
   return result
 end
 
 function Resource:__newindex (key, value)
-  local client   = Client:get ()
   local context  = self.context
   local resource = self.resource
   local data     = self.data
+  if not context.can_write then
+    error {
+      code     = 403,
+      message  = "Forbidden",
+      resource = resource,
+    }
+  end
+  local client   = Client:get ()
   local encode   = Format.encode
   if type (value) == "table" then
     local subresource = "${resource}/${key}" % {
@@ -178,10 +203,17 @@ function Resource:__newindex (key, value)
 end
 
 function Resource:__call (changes)
-  local client   = Client:get ()
   local context  = self.context
   local resource = self.resource
   local data     = self.data
+  if not context.can_write then
+    error {
+      code     = 403,
+      message  = "Forbidden",
+      resource = resource,
+    }
+  end
+  local client   = Client:get ()
   local encode   = Format.encode
   assert (type (changes) == "table")
   local keys = {}
@@ -258,6 +290,27 @@ copas.addthread (function ()
     end
   end
 end)
+
+-- Root Resource
+-- =============
+
+do
+  local Root = require "cosy.server.resource.root"
+  local client = redis.connect ({
+    host      = host,
+    port      = port,
+    use_copas = false,
+    timeout   = 0.1
+  })
+  client:select (db)
+  local encode = Format.encode
+  local r = Root.create ()
+  for k, v in pairs (r) do
+    if not client:hexists (root, k) then
+      client:hset (root, encode (k), encode (v))
+    end
+  end
+end
 
 return function (context)
   return Resource.new (context, root)

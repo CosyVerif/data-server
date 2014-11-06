@@ -20,9 +20,21 @@ function User.create (t)
     fullname       = t.fullname,
     email          = t.email,
     validation_key = generate_key (),
-    is_active      = false,
-    is_public      = true,
+    is_active      = configuration.defaults.active,
+    is_public      = configuration.defaults.user:lower () == "public",
   }
+end
+
+function User:is_owner (context)
+  return self.username == context.username
+end
+
+function User:can_read (context)
+  return self.is_public
+end
+
+function User:can_write (context)
+  return self.username == context.username
 end
 
 --local haricot = require "haricot"
