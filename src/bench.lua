@@ -9,17 +9,19 @@ local port      = configuration.redis.port
 local db        = configuration.redis.database
 local cosy      = configuration.server.root
 
-local nb_create = 100
-local nb_read   = 1000
-local nb_write  = 500
-local nb_update = 200
-local finished  = 0
-local total     = 0
+local nb_create  =  100
+local nb_read    = 1000
+local nb_write   =  500
+local nb_update  =  200
+local nb_iterate =   50
+local finished   = 0
+local total      = 0
 
-print ("# create: " .. tostring (nb_create))
-print ("# update: " .. tostring (nb_update * nb_create))
-print ("# write : " .. tostring (nb_write  * nb_create))
-print ("# read  : " .. tostring (nb_read   * nb_create))
+print ("# create : " .. tostring (nb_create))
+print ("# iterate: " .. tostring (nb_iterate * nb_create))
+print ("# update : " .. tostring (nb_update  * nb_create))
+print ("# write  : " .. tostring (nb_write   * nb_create))
+print ("# read   : " .. tostring (nb_read    * nb_create))
 
 local start_time = os.time ()
 
@@ -88,6 +90,19 @@ local function do_update (i)
   finish ()
 end
 
+local function do_iterate (i)
+  local p = resource {
+    username = "user-${i}" % { i = i }
+  } [i]
+  for _ = 1, nb_iterate do
+    for k, v in pairs (p) do
+      copas.sleep (0)
+    end
+  end
+  finish ()
+end
+
+
 local function do_create (i)
   local root = resource {
     username = "username",
@@ -99,11 +114,13 @@ local function do_create (i)
     email    = "user.${i}@gmail.com" % { i = i },
   }
   total = total + 1
-  copas.addthread (function () do_read  (i) end)
+  copas.addthread (function () do_read    (i) end)
   total = total + 1
-  copas.addthread (function () do_write (i) end)
+  copas.addthread (function () do_write   (i) end)
   total = total + 1
-  copas.addthread (function () do_update (i) end)
+  copas.addthread (function () do_update  (i) end)
+  total = total + 1
+  copas.addthread (function () do_iterate (i) end)
   finish ()
 end
 

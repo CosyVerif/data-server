@@ -137,16 +137,15 @@ function Resource:__index (key)
   local context  = self.context
   local resource = self.resource
   local data     = self.data
-  if not context.can_read then
-    error {
-      code     = 403,
-      message  = "Forbidden",
-      resource = resource,
-    }
-  end
   local result = data [key]
   if type (result) == "table" and getmetatable (result) == Reference then
-    result = Resource.new (context, result.resource)
+    return Resource.new (context, result.resource)
+  elseif not context.can_read then
+      error {
+        code     = 403,
+        message  = "Forbidden",
+        resource = resource,
+      }
   end
   return result
 end
@@ -249,6 +248,28 @@ function Resource:__call (changes)
       assert (false)
     end
   end
+end
+
+function Resource:__ipairs ()
+  local data = self.data
+  return coroutine.wrap (function ()
+    for k, v in ipairs (data) do
+      if type (v) ~= "function" then
+        coroutine.yield (k, self [k])
+      end
+    end
+  end)
+end
+
+function Resource:__pairs ()
+  local data = self.data
+  return coroutine.wrap (function ()
+    for k, v in pairs (data) do
+      if type (v) ~= "function" then
+        coroutine.yield (k, self [k])
+      end
+    end
+  end)
 end
 
 function Resource:__tostring ()
