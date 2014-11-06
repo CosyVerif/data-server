@@ -11,18 +11,23 @@ local cosy      = configuration.server.root
 local nb_create = 200
 local nb_read   = 1000
 local nb_write  = 500
+local nb_update = 200
 local finished  = 0
 local total     = 0
 
 print ("# create: " .. tostring (nb_create))
+print ("# update: " .. tostring (nb_update * nb_create))
 print ("# write : " .. tostring (nb_write * nb_create))
 print ("# read  : " .. tostring (nb_read  * nb_create))
 
 local start_time = os.time ()
 
 local function finish ()
+  io.write "."
+  io.flush ()
   finished = finished + 1
   if finished == total then
+    print ""
     local client = redis.connect ({
       host      = host,
       port      = port,
@@ -49,7 +54,7 @@ local function do_read (i)
   local p = resource {} [i]
   for _ = 1, nb_read do
     assert (p.username == name)
-    copas.sleep (0.0001)
+    copas.sleep (0)
   end
   finish ()
 end
@@ -58,7 +63,22 @@ local function do_write (i)
   local p = resource {} [i]
   for _ = 1, nb_write do
     p.is_private = not p.is_private
-    copas.sleep (0.0001)
+    copas.sleep (0)
+  end
+  finish ()
+end
+
+local function do_update (i)
+  local p = resource {} [i]
+  for _ = 1, nb_update do
+    p {
+      password  = "pass",
+      some_key  = true,
+      some_data = {
+        x = 1,
+      },
+    }
+    copas.sleep (0)
   end
   finish ()
 end
@@ -75,6 +95,8 @@ local function do_create (i)
   copas.addthread (function () do_read  (i) end)
   total = total + 1
   copas.addthread (function () do_write (i) end)
+  total = total + 1
+  copas.addthread (function () do_update (i) end)
   finish ()
 end
 

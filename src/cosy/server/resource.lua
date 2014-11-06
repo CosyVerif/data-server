@@ -130,6 +130,7 @@ function Resource:__newindex (key, value)
   local client   = Client:get ()
   local context  = self.context
   local resource = self.resource
+  local data     = self.data
   local encode   = Format.encode
   if type (value) == "table" then
     local subresource = "${resource}/${key}" % {
@@ -147,7 +148,10 @@ function Resource:__newindex (key, value)
       end
     end
     if #t ~= 0 then
+--      client:transaction (function (c)
+      client:del   (subresource)
       client:hmset (subresource, table.unpack (t))
+--      end)
     end
     local sub = Resource.new (context, subresource)
     for k, v in pairs (s) do
@@ -155,13 +159,57 @@ function Resource:__newindex (key, value)
     end
     value = Reference.new (subresource)
   end
+--  client:transaction (function (c)
   client:hset    (resource, encode (key), encode (value))
   client:publish (channel, json.encode {
     origin   = uuid,
     resource = resource,
-    key      = key,
+    keys     = { key },
   })
-  self.data [key] = value
+--  end)
+  data [key] = value
+end
+
+function Resource:__call (changes)
+  local client   = Client:get ()
+  local context  = self.context
+  local resource = self.resource
+  local data     = self.data
+  local encode   = Format.encode
+  assert (type (changes) == "table")
+  local keys = {}
+  local t = {}
+  local s = {}
+  for k, v in pairs (changes) do
+    keys [#keys + 1] = encode (k)
+    if type (v) == "table" then
+      s [k] = v
+    else
+      t [#t + 1] = encode (k)
+      t [#t + 1] = encode (v)
+      data [k] = v
+    end
+  end
+  if #t ~= 0 then
+--    client:transaction (function (c)
+    client:hmset (resource, table.unpack (t))
+    client:publish (channel, json.encode {
+      origin   = uuid,
+      resource = resource,
+      keys     = keys,
+    })
+--    end)
+  end
+  for k, v in pairs (s) do
+    local sub = self [k]
+    if sub == nil then
+      self [k] = v
+    elseif type (sub) == "table" then
+      sub (v)
+    else
+      assert (false)
+    end
+  end
 end
 
 function Resource:__tostring ()
@@ -173,6 +221,7 @@ end
 -- Updater
 -- =======
 
+--[=[
 copas.addthread (function ()
   local c     = Client:get ()
   local client = redis.connect {
@@ -182,27 +231,28 @@ copas.addthread (function ()
     timeout   = 0,
   }
   client:select (db)
-  local count  = 0
   local encode = Format.encode
   local decode = Format.decode
   for message, _ in client:pubsub { subscribe = { channel } } do
     if message.kind == "message" then
-      count = count + 1
-      if count % 10000 == 0 then
-        print ("Received a lot of messages!")
-      end
       local body     = json.decode (message.payload)
       local resource = body.resource
-      local key      = body.key
+      local keys     = body.keys
       local data     = rawget (store, resource)
       if data then
-        local value = c:hget (resource, encode (key))
-        data [key]  = decode (value)
+        local ekeys = {}
+        for i, k in ipairs (keys) do
+          ekeys [i] = encode (k)
+        end
+        local values = c:hmget (resource, "nil", table.unpack (ekeys))
+        for i, v in ipairs (values) do
+          data [keys [i]] = decode (v)
+        end
       end
     end
   end
 end)
-
+--]=]
 return function (context)
   return Resource.new (context, root)
 end
