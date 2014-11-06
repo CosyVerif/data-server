@@ -99,6 +99,13 @@ function Store:__index (resource)
   for k, v in pairs (data) do
     result [decode (k)] = decode (v)
   end
+  local type = result.type
+  if type then
+    local class = require ("cosy.server.resource." .. type)
+    for k, v in pairs (class) do
+      result [k] = v
+    end
+  end
   self [resource] = result
   return result
 end
@@ -221,7 +228,6 @@ end
 -- Updater
 -- =======
 
---[=[
 copas.addthread (function ()
   local c     = Client:get ()
   local client = redis.connect {
@@ -252,7 +258,7 @@ copas.addthread (function ()
     end
   end
 end)
---]=]
+
 return function (context)
   return Resource.new (context, root)
 end

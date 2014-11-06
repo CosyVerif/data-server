@@ -1,7 +1,8 @@
 local redis         = require "redis"
 local copas         = require "copas"
-local resource      = require "cosy.server.resource"
 local configuration = require "cosy.server.configuration"
+local resource      = require "cosy.server.resource"
+local User          = require "cosy.server.resource.user"
 
 local host      = configuration.redis.host
 local port      = configuration.redis.port
@@ -85,7 +86,7 @@ end
 
 local function do_create (i)
   local root = resource {}
-  root [i] = {
+  root [i] = User.create {
     username = "user-${i}" % { i = i },
     password = "toto",
     fullname = "User ${i}" % { i = i },
