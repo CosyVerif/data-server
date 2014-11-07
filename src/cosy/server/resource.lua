@@ -1,36 +1,13 @@
 local _             = require "cosy.util.string"
 local configuration = require "cosy.server.configuration"
+local redis         = require "cosy.server.redis"
 local copas         = require "copas"
 local json          = require "cjson"
-local redis         = require "redis"
 
-local host = configuration.redis.host
-local port = configuration.redis.port
-local db   = configuration.redis.database
 local root = configuration.server.root
 local uuid = configuration.server.uuid
 
 local channel = "cosy-updates"
-
--- Redis
--- =====
-
-local Client = {}
-
-function Client:get ()
-  local id = coroutine.running ()
-  if not self [id] then
-    local result = redis.connect ({
-      host      = host,
-      port      = port,
-      use_copas = true,
-      timeout   = 0.1
-    })
-    result:select (db)
-    self [id] = result
-  end
-  return self [id]
-end
 
 -- Encode/Decoder
 -- ==============
@@ -92,7 +69,7 @@ local Store = {
 }
 
 function Store:__index (resource)
-  local client = Client:get ()
+  local client = redis:get ()
   local result = {}
   local data   = client:hgetall (resource)
   local decode = Format.decode
@@ -161,7 +138,7 @@ function Resource:__newindex (key, value)
       resource = resource,
     }
   end
-  local client   = Client:get ()
+  local client   = redis:get ()
   local encode   = Format.encode
   local action
   if value == nil then
@@ -225,7 +202,7 @@ function Resource:__call (changes)
       resource = resource,
     }
   end
-  local client   = Client:get ()
+  local client   = redis:get ()
   local encode   = Format.encode
   assert (type (changes) == "table")
   local keys = {}
@@ -296,17 +273,11 @@ end
 -- =======
 
 copas.addthread (function ()
-  local c     = Client:get ()
-  local client = redis.connect {
-    host      = "127.0.0.1",
-    port      = 6379,
-    use_copas = true,
-    timeout   = 0,
-  }
-  client:select (db)
+  local client = redis:get ()
+  local sub    = redis:sub ()
   local encode = Format.encode
   local decode = Format.decode
-  for message, _ in client:pubsub { subscribe = { channel } } do
+  for message, _ in sub:pubsub { subscribe = { channel } } do
     if message.kind == "message" then
       local body     = json.decode (message.payload)
       local resource = body.resource
@@ -317,7 +288,7 @@ copas.addthread (function ()
         for i, k in ipairs (keys) do
           ekeys [i] = encode (k)
         end
-        local values = c:hmget (resource, "nil", table.unpack (ekeys))
+        local values = client:hmget (resource, "nil", table.unpack (ekeys))
         for i, v in ipairs (values) do
           data [keys [i]] = decode (v)
         end
@@ -331,13 +302,7 @@ end)
 
 do
   local Root = require "cosy.server.resource.root"
-  local client = redis.connect ({
-    host      = host,
-    port      = port,
-    use_copas = false,
-    timeout   = 0.1
-  })
-  client:select (db)
+  local client = redis:get (true)
   local encode = Format.encode
   local r = Root.create ()
   for k, v in pairs (r) do
