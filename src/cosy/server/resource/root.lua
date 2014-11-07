@@ -21,4 +21,8 @@ function Root:can_write (context)
   return context.username ~= nil
 end
 
+function Root:get (context)
+  
+end
+
 return Root

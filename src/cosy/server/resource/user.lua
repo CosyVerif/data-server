@@ -37,6 +37,10 @@ function User:can_write (context)
   return self.username == context.username
 end
 
+function check_password (password)
+  return bcrypt.verify (password, self.password)
+end
+
 --local haricot = require "haricot"
 --local bs = haricot.new("localhost", 11300)
 
