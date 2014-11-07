@@ -169,7 +169,7 @@ function Resource:__newindex (key, value)
   elseif client:hexists (resource, encode (key)) then
     action = "update"
   else
-    action = create
+    action = "insert"
   end
   if type (value) == "table" then
     local subresource = "${resource}/${key}" % {
