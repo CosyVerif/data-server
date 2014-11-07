@@ -163,6 +163,14 @@ function Resource:__newindex (key, value)
   end
   local client   = Client:get ()
   local encode   = Format.encode
+  local action
+  if value == nil then
+    action = "delete"
+  elseif client:hexists (resource, encode (key)) then
+    action = "update"
+  else
+    action = create
+  end
   if type (value) == "table" then
     local subresource = "${resource}/${key}" % {
       resource = resource,
@@ -191,10 +199,15 @@ function Resource:__newindex (key, value)
     value = Reference.new (subresource)
   end
 --  client:transaction (function (c)
-  client:hset    (resource, encode (key), encode (value))
+  if action == "delete" then
+    client:hdel (resource, encode (key))
+  else
+    client:hset (resource, encode (key), encode (value))
+  end
   client:publish (channel, json.encode {
     origin   = uuid,
     resource = resource,
+    action   = action,
     keys     = { key },
   })
 --  end)
