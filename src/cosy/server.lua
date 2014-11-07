@@ -3,9 +3,17 @@ local resource      = require "cosy.server.resource"
 local _             = require "cosy.util.string"
 local copas         = require "copas"
 local socket        = require "socket"
---local ssl           = require "ssl"
-local base64        = require "base64"
+local mime          = require "mime"
 local json          = require "cjson"
+local crypto        = require "crypto"
+--local ssl           = require "ssl"
+
+local base64 = {}
+base64.encode = mime.b64
+base64.decode = mime.unb64
+local sha1 = function (s)
+  return crypto.digest ("sha1", s, true)
+end
 
 local host   = configuration.server.host
 local port   = configuration.server.port
@@ -19,7 +27,8 @@ Context.__index = Context
 
 function Context.new (skt)
   return setmetatable ({
-    skt     = skt,
+    raw_skt = skt,
+    skt     = copas.wrap (skt),
     request  = {
       method   = nil,
       resource = nil,
@@ -154,33 +163,55 @@ function Context:identify ()
   end
 end
 
---[=[
-local function handler (skt)
-  skt = copas.wrap (skt)
-  while true do
-    local context = Context.new (skt)
-    print "before receive"
-    context:receive  ()
-    print "before identity"
-    context:identify ()
-    print "after identity"
-    context:send ()
-    print "after send"
-    context:flush ()
+-- WebSocket
+-- =========
+--
+-- Code partially taken from https://github.com/lipp/lua-websockets
+
+local ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+
+function Context:websocket ()
+  local headers = self.request.headers
+  if not headers.connection or headers.connection:lower () ~= "upgrade"
+  or not headers.upgrade    or headers.upgrade ~= "websocket" then
+    return
   end
+  local key       = headers.sec_websocket_key
+  local version   = headers.sec_websocket_version
+  local protocols = headers.sec_websocket_protocol
+  if not key then
+    error {
+      code = 400,
+      message = "Bad Request",
+      reason  = "header Sec-WebSocket-Key is missing",
+    }
+  end
+  self.response = {
+    code    = 101,
+    message = "Switching Protocols",
+    headers = {
+      upgrade    = "websocket",
+      connection = "upgrade",
+      sec_websocket_accept   = base64.encode (sha1 (key .. ws_guid)),
+      sec_websocket_protocol = "cosy",
+    },
+  }
+  self:send ()
 end
---]=]
+
 local function handler (skt)
-  skt = copas.wrap (skt)
   while true do
     local context = Context.new (skt)
     local function perform ()
       local ok, r = pcall (function ()
-        context:receive  ()
-        context:identify ()
+        context:receive   ()
+        context:identify  ()
+        context:websocket ()
+        context.response.code    = 200
+        context.response.message = "OK"
       end)
       if not ok then
-        print ("Error:", r)
+--        print ("Error:", r)
         context.response.code    = r.code
         context.response.message = r.message
         context.response.body    = r.reason .. "\r\n"
@@ -189,11 +220,12 @@ local function handler (skt)
     end
     local ok, err = pcall (perform)
     if not ok then
-      print ("Error:", err)
+--      print ("Error:", err)
       context.response.code    = 500
       context.response.message = "Internal Server Error"
       context.response.headers.connection = "close"
       context:send ()
+      context.raw_skt:shutdown ()
       break
     end
     context:flush ()
