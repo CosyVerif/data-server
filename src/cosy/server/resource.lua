@@ -247,6 +247,7 @@ function Resource:__call (changes)
     client:publish (channel, json.encode {
       origin   = uuid,
       resource = resource,
+      action   = "update",
       keys     = keys,
     })
 --    end)
