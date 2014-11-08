@@ -3,6 +3,7 @@ local resource      = require "cosy.server.resource"
 local _             = require "cosy.util.string"
 local copas         = require "copas"
 local socket        = require "socket"
+local url           = require "socket.url"
 local mime          = require "mime"
 local json          = require "cjson"
 local crypto        = require "crypto"
@@ -15,8 +16,8 @@ local sha1 = function (s)
   return crypto.digest ("sha1", s, true)
 end
 
-local host   = configuration.server.host
-local port   = configuration.server.port
+local host  = configuration.server.host
+local port  = configuration.server.port
 
 -- HTTP
 -- ====
@@ -30,10 +31,11 @@ function Context.new (skt)
     raw_skt = skt,
     skt     = copas.wrap (skt),
     request  = {
-      method   = nil,
-      resource = nil,
-      headers  = {},
-      body     = nil, -- iterator function
+      method     = nil,
+      resource   = nil,
+      headers    = {},
+      parameters = {},
+      body       = nil, -- iterator function
     },
     response = {
       code    = nil,
@@ -46,26 +48,55 @@ function Context.new (skt)
 end
 
 function Context:receive ()
-  local skt       = self.skt
-  local request   = self.request
-  local headers   = request.headers
-  local firstline = skt:receive "*l"
-  local method, resource = firstline:match "(%a+)%s+(%S)%s+HTTP/1.1"
-  if not method or not resource then
+  local skt        = self.skt
+  local request    = self.request
+  local headers    = request.headers
+  local parameters = request.parameters
+  local firstline  = skt:receive "*l"
+  -- Extract method:
+  local method, query = firstline:match "^(%a+)%s+(%S+)%s+HTTP/1.1"
+  if not method or not query then
     error {
       code    = 400,
       message = "Bad Request",
     }
   end
   request.method   = method:lower ()
-  request.resource = resource
+  local parsed     = url.parse (query)
+  request.resource = url.parse_path (parsed.path)
+  -- Extract headers:
   while true do
     local line = skt:receive "*l"
     if line == "" then
       break
     end
-    local name, value = line:match "([a-zA-Z%-]+):%s*(.*)"
-    headers [name:lower ():gsub ("-", "_")] = value
+    local name, value = line:match "([^:]+):%s*(.*)"
+    name  = name:trim ():lower ():gsub ("-", "_")
+    value = value:trim ()
+    headers [name] = value
+  end
+  -- Extract body:
+  local length  = headers.content_length
+  local chunked = headers.transfer_encoding:lower () == "chunked"
+  if length then
+    request.body = skt:receive (tonumber (length)):trim ()
+  elseif chunked then
+    local body = ""
+    repeat
+      local size = tonumber (skt:receive "*l")
+      body = body .. skt:receive (size)
+    until size == 0
+  end
+  -- Extract parameters:
+  local params = parsed.query or ""
+  if request.method == "post" then
+    params = params .. "&" .. request.body
+  end
+  for p in params:gmatch "([^;&]+)" do
+    local k, v = p:match "([^=]+)=(.*)"
+    k = url.unescape (k):gsub ("+", " ")
+    v = url.unescape (v):gsub ("+", " ")
+    parameters [k] = v
   end
 end
 
@@ -94,7 +125,7 @@ function Context:send ()
     body = json.encode (body)
     response.headers.content_length = #(body)
   elseif type (body) == "function" then
-    -- TODO
+    response.headers.transfer_encoding = "chunked"
   else
     assert (false)
   end
@@ -112,7 +143,9 @@ function Context:send ()
     skt:send (body)
   elseif type (body) == "function" then
     for s in body () do
-      skt:send (s) -- FIXME
+      local data = tostring (s)
+      skt:send (#data .. "\r\n")
+      skt:send (data)
     end
   end
 end
@@ -207,11 +240,12 @@ local function handler (skt)
         context:receive   ()
         context:identify  ()
         context:websocket ()
+
         context.response.code    = 200
         context.response.message = "OK"
       end)
       if not ok then
---        print ("Error:", r)
+        print ("Error:", r)
         context.response.code    = r.code
         context.response.message = r.message
         context.response.body    = r.reason .. "\r\n"
@@ -220,7 +254,7 @@ local function handler (skt)
     end
     local ok, err = pcall (perform)
     if not ok then
---      print ("Error:", err)
+      print ("Error:", err)
       context.response.code    = 500
       context.response.message = "Internal Server Error"
       context.response.headers.connection = "close"
