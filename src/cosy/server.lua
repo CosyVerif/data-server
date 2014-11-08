@@ -16,6 +16,8 @@ local sha1 = function (s)
   return crypto.digest ("sha1", s, true)
 end
 
+local exit_thread = {}
+
 local host  = configuration.server.host
 local port  = configuration.server.port
 
@@ -31,18 +33,19 @@ function Context.new (skt)
     raw_skt = skt,
     skt     = copas.wrap (skt),
     request  = {
+      protocol   = nil,
       method     = nil,
       resource   = nil,
       headers    = {},
       parameters = {},
-      body       = nil, -- iterator function
+      body       = nil,
     },
     response = {
       code    = nil,
       message = nil,
       reason  = nil,
       headers = {},
-      body    = nil, -- iterator function
+      body    = nil,
     },
   }, Context)
 end
@@ -50,21 +53,21 @@ end
 function Context:receive ()
   local skt        = self.skt
   local request    = self.request
-  local headers    = request.headers
-  local parameters = request.parameters
   local firstline  = skt:receive "*l"
   -- Extract method:
-  local method, query = firstline:match "^(%a+)%s+(%S+)%s+HTTP/1.1"
-  if not method or not query then
+  local method, query, protocol = firstline:match "^(%a+)%s+(%S+)%s+(%S+)"
+  if not method or not query or not protocol then
     error {
       code    = 400,
       message = "Bad Request",
     }
   end
+  request.protocol = protocol
   request.method   = method:lower ()
   local parsed     = url.parse (query)
   request.resource = url.parse_path (parsed.path)
   -- Extract headers:
+  local headers    = request.headers
   while true do
     local line = skt:receive "*l"
     if line == "" then
@@ -73,11 +76,11 @@ function Context:receive ()
     local name, value = line:match "([^:]+):%s*(.*)"
     name  = name:trim ():lower ():gsub ("-", "_")
     value = value:trim ()
-    headers [name] = value
+    headers [name] = value -- FIXME: very slow, why?
   end
   -- Extract body:
   local length  = headers.content_length
-  local chunked = headers.transfer_encoding:lower () == "chunked"
+  local chunked = (headers.transfer_encoding or ""):lower () == "chunked"
   if length then
     request.body = skt:receive (tonumber (length)):trim ()
   elseif chunked then
@@ -88,6 +91,7 @@ function Context:receive ()
     until size == 0
   end
   -- Extract parameters:
+  local parameters = request.parameters
   local params = parsed.query or ""
   if request.method == "post" then
     params = params .. "&" .. request.body
@@ -102,14 +106,16 @@ end
 
 function Context:send ()
   local skt       = self.skt
+  local request   = self.request
   local response  = self.response
   local headers   = response.headers
   local body      = response.body
   assert (response.code)
   -- Send prefix:
-  local firstline = "HTTP/1.1 ${code} ${message}\r\n" % {
-    code    = response.code,
-    message = response.message,
+  local firstline = "${protocol} ${code} ${message}\r\n" % {
+    protocol = request.protocol,
+    code     = response.code,
+    message  = response.message,
   }
   skt:send (firstline)
   -- Cleanup body and compute content-length:
@@ -130,6 +136,18 @@ function Context:send ()
     assert (false)
   end
   -- Send headers:
+  local close = false
+  if request.protocol == "HTTP/1.0" then
+    close = true
+  end
+  local connection = (request.headers.connection or ""):lower ()
+  if connection == "keep-alive" then
+    response.headers.connection = "keep-alive"
+    close = false
+  elseif connection == "close" then
+    reponse.headers.connection = "close"
+    close = true
+  end
   for k, v in pairs (headers) do
     local header = "${name}: ${value}\r\n" % {
       name  = k:gsub ("_", "-"),
@@ -148,11 +166,10 @@ function Context:send ()
       skt:send (data)
     end
   end
-end
-
-function Context:flush ()
-  local skt = self.skt
-  skt:flush ()
+  -- Close if required:
+  if close then
+    error (exit_thread)
+  end
 end
 
 -- Authentication
@@ -245,24 +262,25 @@ local function handler (skt)
         context.response.message = "OK"
       end)
       if not ok then
-        print ("Error:", r)
+--        print ("Error:", r)
         context.response.code    = r.code
-        context.response.message = r.message
-        context.response.body    = r.reason .. "\r\n"
+        context.response.message = (r.message or "")
+        context.response.body    = (r.reason  or "") .. "\r\n"
       end
       context:send ()
     end
     local ok, err = pcall (perform)
     if not ok then
-      print ("Error:", err)
-      context.response.code    = 500
-      context.response.message = "Internal Server Error"
-      context.response.headers.connection = "close"
-      context:send ()
+      if err ~= exit_thread then
+--        print ("Error:", err)
+        context.response.code    = 500
+        context.response.message = "Internal Server Error"
+        context.response.headers.connection = "close"
+        context:send ()
+      end
       context.raw_skt:shutdown ()
       break
     end
-    context:flush ()
   end
 end
 
