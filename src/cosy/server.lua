@@ -178,6 +178,8 @@ end
 
 -- Authentication
 -- ==============
+--
+-- TODO: use JSON Web Tokens
 
 local identities = setmetatable ({}, { __mode = "kv" })
 
@@ -217,6 +219,31 @@ function Context:identify ()
   end
 end
 
+-- Request
+-- =======
+
+function Context:answer ()
+  local request = self.request
+  local r       = resource (self)
+  for _, k in ipairs (request.resource) do
+    r = r [k]
+    if r == nil then
+      error {
+        code    = 404,
+        message = "Not Found",
+      }
+    end
+  end
+  local method = r [request.method]
+  if not method then
+    error {
+      code    = 405,
+      message = "Method Not Allowed",
+    }
+  end
+  return method (r, self)
+end
+
 -- WebSocket
 -- =========
 --
@@ -251,7 +278,12 @@ function Context:websocket ()
     },
   }
   self:send ()
+  -- TODO
+  return true
 end
+
+-- HTTP Handler
+-- ============
 
 local function handler (skt)
   while true do
@@ -260,10 +292,9 @@ local function handler (skt)
       local ok, r = pcall (function ()
         context:receive   ()
         context:identify  ()
-        context:websocket ()
-
-        context.response.code    = 200
-        context.response.message = "OK"
+        if not context:websocket () then
+          context:answer ()
+        end
       end)
       if not ok then
 --        print ("Error:", r)

@@ -22,7 +22,20 @@ function Root:can_write (context)
 end
 
 function Root:get (context)
-  
+  local result = {}
+  for k, v in pairs (self) do
+    if type (v) == "table" and v.type then
+      result [#result + 1] = {
+        identifier = k,
+        is_owner   = v:is_owner  (context),
+        can_read   = v:can_read  (context),
+        can_write  = v:can_write (context),
+      }
+    end
+  end
+  context.response.code    = 200
+  context.response.message = "OK"
+  return result
 end
 
 return Root
