@@ -223,7 +223,8 @@ end
 -- =======
 
 function Context:answer ()
-  local request = self.request
+  local request  = self.request
+  local response = self.response
   local r       = resource (self)
   for _, k in ipairs (request.resource) do
     r = r [k]
@@ -241,7 +242,12 @@ function Context:answer ()
       message = "Method Not Allowed",
     }
   end
-  return method (r, self)
+  local result = method (r, self)
+  if not response.code then
+    response.code = 200
+    response.message = "OK"
+  end
+  return result
 end
 
 -- WebSocket

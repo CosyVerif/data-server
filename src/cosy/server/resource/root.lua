@@ -33,8 +33,6 @@ function Root:get (context)
       }
     end
   end
-  context.response.code    = 200
-  context.response.message = "OK"
   return result
 end
 
