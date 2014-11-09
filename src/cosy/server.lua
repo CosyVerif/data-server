@@ -145,25 +145,29 @@ function Context:send ()
     response.headers.connection = "keep-alive"
     close = false
   elseif connection == "close" then
-    reponse.headers.connection = "close"
+    response.headers.connection = "close"
     close = true
   end
+  local to_send = {}
   for k, v in pairs (headers) do
-    local header = "${name}: ${value}\r\n" % {
+    to_send [#to_send + 1] = "${name}: ${value}" % {
       name  = k:gsub ("_", "-"),
       value = v,
     }
-    skt:send (header)
   end
-  skt:send "\r\n"
+  to_send [#to_send + 1] = ""
   -- Send body:
   if type (body) == "string" then
-    skt:send (body)
+    to_send [#to_send + 1] = body
+    skt:send (table.concat (to_send, "\r\n"))
   elseif type (body) == "function" then
+    skt:send (table.concat (to_send, "\r\n"))
     for s in body () do
       local data = tostring (s)
-      skt:send (#data .. "\r\n")
-      skt:send (data)
+      skt:send ("${size}\r\n${data}" % {
+        size = #data,
+        data = data,
+      })
     end
   end
   -- Close if required:
@@ -185,7 +189,7 @@ function Context:identify ()
     local username, password = decoded:match "(%w+):(.*)"
     -- Check validity:
     local cached = identities [username]
-    if not (cached and cached == password) then
+    if not cached or cached ~= password then
       local user = resource {} [username]
       if not user then
         error {
