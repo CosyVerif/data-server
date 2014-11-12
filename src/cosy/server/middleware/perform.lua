@@ -5,7 +5,7 @@ local Perform = {}
 function Perform.request (context)
   local request  = context.request
   local response = context.response
-  local r       = resource (context)
+  local r        = resource (context)
   for _, k in ipairs (request.resource) do
     r = r [k]
     if r == nil then
