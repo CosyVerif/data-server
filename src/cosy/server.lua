@@ -3,14 +3,9 @@ local resource      = require "cosy.server.resource"
 local _             = require "cosy.util.string"
 local copas         = require "copas"
 local socket        = require "socket"
-local mime          = require "mime"
 --local iconv         = require "iconv"
 --local utf8          = require "utf8"
 --local ssl           = require "ssl"
-
-local base64 = {}
-base64.encode = mime.b64
-base64.decode = mime.unb64
 
 local host  = configuration.server.host
 local port  = configuration.server.port
