@@ -1,5 +1,6 @@
 local json = require "cjson"
 local yaml = require "yaml"
+local url  = require "socket.url"
 
 local Content_Type = {}
 
@@ -17,6 +18,19 @@ function Content_Type.request (context)
   elseif ct.main_type == "application" and ct.sub_type == "lua"  then
     error {
       code    = 501,
+      message = "Not Implemented",
+    }
+  elseif ct.main_type == "application" and ct.sub_type == "x-www-form-urlencoded" then
+    body = {}
+    for p in request.body:gmatch "([^;&]+)" do
+      local k, v = p:match "([^=]+)=(.*)"
+      k = url.unescape (k):gsub ("+", " ")
+      v = url.unescape (v):gsub ("+", " ")
+      body [k] = v
+    end
+  elseif ct.main_type == "multipart" and ct.sub_type == "form-data" then
+    error {
+      code    = 502,
       message = "Not Implemented",
     }
   else

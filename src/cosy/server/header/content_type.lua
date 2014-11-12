@@ -6,7 +6,7 @@ local cache = setmetatable ({}, { __mode = "kv" })
 local Content_Type = {}
 
 function Content_Type.request (context)
-  local headers = context.request.haeders
+  local headers = context.request.headers
   local value   = headers.content_type
   local cached  = cache [value]
   if cached then
