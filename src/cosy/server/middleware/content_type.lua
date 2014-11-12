@@ -13,7 +13,7 @@ function Content_Type.request (context)
   if     ct.main_type == "application" and ct.sub_type == "json" then
     body = json.decode (request.body)
   elseif ct.main_type == "application" and ct.sub_type == "yaml" then
-    body = yaml.decode (request.body)
+    body = yaml.load (request.body)
   elseif ct.main_type == "application" and ct.sub_type == "lua"  then
     error {
       code    = 501,
@@ -64,7 +64,7 @@ function Content_Type.response (context)
         main_type = "application",
         sub_type  = "yaml",
       }
-      body = yaml.encode (response.body)
+      body = yaml.dump (response.body)
     elseif ct.main_type == "application" and ct.sub_type == "lua"  then
       response.headers.content_type = {
         main_type = "application",

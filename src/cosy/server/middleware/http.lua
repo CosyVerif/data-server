@@ -143,14 +143,16 @@ end
 
 function Http.error (context, err)
   if type (err) == "table" and err.code then
-    context.response         = {}
-    context.response.code    = err.code
-    context.response.message = (err.message or "")
-    context.response.body    = (err.reason  or "") .. "\r\n"
+    context.response = {
+      code    = err.code,
+      message = err.message or "",
+      body    = err.reason  or "",
+      headers = {},
+    }
     Http.response (context)
   else
-    context.continue         = false
-    context.response         = {
+    context.continue = false
+    context.response = {
       code    = 500,
       message = "Internal Server Error",
       headers = {
