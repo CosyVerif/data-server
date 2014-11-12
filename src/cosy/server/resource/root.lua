@@ -21,7 +21,7 @@ function Root:can_write (context)
   return context.username ~= nil
 end
 
-function Root:get (context)
+function Root:GET (context)
   local result = {}
   for k, v in pairs (self) do
     if type (v) == "table" and v.type then
