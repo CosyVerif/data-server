@@ -29,7 +29,7 @@ function User:is_owner (context)
   return self.username == context.username
 end
 
-function User:can_read (context)
+function User:can_read ()
   return self.is_public
 end
 
@@ -37,7 +37,7 @@ function User:can_write (context)
   return self.username == context.username
 end
 
-function check_password (password)
+function User:check_password (password)
   return bcrypt.verify (password, self.password)
 end
 

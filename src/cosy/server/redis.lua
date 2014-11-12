@@ -26,6 +26,7 @@ function Client:get (main)
 end
 
 function Client:sub (main)
+  local _      = self
   local result = redis.connect ({
     host      = host,
     port      = port,

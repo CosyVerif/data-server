@@ -9,15 +9,17 @@ function Root.create ()
   }
 end
 
-function Root:is_owner (context)
+function Root:is_owner ()
+  local _ = self
   return false
 end
 
-function Root:can_read (context)
+function Root:can_read ()
   return self.is_public
 end
 
 function Root:can_write (context)
+  local _ = self
   return context.username ~= nil
 end
 
