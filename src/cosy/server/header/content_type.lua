@@ -10,7 +10,7 @@ function Content_Type.request (context)
   local value   = headers.content_type
   local cached  = cache [value]
   if cached then
-    request.content_type = cached
+    headers.content_type = cached
     return
   end
   local main_type, sub_type = value:match (pair_pattern)
@@ -22,7 +22,7 @@ function Content_Type.request (context)
   for k, v in value:gmatch (parameter_pattern) do
     result.parameters [k] = v
   end
-  request.content_type = result
+  headers.content_type = result
   cache [value]        = result
 end
 
