@@ -1,6 +1,9 @@
-return function (context, value)
-  local skt     = context.skt
+local Transfer_Encoding = {}
+
+function Transfer_Encoding.request (context)
   local request = context.request
+  local value   = request.headers.transfer_encoding
+  local skt     = context.skt
   if value:lower () == "chunked" then
     local body = ""
     repeat
@@ -10,3 +13,5 @@ return function (context, value)
     request.body = body
   end
 end
+
+return Transfer_Encoding

@@ -7,8 +7,12 @@ base64.decode = mime.unb64
 
 local identities = setmetatable ({}, { __mode = "kv" })
 
-return function (context, authorization)
-  local encoded = authorization:match "%s*Basic (.+)%s*"
+local Authorization = {}
+
+function Authorization.request (context)
+  local headers = context.request.headers
+  local value   = headers.authorization
+  local encoded = value:match "%s*Basic (.+)%s*"
   local decoded = base64.decode (encoded)
   local username, password = decoded:match "(%w+):(.*)"
   -- Check validity:
@@ -39,3 +43,5 @@ return function (context, authorization)
   context.username = username
   context.password = password
 end
+
+return Authorization

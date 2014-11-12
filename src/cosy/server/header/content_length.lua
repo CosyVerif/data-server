@@ -1,10 +1,12 @@
             require "cosy.util.string"
 local url = require "socket.url"
 
-return function (context, length)
-  local skt     = context.skt
+local Content_Length = {}
+
+function Content_Length.request (context)
   local request = context.request
-  length        = tonumber (length)
+  local length  = tonumber (request.headers.length)
+  local skt     = context.skt
   request.body  = skt:receive (length):trim ()
   -- Extract parameters:
   if request.method == "POST" then
@@ -17,3 +19,8 @@ return function (context, length)
     end
   end
 end
+
+function Content_Length.response ()
+end
+
+return Content_Length

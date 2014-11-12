@@ -1,5 +1,4 @@
 local configuration = require "cosy.server.configuration"
-local resource      = require "cosy.server.resource"
 local _             = require "cosy.util.string"
 local copas         = require "copas"
 local socket        = require "socket"
@@ -10,42 +9,12 @@ local socket        = require "socket"
 local host  = configuration.server.host
 local port  = configuration.server.port
 
--- Request
--- =======
-
-local Perform = {}
-
-function Perform.call (context)
-  local request  = context.request
-  local response = context.response
-  local r       = resource (context)
-  for _, k in ipairs (request.resource) do
-    r = r [k]
-    if r == nil then
-      error {
-        code    = 404,
-        message = "Not Found",
-      }
-    end
-  end
-  local method = r [request.method]
-  if not method then
-    error {
-      code    = 405,
-      message = "Method Not Allowed",
-    }
-  end
-  response.body = method (r, context)
-  if not response.code then
-    response.code = 200
-    response.message = "OK"
-  end
-end
-
 -- Query Handler
 -- =============
 
-local Http = require "cosy.server.http"
+local Http         = require "cosy.server.middleware.http"
+local Content_Type = require "cosy.server.middleware.content_type"
+local Perform      = require "cosy.server.middleware.perform"
 
 local function new_context (skt)
   return {
@@ -70,6 +39,7 @@ local function new_context (skt)
     },
     onion = {
       Http,
+      Content_Type,
       Perform,
     },
   }
@@ -88,15 +58,12 @@ local function handler (skt)
         return
       end
       local result, err = pcall (function ()
-        if o.pre then
-          o.pre (context)
-        end
-        if o.call then
-          o.call (context)
+        if o.request then
+          o.request (context)
         end
         perform (i+1)
-        if o.post then
-          o.post (context)
+        if o.response then
+          o.response (context)
         end
       end)
       if not result then

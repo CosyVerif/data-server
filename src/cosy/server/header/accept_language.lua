@@ -3,15 +3,18 @@ local parameter_pattern = "%s*([^/=;,%s]+)%s*[=]%s*([^;,%s]+)%s*"
 
 local cache = setmetatable ({}, { __mode = "kv" })
 
-return function (context, value)
-  local request = context.request
+local Accept_Language = {}
+
+function Accept_Language.request (context)
+  local headers = context.request.headers
+  local value   = headers.accept_language
   local cached  = cache [value]
   if cached then
-    request.accept_language = cached
+    headers.accept_language = cached
     return
   end
   local accepts = {}
-  request.accept_language = accepts
+  headers.accept_language = accepts
   for part in value:gmatch "%s*([^,]+)" do
     local v = part:match (word_pattern)
     local result = {
@@ -30,3 +33,5 @@ return function (context, value)
   end)
   cache [value] = accepts
 end
+
+return Accept_Language

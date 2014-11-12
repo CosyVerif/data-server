@@ -3,15 +3,18 @@ local parameter_pattern = "%s*([^/=;,%s]+)%s*[=]%s*([^;,%s]+)%s*"
 
 local cache = setmetatable ({}, { __mode = "kv" })
 
-return function (context, value)
-  local request = context.request
+local Accept = {}
+
+function Accept.request (context)
+  local headers = context.request.headers
+  local value   = headers.accept
   local cached  = cache [value]
   if cached then
-    request.accept = cached
+    headers.accept = cached
     return
   end
   local accepts  = {}
-  request.accept = accepts
+  headers.accept = accepts
   for part in value:gmatch "%s*([^,]+)" do
     local main_type, sub_type = part:match (pair_pattern)
     local result = {
@@ -31,3 +34,5 @@ return function (context, value)
   end)
   cache [value] = accepts
 end
+
+return Accept

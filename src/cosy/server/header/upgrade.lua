@@ -11,9 +11,12 @@ end
 
 local ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
-return function (context, value)
+local Upgrade = {}
+
+function Upgrade.request (context)
   local request = context.request
   local headers = request.headers
+  local value   = headers.upgrade
   if not headers.connection or headers.connection:lower () ~= "upgrade"
   or value ~= "websocket" then
     error {
@@ -58,3 +61,5 @@ return function (context, value)
   context:send ()
   -- TODO
 end
+
+return Upgrade
