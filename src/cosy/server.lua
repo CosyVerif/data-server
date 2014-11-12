@@ -6,15 +6,13 @@ local socket        = require "socket"
 local url           = require "socket.url"
 local mime          = require "mime"
 local json          = require "cjson"
-local crypto        = require "crypto"
+local iconv         = require "iconv"
+local utf8          = require "utf8"
 --local ssl           = require "ssl"
 
 local base64 = {}
 base64.encode = mime.b64
 base64.decode = mime.unb64
-local sha1 = function (s)
-  return crypto.digest ("sha1", s, true)
-end
 
 local exit_thread = {}
 
@@ -64,6 +62,7 @@ function Context:receive ()
   end
   request.protocol = protocol
   request.method   = method:lower ()
+  request.query    = query
   local parsed     = url.parse (query)
   request.resource = url.parse_path (parsed.path)
   -- Extract headers:
@@ -76,23 +75,16 @@ function Context:receive ()
     local name, value = line:match "([^:]+):%s*(.*)"
     name  = name:trim ():lower ():gsub ("-", "_")
     value = value:trim ()
-    headers [name] = value -- FIXME: very slow, why?
+    headers [name] = value
   end
-  -- Extract body:
-  local length  = headers.content_length
-  local chunked = (headers.transfer_encoding or ""):lower () == "chunked"
-  if length then
-    request.body = skt:receive (tonumber (length)):trim ()
-  elseif chunked then
-    local body = ""
-    repeat
-      local size = tonumber (skt:receive "*l")
-      body = body .. skt:receive (size)
-    until size == 0
-  end
+end
+
+function Context:extract_parameters ()
   -- Extract parameters:
+  local request    = self.request
   local parameters = request.parameters
-  local params = parsed.query or ""
+  local parsed     = url.parse (request.query)
+  local params     = parsed.query or ""
   if request.method == "post" then
     params = params .. "&" .. request.body
   end
@@ -128,7 +120,7 @@ function Context:send ()
   elseif type (body) == "string" then
     response.headers.content_length = #(body)
   elseif type (body) == "table" then
-    body = json.encode (body)
+    body = json.encode (body) -- FIXME: convert to the correct format
     response.headers.content_length = #(body)
   elseif type (body) == "function" then
     response.headers.transfer_encoding = "chunked"
@@ -136,17 +128,14 @@ function Context:send ()
     assert (false)
   end
   -- Send headers:
-  local close = false
-  if request.protocol == "HTTP/1.0" then
-    close = true
-  end
-  local connection = (request.headers.connection or ""):lower ()
-  if connection == "keep-alive" then
-    response.headers.connection = "keep-alive"
-    close = false
-  elseif connection == "close" then
-    response.headers.connection = "close"
-    close = true
+  if not headers.connection then
+    if request.protocol == "HTTP/1.0" then
+      headers.connection = "close"
+    elseif request.protocol == "HTTP/1.1" then
+      headers.connection = "keep-alive"
+    else
+      assert (false)
+    end
   end
   local to_send = {}
   for k, v in pairs (headers) do
@@ -171,51 +160,23 @@ function Context:send ()
     end
   end
   -- Close if required:
-  if close then
+  if headers.connection == "close" then
     error (exit_thread)
   end
 end
 
--- Authentication
--- ==============
---
--- TODO: use JSON Web Tokens
-
-local identities = setmetatable ({}, { __mode = "kv" })
-
-function Context:identify ()
-  local request = self.request
-  if request.headers.authorization then
-    local encoded = request.headers.authorization:match "%s*Basic (.+)%s*"
-    local decoded = base64.decode (encoded)
-    local username, password = decoded:match "(%w+):(.*)"
-    -- Check validity:
-    local cached = identities [username]
-    if not cached or cached ~= password then
-      local user = resource {} [username]
-      if not user then
-        error {
-          code    = 401,
-          message = "Unauthorized",
-          reason  = "user does not exist",
-        }
-      elseif user.type ~= "user" then
-        error {
-          code    = 401,
-          message = "Unauthorized",
-          reason  = "entity is not a user",
-        }
-      elseif not user:check_password (password) then
-        error {
-          code    = 401,
-          message = "Unauthorized",
-          reason  = "password is erroneous",
-        }
-      end
-      identities [username] = password
+function Context:handle_headers ()
+  local headers = self.request.headers
+  for k, v in pairs (headers) do
+    local ok, handler = pcall (require, "cosy.server.header." .. k)
+    if not ok then
+      error {
+        code    = 412,
+        message = "Precondition Failed",
+        reason  = "unknown header: " .. k
+      }
     end
-    self.username = username
-    self.password = password
+    handler (self, v)
   end
 end
 
@@ -250,44 +211,6 @@ function Context:answer ()
   return result
 end
 
--- WebSocket
--- =========
---
--- Code partially taken from https://github.com/lipp/lua-websockets
-
-local ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
-
-function Context:websocket ()
-  local headers = self.request.headers
-  if not headers.connection or headers.connection:lower () ~= "upgrade"
-  or not headers.upgrade    or headers.upgrade ~= "websocket" then
-    return
-  end
-  local key       = headers.sec_websocket_key
-  local version   = headers.sec_websocket_version
-  local protocols = headers.sec_websocket_protocol
-  if not key then
-    error {
-      code = 400,
-      message = "Bad Request",
-      reason  = "header Sec-WebSocket-Key is missing",
-    }
-  end
-  self.response = {
-    code    = 101,
-    message = "Switching Protocols",
-    headers = {
-      upgrade    = "websocket",
-      connection = "upgrade",
-      sec_websocket_accept   = base64.encode (sha1 (key .. ws_guid)),
-      sec_websocket_protocol = "cosy",
-    },
-  }
-  self:send ()
-  -- TODO
-  return true
-end
-
 -- HTTP Handler
 -- ============
 
@@ -296,14 +219,13 @@ local function handler (skt)
     local context = Context.new (skt)
     local function perform ()
       local ok, r = pcall (function ()
-        context:receive   ()
-        context:identify  ()
-        if not context:websocket () then
-          context:answer ()
-        end
+        context:receive ()
+        context:handle_headers ()
+        context:extract_parameters ()
+        context:answer ()
       end)
       if not ok then
---        print ("Error:", r)
+        print ("Error:", r)
         context.response.code    = r.code
         context.response.message = (r.message or "")
         context.response.body    = (r.reason  or "") .. "\r\n"
@@ -313,7 +235,7 @@ local function handler (skt)
     local ok, err = pcall (perform)
     if not ok then
       if err ~= exit_thread then
---        print ("Error:", err)
+        print ("Error:", err)
         context.response.code    = 500
         context.response.message = "Internal Server Error"
         context.response.headers.connection = "close"
