@@ -12,7 +12,7 @@ function Http.request (context)
   local firstline  = skt:receive "*l"
   if firstline == nil then
     context.continue = false
-    return
+    error (true)
   end
   -- Extract method:
   local method, query, protocol = firstline:match "^(%a+)%s+(%S+)%s+(%S+)"
@@ -109,8 +109,8 @@ function Http.response (context)
     end
     handler.response (context)
   end
+  -- Send response:
   local to_send   = {}
-  -- Send prefix:
   to_send [1] = "${protocol} ${code} ${message}" % {
     protocol = response.protocol,
     code     = response.code,
@@ -123,7 +123,6 @@ function Http.response (context)
     }
   end
   to_send [#to_send + 1] = ""
-  -- Send body:
   if body == nil then
     skt:send (table.concat (to_send, "\r\n"))
   elseif type (body) == "string"   then

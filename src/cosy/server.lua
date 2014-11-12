@@ -9,9 +9,6 @@ local socket        = require "socket"
 local host  = configuration.server.host
 local port  = configuration.server.port
 
--- Query Handler
--- =============
-
 local Http         = require "cosy.server.middleware.http"
 local Content_Type = require "cosy.server.middleware.content_type"
 local Perform      = require "cosy.server.middleware.perform"
@@ -67,7 +64,8 @@ local function handler (skt)
         end
       end)
       if not result then
-        if o.error then
+        if err == true then
+        elseif o.error then
           o.error (context, err)
         else
           error (err)
