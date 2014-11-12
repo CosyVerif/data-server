@@ -15,7 +15,7 @@ local User = {}
 function User.create (t)
   return {
     type           = "user",
-    username       = t.username,
+    identifier     = t.identifier,
     password       = bcrypt.digest (t.password, rounds),
     fullname       = t.fullname,
     email          = t.email,
@@ -26,7 +26,7 @@ function User.create (t)
 end
 
 function User:is_owner (context)
-  return self.username == context.username
+  return self.identifier == context.identifier
 end
 
 function User:can_read ()
@@ -34,7 +34,7 @@ function User:can_read ()
 end
 
 function User:can_write (context)
-  return self.username == context.username
+  return self.identifier == context.identifier
 end
 
 function User:check_password (password)
