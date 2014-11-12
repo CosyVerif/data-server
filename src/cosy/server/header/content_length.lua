@@ -1,4 +1,5 @@
-require "cosy.util.string"
+            require "cosy.util.string"
+local url = require "socket.url"
 
 return function (context, length)
   local skt     = context.skt
