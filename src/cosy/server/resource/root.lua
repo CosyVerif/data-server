@@ -38,4 +38,17 @@ function Root:GET (context)
   return result
 end
 
+function Root:POST (context)
+  local request    = context.request
+  local response   = context.response
+  local parameters = request.body
+  local r_type     = parameters.type
+  local Resource   = require ("cosy.server.resource." .. r_type)
+  local result     = Resource.create (parameters)
+  self [result.identifier] = result
+  response.body    = result
+  response.code    = 201
+  response.message = "Created"
+end
+
 return Root
