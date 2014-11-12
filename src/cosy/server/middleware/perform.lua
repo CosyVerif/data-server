@@ -1,4 +1,4 @@
-local resource      = require "cosy.server.resource"
+local resource = require "cosy.server.resource"
 
 local Perform = {}
 
