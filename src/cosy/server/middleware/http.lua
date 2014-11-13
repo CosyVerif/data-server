@@ -102,7 +102,6 @@ end
 
 function Http.response (context)
   local skt       = context.skt
-  local request   = context.request
   local response  = context.response
   local headers   = response.headers
   local body      = response.body
