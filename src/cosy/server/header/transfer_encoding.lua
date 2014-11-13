@@ -14,7 +14,7 @@ function Transfer_Encoding.request (context)
     tokens [word:lower ():gsub ("-", "_")] = true
   end
   headers.transfer_encoding = tokens
-  -- 
+  --
   local skt = context.skt
   if tokens.chunked then
     local body = ""
@@ -23,7 +23,8 @@ function Transfer_Encoding.request (context)
       while not line or line == "" do
         line = skt:receive "*l"
       end
-      body = body .. skt:receive (tonumber (line))
+      local size = tonumber (line)
+      body = body .. skt:receive (size)
     until size == 0 or not size
     request.body = body
   end
