@@ -23,13 +23,23 @@ function Http.request (context)
     }
   end
   local request    = context.request
+  local response   = context.response
   request.protocol = protocol
   request.method   = method:upper ()
   request.query    = query
   local parsed     = url.parse (query)
   request.resource = url.parse_path (parsed.path)
+  -- Set default headers depending on protocol:
+  local headers     = request.headers
+  response.protocol = request.protocol
+  if protocol == "HTTP/1.0" then
+    headers.connection = "close"
+  elseif protocol == "HTTP/1.1" then
+    headers.connection = "keep-alive"
+  else
+    assert (false)
+  end
   -- Extract headers:
-  local headers    = request.headers
   while true do
     local line = skt:receive "*l"
     if line == "" then
@@ -50,6 +60,9 @@ function Http.request (context)
     parameters [k] = v
   end
   -- Handle headers:
+  local handled     = {}
+  local handlers    = {}
+  local nb_handlers = 0
   for k in pairs (headers) do
     local ok, handler = pcall (require, "cosy.server.header." .. k)
     if not ok then
@@ -62,7 +75,28 @@ function Http.request (context)
     if not handler.request then
       error ("No request for " .. k)
     end
-    handler.request (context)
+    handlers [k] = handler
+    nb_handlers = nb_handlers + 1
+  end
+  local count = 0
+  while count ~= nb_handlers do
+    for k, handler in pairs (handlers) do
+      if not handled [k] then
+        local missing = false
+        for _, k in ipairs (handler.depends or {}) do
+          k = k:lower ():gsub ("-", "_")
+          if headers [k] and not handled [k] then
+            missing = true
+            break
+          end
+        end
+        if not missing then
+          handler.request (context)
+          handled [k] = true
+          count       = count + 1
+        end
+      end
+    end
   end
 end
 
@@ -83,18 +117,8 @@ function Http.response (context)
   else
     assert (false)
   end
-  -- Set Connection:
-  response.protocol = request.protocol
-  if not headers.connection then
-    if response.protocol == "HTTP/1.0" then
-      headers.connection = "close"
-    elseif response.protocol == "HTTP/1.1" then
-      headers.connection = "keep-alive"
-    else
-      assert (false)
-    end
-  end
   -- Handle headers:
+  -- FIXME: use the same as in request
   for k in pairs (headers) do
     local ok, handler = pcall (require, "cosy.server.header." .. k)
     if not ok then
@@ -155,7 +179,7 @@ function Http.error (context, err)
       code    = 500,
       message = "Internal Server Error",
       headers = {
-        connection = "close"
+        connection = { ["close"] = true }
       },
     }
     Http.response (context)
