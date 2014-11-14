@@ -44,7 +44,7 @@ do
   local run = io.popen ("uuidgen", "r")
   local result = run:read "*all"
   run:close ()
-  configuration.server.uuid = result
+  configuration.server.uuid = result:trim ()
 end
 logger:info ("Generated uuid ${uuid}." % {
   uuid = configuration.server.uuid,
