@@ -31,7 +31,7 @@ function Http.request (context)
   request.resource = url.parse_path (parsed.path)
   -- Set default headers depending on protocol:
   local headers     = request.headers
-  response.protocol = request.protocol
+  response.protocol = protocol
   if protocol == "HTTP/1.0" then
     headers.connection = "close"
   elseif protocol == "HTTP/1.1" then
@@ -165,22 +165,15 @@ end
 
 function Http.error (context, err)
   if type (err) == "table" and err.code then
-    context.response = {
-      code    = err.code,
-      message = err.message or "",
-      body    = err.reason  or "",
-      headers = {},
-    }
+    context.response.code    = err.code
+    context.response.message = err.message or ""
+    context.response.body    = (err.reason  or "") .. "\r\r"
     Http.response (context)
   else
     context.continue = false
-    context.response = {
-      code    = 500,
-      message = "Internal Server Error",
-      headers = {
-        connection = { ["close"] = true }
-      },
-    }
+    context.response.code = 500
+    context.response.message = "Internal Server Error"
+    context.response.headers.connection = { close = true }
     Http.response (context)
     error (err)
   end
