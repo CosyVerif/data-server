@@ -18,22 +18,22 @@ function Root:can_read ()
   return self.is_public
 end
 
-function Root:can_write (context)
+function Root:can_write ()
   local _ = self
-  return context.username ~= nil
+  return true
 end
 
 function Root:GET (context)
+  print "GET"
   local result = {}
   for k, v in pairs (self) do
-    if type (v) == "table" and v.type then
-      result [#result + 1] = {
-        identifier = k,
-        is_owner   = v:is_owner  (context),
-        can_read   = v:can_read  (context),
-        can_write  = v:can_write (context),
-      }
-    end
+    result [#result + 1] = {
+      key        = k,
+      identifier = tostring (v),
+      is_owner   = v:is_owner  (context),
+      can_read   = v:can_read  (context),
+      can_write  = v:can_write (context),
+    }
   end
   return result
 end
