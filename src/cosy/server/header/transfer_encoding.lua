@@ -23,21 +23,10 @@ function Transfer_Encoding.request (context)
       while not line or line == "" do
         line = skt:receive "*l"
       end
-      local size = tonumber (line)
+      local size = tonumber (line, 16)
       body = body .. skt:receive (size)
     until size == 0 or not size
     request.body = body
-  end
-  if headers.connection and headers.connection.te then
-    repeat
-      local line = skt:receive "*l"
-      if line ~= "" then
-        local name, value = line:match "([^:]+):%s*(.*)"
-        name  = name:trim ():lower ():gsub ("-", "_")
-        value = value:trim ()
-        headers [name] = value
-      end
-    until line == ""
   end
 end
 

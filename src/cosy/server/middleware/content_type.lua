@@ -54,6 +54,9 @@ function Content_Type.response (context)
   local request  = context.request
   local response = context.response
   local accepts  = request.headers.accept
+  if response.body == nil then
+    response.body = {}
+  end
   local body = false
   for _, ct in ipairs (accepts) do
     if     ct.main_type == "*"           and ct.sub_type == "*"    then

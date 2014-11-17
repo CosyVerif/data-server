@@ -32,13 +32,6 @@ function Http.request (context)
   -- Set default headers depending on protocol:
   local headers     = request.headers
   response.protocol = protocol
-  if protocol == "HTTP/1.0" then
-    headers.connection = "close"
-  elseif protocol == "HTTP/1.1" then
-    headers.connection = "keep-alive"
-  else
-    assert (false)
-  end
   -- Extract headers:
   while true do
     local line = skt:receive "*l"
@@ -49,6 +42,23 @@ function Http.request (context)
     name  = name:trim ():lower ():gsub ("-", "_")
     value = value:trim ()
     headers [name] = value
+  end
+  -- Add protocol-specific headers:
+  if protocol == "HTTP/1.0" then
+    if not headers.connection then
+      headers.connection = "close"
+    end
+  elseif protocol == "HTTP/1.1" then
+    if not headers.connection then
+      headers.connection = "keep-alive"
+    end
+    if method == "POST" and
+      not headers.content_length and
+      not headers.transfer_encoding then
+      headers.transfer_encoding = "chunked"
+    end
+  else
+    assert (false)
   end
   -- Extract parameters:
   local parameters = request.parameters
@@ -114,6 +124,7 @@ function Http.response (context)
   elseif type (body) == "function" then
     response.headers.transfer_encoding = "chunked"
   else
+    print (type (body), body)
     assert (false)
   end
   -- Handle headers:
@@ -146,6 +157,7 @@ function Http.response (context)
     }
   end
   to_send [#to_send + 1] = ""
+  print (table.concat (to_send, "\r\n"))
   if body == nil then
     skt:send (table.concat (to_send, "\r\n"))
   elseif type (body) == "string"   then

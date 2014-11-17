@@ -24,7 +24,6 @@ function Root:can_write ()
 end
 
 function Root:GET (context)
-  print "GET"
   local result = {}
   for k, v in pairs (self) do
     result [#result + 1] = {
@@ -44,8 +43,7 @@ function Root:POST (context)
   local parameters = request.body
   local r_type     = parameters.type
   local Resource   = require ("cosy.server.resource." .. r_type)
-  local result     = Resource.create (parameters)
-  self [result.identifier] = result
+  local created    = self + Resource.new (parameters)
   response.body    = result
   response.code    = 201
   response.message = "Created"

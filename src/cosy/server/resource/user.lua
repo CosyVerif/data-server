@@ -12,7 +12,7 @@ end
 
 local User = {}
 
-function User.create (t)
+function User.new (t)
   return {
     type           = "user",
     identifier     = t.identifier,
@@ -39,6 +39,10 @@ end
 
 function User:check_password (password)
   return bcrypt.verify (password, self.password)
+end
+
+function User:DELETE (context)
+
 end
 
 --local haricot = require "haricot"

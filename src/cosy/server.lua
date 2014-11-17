@@ -6,8 +6,8 @@ local socket        = require "socket"
 --local utf8          = require "utf8"
 --local ssl           = require "ssl"
 
-local host  = configuration.server.host
-local port  = configuration.server.port
+local host = configuration.server.host
+local port = configuration.server.port
 
 local Http         = require "cosy.server.middleware.http"
 local Content_Type = require "cosy.server.middleware.content_type"

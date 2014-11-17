@@ -38,7 +38,7 @@ for _, filename in ipairs (paths) do
   end
 end
 logger:info "Loaded configuration."
-logger:debug (yaml.dump (configuration))
+--logger:debug (yaml.dump (configuration))
 
 do
   local run = io.popen ("uuidgen", "r")

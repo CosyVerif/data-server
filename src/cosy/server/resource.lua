@@ -12,8 +12,10 @@ local channel = "cosy-updates"
 --[[
 Each resource is represented as:
 resource:
-  "_parent:" "@resource"
+  "_parent": "@resource"
   "_properties": json
+  "_class": type
+  "_see": "@resource" (when moved)
   "sub": "@resource"
   "sub": "@resource"
 --]]
@@ -39,6 +41,29 @@ end
 
 local store = setmetatable ({}, Store)
 
+-- Context
+-- =======
+
+local Context = {}
+
+function Context.clone (context)
+  local result = setmetatable ({}, getmetatable (context))
+  for k, v in pairs (context) do
+    if type (v) == "table" then
+      result [k] = Context.clone (v)
+    else
+      result [k] = v
+    end
+  end
+  return result
+end
+
+function Context.new (c)
+  return setmetatable ({}, {
+    __index = c,
+  })
+end
+
 -- Resource
 -- ========
 
@@ -46,11 +71,10 @@ local Resource = {}
 
 local Properties = {}
 
-Resource.__index = Resource
-
-function Resource.root (context)
-  local data   = store [root_id]
-  local class  = data._class
+function Resource.root (c)
+  local data    = store [root_id]
+  local class   = data._class
+  local context = Context.new (c)
   local result = setmetatable ({
     _id       = root_id,
     _context  = context,
@@ -64,26 +88,16 @@ function Resource.root (context)
 end
 
 function Resource:__add (t)
-  local id     = self._id
-  if Resource.exists (self) then
-    error {
-      code    = 409,
-      message = "Conflict",
-      reason  = "resource ${id} exists already" % { id = id },
-    }
-  end
-  local key    = self._key
-  local parent = self._parent
-  if parent and not Resource.exists (parent) then
-    error {
-      code    = 404,
-      message = "Not Found",
-      reason  = "parent resource ${id} does not exist" % { id = parent._id },
-    }
-  end
+  local target = self / t.identifier
+  local id     = target._id
+  local key    = target._key
+  local parent = target._parent
   local script = [[
-assert (redis.call ("EXISTS", ${resource}) == 0)
+assert (redis.call ("EXISTS", ${resource}) == 0
+    or  redis.call ("HEXISTS", ${resource}, "_properties") == 0
+    or  redis.call ("HEXISTS", ${resource}, "_see") == 1)
 assert (redis.call ("HEXISTS", ${parent}, "${key}") == 0)
+redis.call ("DEL", ${resource})
 redis.call ("HSET", ${parent}, "${key}", ${resource})
 redis.call ("HSET", ${resource}, "_properties", [=[${properties}]=])
 redis.call ("HSET", ${resource}, "_parent", ${parent})
@@ -119,8 +133,101 @@ redis.call ("PUBLISH", "${channel}", [=[${message}]=])
   end
   local data = store [id]
   data._properties = t
+  data._class      = require ("cosy.server.resource." .. t.type:lower ())
   data._parent     = parent._id
+  return target
+end
+
+function Resource:__sub (key)
+  assert (type (key) == "string")
+  local target = self / key
+  local id     = self._id
+  local script = [[
+assert (redis.call ("EXISTS", ${resource}) == 1)
+assert (redis.call ("HEXISTS", ${parent}, "${key}") == 1)
+redis.call ("HDEL", ${parent}, "${key}")
+redis.call ("HDEL", ${resource}, "_properties",)
+redis.call ("PUBLISH", "${channel}", [=[${message}]=])
+]] % {
+    parent     = "KEYS [1]",
+    resource   = "KEYS [2]",
+    key        = key,
+    channel    = channel,
+    message    = json.encode {
+      origin   = uuid,
+      {
+        resource = id,
+        action   = "delete",
+      }
+    },
+  }
+  local client = redis:get ()
+  if not pcall (function ()
+    client:eval (script, 2, self._id, target._id)
+  end) then
+    error {
+      code    = 409,
+      message = "Conflict",
+      reason  = "resource ${id} does not exist" % { id = id },
+    }
+  end
+  data._properties = nil
+  data._class      = nil
   return self
+end
+
+function Resource:move (target)
+  local source_parent = self._parent
+  local source_key    = self._key
+  local target_parent = target._parent
+  local target_key    = target._key
+  local script = [[
+assert (redis.call ("EXISTS", ${source}) == 1)
+assert (redis.call ("EXISTS", ${target}) == 0
+    or  redis.call ("HEXISTS", ${target}, "_properties") == 0
+    or  redis.call ("HEXISTS", ${target}, "_see") == 1)
+assert (redis.call ("HEXISTS", ${target_parent}, "${target_key}") == 0)
+redis.call ("DEL", ${target})
+redis.call ("RENAME", ${source}, ${target})
+redis.call ("HSET", ${target_parent}, "${target_key}", ${target})
+redis.call ("HDEL", ${source_parent}, "${source_key}")
+redis.call ("PUBLISH", "${channel}", [=[${message}]=])
+]] % {
+    source     = "KEYS [1]",
+    target     = "KEYS [2]",
+    source_parent = "KEYS [3]",
+    target_parent = "KEYS [4]",
+    source_key    = source_key,
+    target_key    = target_key,
+    channel    = channel,
+    message    = json.encode {
+      origin   = uuid,
+      {
+        resource = source_parent._id,
+        action   = "update",
+        keys     = { source_key },
+      },
+      {
+        resource = target_parent._id,
+        action   = "update",
+        keys     = { target_key },
+      },
+      {
+        resource = id,
+        action   = "move",
+      }
+    },
+  }
+  local client = redis:get ()
+  if not pcall (function ()
+    client:eval (script, 2, source._id, target._id, source_parent._id, target_parent._id)
+  end) then
+    error {
+      code    = 409,
+      message = "Conflict",
+    }
+  end
+  return target
 end
 
 function Resource:exists ()
@@ -131,7 +238,7 @@ end
 
 function Resource:__div (key)
   assert (type (key) == "string")
-  local context = self._context
+  local context = Context.clone (self._context)
   local id      = "${parent}/${key}" % {
     parent = self._id,
     key    = key,
@@ -155,6 +262,18 @@ end
 function Resource:__index (key)
   local id     = self._id
   local data   = store [id]
+  if data._see then
+    error {
+      code    = 301,
+      message = "Moved Permanently",
+      reason  = data._see,
+    }
+  elseif not data._properties then
+    error {
+      code    = 410,
+      message = "Gone",
+    }
+  end
   local class  = data._class
   if class [key] then
     return class [key]
@@ -278,6 +397,10 @@ end)
 do
   local Root   = require "cosy.server.resource.root"
   local client = redis:get (true)
+  if configuration.clean then
+    print "Flushing database..."
+    client:flushdb ()
+  end
   local script = [[
 assert (redis.call ("EXISTS", ${root}) == 0)
 redis.call ("HSET", ${root}, "_properties", [=[${properties}]=])
@@ -314,4 +437,5 @@ return {
     return Resource.root (context)
   end,
   exists = Resource.exists,
+  move   = Resource.move,
 }
