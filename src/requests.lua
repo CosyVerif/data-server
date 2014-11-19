@@ -6,6 +6,7 @@ local ltn12 = require "ltn12"
 local json  = require "cjson"
 
 -- GET /
+--[==[
 do
   print "GET /"
   local result = {}
@@ -28,6 +29,7 @@ do
   print (table.concat (result))
   assert (code == 200)
 end
+--]==]
 
 -- POST / user
 do

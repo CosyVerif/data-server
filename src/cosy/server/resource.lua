@@ -131,10 +131,7 @@ redis.call ("PUBLISH", "${channel}", [=[${message}]=])
       reason  = "resource ${id} exists already" % { id = id },
     }
   end
-  local data = store [id]
-  data._properties = t
-  data._class      = require ("cosy.server.resource." .. t.type:lower ())
-  data._parent     = parent._id
+  store [id] = nil
   return target
 end
 
@@ -171,8 +168,7 @@ redis.call ("PUBLISH", "${channel}", [=[${message}]=])
       reason  = "resource ${id} does not exist" % { id = id },
     }
   end
-  data._properties = nil
-  data._class      = nil
+  store [target._id] = nil
   return self
 end
 
@@ -213,14 +209,14 @@ redis.call ("PUBLISH", "${channel}", [=[${message}]=])
         keys     = { target_key },
       },
       {
-        resource = id,
+        resource = target._id,
         action   = "move",
       }
     },
   }
   local client = redis:get ()
   if not pcall (function ()
-    client:eval (script, 2, source._id, target._id, source_parent._id, target_parent._id)
+    client:eval (script, 2, self._id, target._id, source_parent._id, target_parent._id)
   end) then
     error {
       code    = 409,
@@ -409,27 +405,6 @@ redis.call ("HSET", ${root}, "_properties", [=[${properties}]=])
     properties = json.encode (Root.create ()),
   }
   pcall (function () client:eval (script, 1, root_id) end)
-
-  --[=[
-  local root = Resource.root ()
-  for _, s in ipairs {
-    "abcde",
-    "tata",
-    "tete",
-    "titi",
-    "toto",
-    "tutu",
-  } do
-    local r = root / s
-    pcall (function () Resource.create (r, Root.create ()) end)
-    r.machin = {}
-    r.machin.chose = s
-  end
-  print ("#", #root)
-  for k, v in pairs (root) do
-    print (k, v)
-  end
-  --]=]
 end
 
 return {

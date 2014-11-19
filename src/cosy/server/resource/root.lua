@@ -24,17 +24,23 @@ function Root:can_write ()
 end
 
 function Root:GET (context)
-  local result = {}
-  for k, v in pairs (self) do
-    result [#result + 1] = {
-      key        = k,
-      identifier = tostring (v),
-      is_owner   = v:is_owner  (context),
-      can_read   = v:can_read  (context),
-      can_write  = v:can_write (context),
-    }
+  local iter = pairs (self)
+  return function ()
+    repeat
+      local k, v = iter ()
+      if k == nil then
+        return nil
+      elseif v:can_read (context) then
+        return {
+          key        = k,
+          identifier = tostring (v),
+          is_owner   = v:is_owner  (context),
+          can_read   = v:can_read  (context),
+          can_write  = v:can_write (context),
+        }
+      end
+    until false
   end
-  return result
 end
 
 function Root:POST (context)
