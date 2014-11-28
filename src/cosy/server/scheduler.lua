@@ -1,201 +1,181 @@
-local socket = require "socket"
-
-local scheduler = {}
-
-scheduler._COROUTINE_TAG = {}
-scheduler._ITERATOR_TAG  = {}
-
-scheduler.threads = {}
-scheduler.last = 0
-
-function scheduler.addthread (f, ...)
-  local threads = scheduler.threads
-  local i     = #threads + 1
-  threads [i] = { co = coroutine.create (f), ps = table.pack (...) }
-  scheduler.last = math.max (i, scheduler.last)
-end
-
-function scheduler.addserver (skt, handler, timeout)
-  skt:settimeout (timeout or 0)
-  scheduler.addthread (function ()
-    while true do
-      local result, err = skt:accept ()
-      if not result and err == "timeout" then
-        if scheduler.last == 1 then
-          socket.sleep (0.01)
-        end
-        scheduler.yield ()
-      elseif not result then
-        error (err)
-      else
-        scheduler.addthread (function (skt)
-          pcall (handler, skt)
-          skt:close ()
-        end, scheduler.wrap (result))
-      end
-    end
-  end)
-end
-
-function scheduler.yield (...)
-  coroutine.yield (scheduler._COROUTINE_TAG, ...)
-end
-
-function scheduler.loop ()
-  local i     = 1
-  local threads = scheduler.threads
-  while #threads ~= 0 do
-    local current = threads [i]
-    if current ~= nil then
-      local result
-      if type (current) == "table" then
-        result    = { coroutine.resume (current.co, table.unpack (current.ps)) }
-        current   = current.co
-        threads [i] = current
-      else
-        result = { coroutine.resume (current) }
-      end
-      local status = result [1]
-      local tag    = result [2]
-      if status and tag and tag ~= scheduler._COROUTINE_TAG then
-        table.remove (result, 1)
-        table.remove (result, 1)
-        coroutine.yield (tag, table.unpack (result))
-      end
-      if coroutine.status (current) == "dead" then
-        threads [i] = nil
-        for j = scheduler.last, 1, -1 do
-          if threads [j] then
-            scheduler.last = j
-            break
-          end
-        end
-      end
-    end
-    i = i >= scheduler.last and 1 or i + 1
-  end
-end
-
-function scheduler.connect (skt, host, port)
-  skt:settimeout(0)
-  repeat
-    local ret, err = skt:connect (host, port)
-    if ret or err ~= "timeout" then
-      return ret, err
-    end
-    scheduler.yield ()
-  until false
-end
-
-function scheduler.settimeout (client, t)
-  client:settimeout (t)
-end
-
-function scheduler.receive (client, pattern)
-  pattern = pattern or "*l"
-  repeat
-    local s, err = client:receive (pattern)
-    if not s and err == "timeout" then
-      scheduler.yield ()
-    elseif not s then
-      error (err)
-    else
-      return s
-    end
-  until false
-end
-
-function scheduler.send (client, data, from, to)
-  from = from or 1
-  local s, err
-  local last = from - 1
-  repeat
-    s, err, last = client:send (data, last + 1, to)
-    if not s and err == "timeout" then
-      scheduler.yield ()
-    elseif not s then
-      error (err)
-    else
-      return s
-    end
-  until false
-end
-
-function scheduler.flush ()
-end
-
-function scheduler.setoption (client, option, value)
-  client:setoption (option, value)
-end
-
-function scheduler.close (client)
-  client:close ()
-end
-
 local Socket = {}
 
 Socket.__index = Socket
 
 function Socket:connect (host, port)
-  return scheduler.connect (self.skt, host, port)
-end
-
-function Socket:settimeout (t)
-  return scheduler.settimeout (self.skt, t)
-end
-
-function Socket:receive (pattern)
-  return scheduler.receive (self.skt, pattern)
-end
-
-function Socket:send (data, from, to)
-  return scheduler.send (self.skt, data, from, to)
-end
-
-function Socket:flush ()
-  return scheduler.flush (self.skt)
-end
-
-function Socket:setoption (option, value)
-  return scheduler.setoption (self.skt, option, value)
+  local coroutine = self.coroutine
+  local socket    = self.socket
+  socket:settimeout (0)
+  repeat
+    local ret, err = socket:connect (host, port)
+    if not ret and err == "timeout" then
+      coroutine.yield ()
+    elseif not ret then
+      return ret, err
+    else
+      ret:settimeout (0)
+      return ret
+    end
+  until false
 end
 
 function Socket:close ()
-  return scheduler.close (self.skt)
+  local socket = self.socket
+  socket:shutdown ()
+  socket:close ()
 end
 
-function scheduler.wrap (skt)
-  skt:settimeout (0)
-  return setmetatable ({
-    skt = skt
-  }, Socket)
-end
-
-function scheduler.iterator (f, t)
-  t = t or scheduler._ITERATOR_TAG
-  local co = coroutine.create (f)
-  return function ()
-    local result = { table.pack (coroutine.resume (co)) }
-    local status = result [1]
-    if not status then
-      error (result [2])
-    end
-    local tag = result [2]
-    table.remove (result, 1)
-    if tag == t then
-      table.remove (result, 1)
-      return table.unpack (result)
-    elseif tag == nil then
-      return
+function Socket:receive (pattern)
+  local coroutine = self.coroutine
+  local socket    = self.socket
+  socket:settimeout (0)
+  pattern = pattern or "*l"
+  repeat
+    local s, err = socket:receive (pattern)
+    if not s and err == "timeout" then
+      coroutine.yield ()
+    elseif not s then
+      error (err)
     else
-      local _, main = coroutine.running ()
-      if main then
-        error "Yield is caught by no wrap."
+      return s
+    end
+  until false
+end
+
+function Socket:send (data, from, to)
+  local coroutine = self.coroutine
+  local socket    = self.socket
+  socket:settimeout (0)
+  from = from or 1
+  local s, err
+  local last = from - 1
+  repeat
+    s, err, last = socket:send (data, last + 1, to)
+    if not s and err == "timeout" then
+      coroutine.yield ()
+    elseif not s then
+      error (err)
+    else
+      return s
+    end
+  until false
+end
+
+function Socket.flush ()
+end
+
+function Socket:setoption (option, value)
+  local socket = self.socket
+  socket:setoption (option, value)
+end
+
+function Socket:settimeout (t)
+  local socket = self.socket
+  socket:settimeout (t)
+end
+
+local Scheduler = {}
+
+Scheduler.__index = Scheduler
+
+function Scheduler.create ()
+  return setmetatable ({
+    threads   = {},
+    _last     = 0,
+    coroutine = require "coroutine.make" (),
+  }, Scheduler)
+end
+
+function Scheduler.addthread (scheduler, f, ...)
+  local threads   = scheduler.threads
+  local coroutine = scheduler.coroutine
+  local i         = #threads + 1
+  local args      = { ... }
+  threads [i]     = coroutine.create (function () f (table.unpack (args)) end)
+  scheduler._last = math.max (i, scheduler._last)
+end
+
+function Scheduler.addserver (scheduler, socket, handler)
+  local sleep     = require "socket" . sleep
+  local coroutine = scheduler.coroutine
+  socket:settimeout (0)
+  scheduler:addthread (function ()
+    while not scheduler.stopping do
+      local client, err = socket:accept ()
+      if not client and err == "timeout" then
+        if scheduler._last == 1 then
+          sleep (0.01)
+        else
+          coroutine.yield ()
+        end
+      elseif not client then
+        error (err)
       else
-        coroutine.yield (table.unpack (result))
+        scheduler:addthread (function ()
+          local status, err = pcall (handler, scheduler:wrap (client))
+          if not status then
+            print (err)
+          end
+          client:close ()
+        end)
       end
     end
+  end)
+end
+
+function Scheduler.pass (scheduler)
+  local coroutine = scheduler.coroutine
+  coroutine.yield ()
+end
+
+function Scheduler.stop (scheduler, brutal)
+  scheduler.stopping  = true
+  scheduler.addthread = function ()
+    error "Method addthread is disabled."
+  end
+  scheduler.addserver = function ()
+    error "Method addserver is disabled."
+  end
+  if brutal then
+    local threads = scheduler.threads
+    for i in pairs (threads) do
+      threads [i] = nil
+    end
+    scheduler._last = 0
   end
 end
 
-return scheduler
+function Scheduler.loop (scheduler)
+  local threads   = scheduler.threads
+  local coroutine = scheduler.coroutine
+  local i         = 1
+  while scheduler._last ~= 0 do
+    local current = threads [i]
+    if current ~= nil then
+      local status, err = coroutine.resume (current)
+      if not status then
+        print (err)
+      end
+      if coroutine.status (current) == "dead" then
+        threads [i] = nil
+        for j = scheduler._last, 0, -1 do
+          if threads [j] then
+            break
+          else
+            scheduler._last = j
+          end
+        end
+      end
+    end
+    i = i >= scheduler._last and 1 or i + 1
+  end
+end
+
+function Scheduler.wrap (scheduler, socket)
+  return setmetatable ({
+    coroutine = scheduler.coroutine,
+    socket    = socket,
+  }, Socket)
+end
+
+return Scheduler

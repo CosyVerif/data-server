@@ -1,4 +1,4 @@
-local scheduler = require "cosy.server.scheduler"
+local Scheduler = require "cosy.server.scheduler"
 local socket    = require "socket"
 
 local function format (n, unit)
@@ -20,14 +20,19 @@ end
 
 local skt = socket.bind ("127.0.0.1", 8080)
 
-scheduler.addserver (skt, function (skt)
+local scheduler = Scheduler.create ()
+
+scheduler:addserver (skt, function (skt)
   local lines = {}
   while true do
-    lines [#lines + 1] = skt:receive "*l"
+    local line = skt:receive "*l"
+    if line:find ("DELETE") then
+      print "Stopping scheduler"
+      scheduler:stop ()
+    end
+    lines [#lines + 1] = line
+    scheduler:pass ()
     if lines [#lines] == "" then
-      for _ = 1, 10 do
-        scheduler.yield ()
-      end
       skt:send [[HTTP/1.0 200 OK
 Connection: close
 ]]
@@ -38,16 +43,16 @@ end)
 
 --[[
 for _ = 1, 1000 do
-  scheduler.addthread (function (n)
+  scheduler:addthread (function (n)
     for _ = 1, n do
-      scheduler.yield ()
+      scheduler.coroutine.yield ()
     end
   end, 10)
 end
 --]]
 
 local start  = socket.gettime ()
-scheduler.loop ()
+scheduler:loop ()
 local finish = socket.gettime ()
 
 print ("Time"  , format ((finish - start) * 1000, "ms"))
